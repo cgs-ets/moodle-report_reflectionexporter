@@ -22,10 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use report_reflectionexporter\reflectionexportermanager;
+
 defined('MOODLE_INTERNAL') || die();
 
 class report_reflectionexporter_renderer extends plugin_renderer_base {
-
+   
     /**
      * Renders the template action icon
      *
@@ -36,10 +38,22 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
      * @return string
      */
     public function pick_action_icon(array $urls) {
+
+        $urls['newicon'] = new moodle_url('/report/reflectionexporter/pix/icon.png');
+        $urls['existingicon'] = new moodle_url('/report/reflectionexporter/pix/continueproc.png');
+
         echo $this->output->render_from_template('report_reflectionexporter/pick', $urls);
     }
 
-    public function render_viewer() {
-        echo $this->output->render_from_template('report_reflectionexporter/viewer', '');
+    public function render_viewer($courseid) {
+        $context = context_course::instance($courseid);
+        $data = new stdClass();
+        $data->courseid = $courseid;
+        $data->coursename = $context->get_context_name();
+        $data->showuseridentity = true;
+        
+        echo $this->output->render_from_template('report_reflectionexporter/viewer', $data);
     }
+
+    
 }

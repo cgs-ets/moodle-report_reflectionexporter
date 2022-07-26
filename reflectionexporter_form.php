@@ -63,8 +63,9 @@ class reflectionexporter_form extends moodleform {
         $mform->addRule('supervisorinitials', null, 'required');
 
         // Allocated students.
-        $manager = new reflectionexportermanager();
-        $students = ($manager->get_active_users($this->_customdata['id']));
+        //$manager = new reflectionexportermanager();
+        reflectionexportermanager::get_active_users($this->_customdata['id']);
+        $students =  reflectionexportermanager::get_active_users($this->_customdata['id']); //($manager->get_active_users($this->_customdata['id']));
         $studentsarray = array();
         foreach ($students as $uid => $student) {
             $studentsarray[$uid] = $student->firstname . ' ' . $student->lastname;

@@ -38,9 +38,12 @@ $PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 
 echo $OUTPUT->header();
+
+$PAGE->set_title('Reflection exporter');
 $renderer = $PAGE->get_renderer('report_reflectionexporter');
 $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php');
 $newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid]);
 $urls = ['existingproc' => $existingprocurl, 'newproc' => $newproc];
 $renderer->pick_action_icon($urls);
+
 echo $OUTPUT->footer();

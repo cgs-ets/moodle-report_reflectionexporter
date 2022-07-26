@@ -1,0 +1,14 @@
+<div data-region="user-selector" class="col-md-4 col-sm">
+    <div class="alignment">
+        <a href="#previous" data-action="previous-user">{{# pix }} i/return {{/ pix }}</a>
+        <span data-region="input-field">
+            <select class = "custom-select" data-action="change-user" data-currentuserid="{{userid}}" data-fileid="{{googledocid}}" data-groupid="{{groupid}}">
+                <option value = "0">Change User</option>
+                {{#users}}              
+                    <option value="{{userid}}">{{fullname}}</option>
+                {{/users}} 
+            </select>
+        </span>
+    <a href="#next" data-action="next-user">{{# pix }} e/forward {{/ pix }}</a>
+    </div>
+</div>

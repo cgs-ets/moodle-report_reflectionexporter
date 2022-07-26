@@ -65,8 +65,7 @@ trait save_pdfbase64 {
             )
         );
 
-        $manager = new reflectionexportermanager();
-        $manager->save_pdfbase64($pdfs);
+        reflectionexportermanager::save_pdfbase64($pdfs);
 
         return array(
             'status' => 'ok',

@@ -1,4 +1,30 @@
 #fitem_id_assessments #id_assessments {
     width: 30%;
 }
+
+/* Index Icons */
+#page-admin-report-reflectionexporter-index .actions {
+    display: block;
+    text-align: center;
+    margin-bottom: 1em;
+}
+
+#page-admin-report-reflectionexporter-index .actions .action {
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+    width: 150px;
+    text-align: center;
+    overflow: hidden;
+    margin: .5em;
+    padding: 1em;
+    border: 1px solid #aaa;
+}
+
+#page-admin-report-reflectionexporter-index .actions .action .action-text {
+    position: relative;
+    top: .4em;
+    font-size: 14px;
+    white-space: normal;
+}
 /* <a href="https://www.flaticon.com/free-icons/export" title="export icons">Export icons created by Uniconlabs - Flaticon</a> */

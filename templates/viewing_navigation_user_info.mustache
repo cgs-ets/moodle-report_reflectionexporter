@@ -1,0 +1,6 @@
+{{> report_reflectionexporter/loading }}
+{{#js}}
+    require(['report_reflectionexporter/viewing_navigation_user_info'], function(UserInfo) { 
+      new UserInfo('[data-region="user-info"]');
+    });
+{{/js}}

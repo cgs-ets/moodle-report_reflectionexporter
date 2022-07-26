@@ -23,22 +23,18 @@
  */
 
 define([
-    "jquery",
     "core/ajax",
     "core/log",
     "report_reflectionexporter/pdf-lib",
-], function ($, Ajax, Log, PDFLib) {
+], function (Ajax, Log, PDFLib) {
     "use strict";
 
     function init(data) {
-        Y.log("report_reflectionexporter init...");
-
         var control = new Controls(data);
         control.main();
     }
 
     function Controls(data) {
-        Y.log("report_reflectionexporter init...");
         this.data = data;
     }
 
@@ -47,13 +43,12 @@ define([
      *
      */
     Controls.prototype.main = function () {
-        Y.log("report_reflectionexporter main...");
         // Get the reflections data.
         this.getreflectionsjson();
 
     };
 
-    Controls.prototype.getreflectionsjson =  function () {
+    Controls.prototype.getreflectionsjson = function () {
         var self = this;
         Ajax.call([{
             methodname: "report_reflectionexporter_get_reflections",
@@ -72,20 +67,21 @@ define([
 
     // Returns an array with the users PDF enconded in base64
     Controls.prototype.processReflections = async function (users) {
-        Y.log("processReflections");
         const studentpdfs = [];
         for (var i = 0; i < users.length; i++) {
             const pdf = await this.fillformAndSave(users[i]);
-            
+
             const student = {
                 uid: users[i].reflections[0].userid,
+                courseid: this.data.cid,
+                rid:  this.data.rid,
                 pdf: pdf
             };
 
             studentpdfs.push(student);
 
         }
-        Y.log(studentpdfs);
+
         return studentpdfs;
 
     };
@@ -112,22 +108,28 @@ define([
         // document.getElementById("pdf").src = pdfDataUri;
 
     };
-
+    /**
+     * Fields to complete for the student
+     *  Candidate personal code: Text1
+     * First reflection session: Text3
+     *  Month first page: Dropdown1
+     *  DP: Dropdown2
+     *  supervisor id: Text5
+     * Second reflection: Text6
+     *  Month second page: Dropdown3
+     *  DP: Dropdown4
+     *  supervisor id: Text8
+     *  third reflection: Text9
+     *  Month third page: Dropdown5
+     *  DP: Dropdown6
+     *  supervisor id: Text11
+     * 
+     * @param {*} user 
+     * @param {*} form 
+     * @param {*} field 
+     */
     Controls.prototype.setFormFields = async function (user, form, field) {
-        // Fields to complete for the student:
-        //Candidate personal code: Text1
-        //First reflection session: Text3
-        //Month first page: Dropdown1
-        // DP: Dropdown2
-        // supervisor id: Text5
-        // Second reflection: Text6
-        //Month second page: Dropdown3
-        // DP: Dropdown4
-        // supervisor id: Text8
-        // third reflection: Text9
-        //Month third page: Dropdown5
-        // DP: Dropdown6
-        // supervisor id: Text11
+
         const fieldName = field.getName();
         switch (fieldName) {
             case "Text1": //Candaite personal code
@@ -180,7 +182,7 @@ define([
         Ajax.call([{
             methodname: "report_reflectionexporter_save_pdfbase64",
             args: {
-                pdfs:JSON.stringify(pdfs),
+                pdfs: JSON.stringify(pdfs),
             },
             done: function (response) {
                 console.log(response);
@@ -190,8 +192,6 @@ define([
             },
         }, ]);
     }
-
-
 
     return {
         init: init,

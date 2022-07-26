@@ -1,1 +1,14 @@
- <iframe id="pdf" style="width: 100%; height: 100%;"></iframe>
+<div data-region="grading-navigation-panel" 
+     data-first-userid="{{userid}}" 
+     data-courseid="{{courseid}}" 
+     data-showuseridentity="{{showuseridentity}}"
+     data-pdfid={{}}>
+   {{> report_reflectionexporter/viewer_navigation }}
+</div>
+
+    {{> report_reflectionexporter/view_panel }}
+
+<div data-region="overlay" class="moodle-has-zindex">
+    {{> report_reflectionexporter/save_in_progress }}
+</div>
+ 

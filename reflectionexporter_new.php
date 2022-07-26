@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use report_reflectionexporter\reflectionexportermanager;
+
 require_once('../../config.php');
 require_once('lib.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -37,15 +39,15 @@ admin_externalpage_setup('report_reflectionexporter', '', null, '', array('pagel
 $PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 
-$manager = new report_reflectionexporter\reflectionexportermanager();
+//$manager = new report_reflectionexporter\reflectionexportermanager();
 $courseurl = new moodle_url('/course/view.php', array('id' => $id));
-$aids = $manager->get_submitted_assessments($id);
+$aids = reflectionexportermanager::get_submitted_assessments($id);
 $mform = new reflectionexporter_form(null, ['id' => $id, 'cmid' => $cmid, 'aids' => $aids]);;
 
 if ($mform->is_cancelled()) {
     redirect($courseurl);
 } else if ($fromform = $mform->get_data()) {
-    $rid = $manager->collect_reflections($fromform);
+    $rid = reflectionexportermanager::collect_and_save_reflections($fromform);
     $fromform->rid = $rid;
     report_reflectionexporter_filemanager_postupdate($fromform);
     $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid);

@@ -23,6 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use report_reflectionexporter\reflectionexportermanager;
 
 require_once('../../config.php');
 require_once('lib.php');
@@ -36,21 +37,24 @@ $rid                     = required_param('rid', PARAM_INT); // id from mdl_repo
 require_login();
 admin_externalpage_setup('report_reflectionexporter', '', null, '', array('pagelayout' => 'report'));
 
-$PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
+$PAGE->add_body_class('report_reflectionexporter');
+$PAGE->set_pagelayout('embedded');
 
 echo $OUTPUT->header();
 $context = context_course::instance($id);
 
+reflectionexportermanager::get_file_url($context, $rid);
+
 $data = new stdClass();
-$url = moodle_url::make_pluginfile_url($context->id, 'report_reflectionexporter', 'attachment', $rid, '/', 'EERPPF_en.pdf', false);;
-$data->fileurl = $url->__toString();
+$data->fileurl = reflectionexportermanager::get_file_url($context, $rid);;
 $data->rid = $rid;
+$data->cid = $id;
 
 $PAGE->requires->js_call_amd('report_reflectionexporter/reflectionexporter', 'init', array($data));
 
-
 $renderer = $PAGE->get_renderer('report_reflectionexporter');
-$renderer->render_viewer();
+
+$renderer->render_viewer($id);
 
 echo $OUTPUT->footer();

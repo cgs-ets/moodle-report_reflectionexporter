@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="report/reflectionexporter/db" VERSION="20220725" COMMENT="XMLDB file for Moodle report/reflectionexporter"
+<XMLDB PATH="report/reflectionexporter/db" VERSION="20220726" COMMENT="XMLDB file for Moodle report/reflectionexporter"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -17,6 +17,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="student id"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The course the reflections assessments belongs to"/>
+        <FIELD NAME="refexid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id from mdl_report_reflectionexporter"/>
         <FIELD NAME="pdf" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
