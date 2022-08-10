@@ -41,5 +41,38 @@ $functions = [
         'type' => 'write', // DB rights of the WS function.
         'loginrequired' => true,
         'ajax' => true    // Is this service available to 'internal' ajax calls.
-    ]
+    ],
+    'report_reflectionexporter_get_pdfbase64' => [
+        'classname' => 'report_reflectionexporter\external\api', // Class containing a reference to the external function.
+        'methodname' => 'get_pdfbase64', // External function name.
+        'description' => 'Get PDF', // Human readable description of the WS function.
+        'type' => 'write', // DB rights of the WS function.
+        'loginrequired' => true,
+        'ajax' => true    // Is this service available to 'internal' ajax calls.
+    ],
+    'report_reflectionexporter_update_pdfbase64' => [
+        'classname' => 'report_reflectionexporter\external\api', // Class containing a reference to the external function.
+        'methodname' => 'update_pdfbase64', // External function name.
+        'description' => 'Update PDF with supervisor comment', // Human readable description of the WS function.
+        'type' => 'write', // DB rights of the WS function.
+        'loginrequired' => true,
+        'ajax' => true    // Is this service available to 'internal' ajax calls.
+    ],
+    'report_reflectionexporter_list_participants' => [
+        'classname' => 'report_reflectionexporter\external\api', // Class containing a reference to the external function.
+        'methodname' => 'list_participants', // External function name.
+        'description' => 'Returns the students to display in the reflection viewer selector', // Human readable description of the WS function.
+        'type' => 'read', // DB rights of the WS function.
+        'loginrequired' => true,
+        'ajax' => true    // Is this service available to 'internal' ajax calls.
+    ],
+    'report_reflectionexporter_get_participant' => [
+        'classname' => 'report_reflectionexporter\external\api', // Class containing a reference to the external function.
+        'methodname' => 'get_participant', // External function name.
+        'description' => 'Returns the student to display in the viewer', // Human readable description of the WS function.
+        'type' => 'read', // DB rights of the WS function.
+        'loginrequired' => true,
+        'ajax' => true    // Is this service available to 'internal' ajax calls.
+    ],
+
 ];

@@ -1,1 +1,10 @@
- <iframe id="pdf" style="width: 100%; height: 100%;"></iframe>
+{{! The content is  generated after calling JS }}
+{{#js}}
+require(['report_reflectionexporter/view_pdf'], function(ViewPDF) {
+    new ViewPDF();
+})
+{{/js}}
+
+
+
+

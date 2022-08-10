@@ -1,14 +1,19 @@
-<div data-region="grading-navigation-panel" 
-     data-first-userid="{{userid}}" 
+<div data-region="viewer-navigation-panel" 
+     data-first-userid="{{firstuserid}}" 
      data-courseid="{{courseid}}" 
      data-showuseridentity="{{showuseridentity}}"
-     data-pdfid={{}}>
+     data-rid="{{reflecid}}">
    {{> report_reflectionexporter/viewer_navigation }}
 </div>
-
+<div data-region="viewer-panel" class ='viewerPanel'>
+<div data-region = 'pdf-comment-container'>
     {{> report_reflectionexporter/view_panel }}
+    </div>
+</div>
 
 <div data-region="overlay" class="moodle-has-zindex">
     {{> report_reflectionexporter/save_in_progress }}
 </div>
  
+{{! Keeps a reference to the PDFS generated }}
+<div class = 'data-pdfjson' hidden data-pdfs = {{pdfjson}}></div>

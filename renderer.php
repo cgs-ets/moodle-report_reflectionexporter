@@ -27,7 +27,7 @@ use report_reflectionexporter\reflectionexportermanager;
 defined('MOODLE_INTERNAL') || die();
 
 class report_reflectionexporter_renderer extends plugin_renderer_base {
-   
+
     /**
      * Renders the template action icon
      *
@@ -45,15 +45,26 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         echo $this->output->render_from_template('report_reflectionexporter/pick', $urls);
     }
 
-    public function render_viewer($courseid) {
-        $context = context_course::instance($courseid);
-        $data = new stdClass();
-        $data->courseid = $courseid;
-        $data->coursename = $context->get_context_name();
-        $data->showuseridentity = true;
+    public function render_importing_process($data) {
         
-        echo $this->output->render_from_template('report_reflectionexporter/viewer', $data);
+        $info = new stdClass();
+        $context = context_course::instance($data->cid);
+        $info->message = 'Importing reflections to PDF. Please do not close the browser';
+        $data->coursename = $context->get_context_name(false, false, true);
+        $info->data =  json_encode($data);
+  
+        echo $this->output->render_from_template('report_reflectionexporter/generating_pdf', $info);
     }
 
-    
+    public function render_viewer($udata) {
+        $context = context_course::instance($udata->cid);
+        $data = new stdClass();
+        $data->courseid = $udata->cid;
+        $data->coursename = $context->get_context_name();
+        $data->showuseridentity = true;
+        $data->reflecid = $udata->rid;
+        $data->firstuserid = 0;
+
+        echo $this->output->render_from_template('report_reflectionexporter/viewer', $data);
+    }
 }

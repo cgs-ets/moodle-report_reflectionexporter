@@ -15,12 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *  External Web Service Template
- *
- * @package   mod_googledocs
- * @category
- * @copyright 2021 Veronica Bermegui
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    report
+ * @subpackage reflectionexporter
+ * @copyright  2022 Veronica Bermegui
  */
 
 namespace report_reflectionexporter\external;
@@ -65,11 +62,12 @@ trait save_pdfbase64 {
             )
         );
 
-        reflectionexportermanager::save_pdfbase64($pdfs);
+
+        $json = reflectionexportermanager::save_pdfbase64($pdfs);
 
         return array(
-            'status' => 'ok',
-            
+            'savedrecords' => json_encode($json),
+
         );
     }
 
@@ -82,7 +80,7 @@ trait save_pdfbase64 {
     public static function save_pdfbase64_returns() {
         return new external_single_structure(
             array(
-                'status' => new external_value(PARAM_TEXT, 'Save in DB status'),
+                'savedrecords' => new external_value(PARAM_TEXT, 'JSON with the created record'),
             )
         );
     }

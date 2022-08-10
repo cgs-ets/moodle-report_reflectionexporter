@@ -33,9 +33,17 @@ require_once('reflectionexporter_form.php');
 $id                      = optional_param('cid', 0, PARAM_INT); // Course ID.
 $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course module ID.
 $rid                     = required_param('rid', PARAM_INT); // id from mdl_report_reflectionexporter.
+$new                     = optional_param('n', 0, PARAM_INT); // new process or exisiting one
+$download                = optional_param('d', 0, PARAM_INT); // new process or exisiting one
+$datajson                = optional_param('datajson', 0, PARAM_RAW); // new process or exisiting one
 
 require_login();
 admin_externalpage_setup('report_reflectionexporter', '', null, '', array('pagelayout' => 'report'));
+
+if ($download) {
+    $file =  reflectionexportermanager::generate_zip($datajson);
+  
+}
 
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 $PAGE->add_body_class('report_reflectionexporter');
@@ -50,11 +58,13 @@ $data = new stdClass();
 $data->fileurl = reflectionexportermanager::get_file_url($context, $rid);;
 $data->rid = $rid;
 $data->cid = $id;
+$data->new = $new;
 
-$PAGE->requires->js_call_amd('report_reflectionexporter/reflectionexporter', 'init', array($data));
 
 $renderer = $PAGE->get_renderer('report_reflectionexporter');
 
-$renderer->render_viewer($id);
+
+$renderer->render_importing_process($data);
+;
 
 echo $OUTPUT->footer();

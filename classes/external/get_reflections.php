@@ -17,10 +17,9 @@
 /**
  *  External Web Service Template
  *
- * @package   mod_googledocs
- * @category
- * @copyright 2021 Veronica Bermegui
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    report
+ * @subpackage reflectionexporter
+ * @copyright  2022 Veronica Bermegui
  */
 
 namespace report_reflectionexporter\external;

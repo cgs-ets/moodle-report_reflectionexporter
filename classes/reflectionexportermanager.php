@@ -26,6 +26,7 @@ namespace report_reflectionexporter;
 use context_course;
 use moodle_url;
 use stdClass;
+use ZipArchive;
 
 class reflectionexportermanager {
 
@@ -52,17 +53,14 @@ class reflectionexportermanager {
         global $DB;
 
         $sql = "SELECT onlinetxt.*, asub.timemodified AS 'month', asub.userid
-                FROM {assign} AS assign 
+                FROM {assignsubmission_onlinetext} AS onlinetxt
                 JOIN {assign_submission} AS asub 
-                ON assign.id = asub.assignment
-                JOIN {assignsubmission_onlinetext} AS onlinetxt 
-                ON assign.id = onlinetxt.assignment
-                WHERE assign.course = ? 
-                AND asub.status = ? 
-                AND asub.assignment IN ( $assessids)
+                ON onlinetxt.submission = asub.id               
+                WHERE asub.status = ? 
+                AND asub.assignment IN ($assessids)
                 AND asub.userid = ?;";
 
-        $params = ['course' => $courseid, 'status' => 'submitted', 'userid' => $userid];
+        $params = ['status' => 'submitted', 'userid' => $userid];
         $results = $DB->get_records_sql($sql, $params);
         $context = $context = context_course::instance($courseid);
         // Format the text to keep new lines. If the student added images, process the URL to avoid warning. 
@@ -74,8 +72,8 @@ class reflectionexportermanager {
             $r->month = date('F', $r->month);
         }
 
-        $results = array_values($results);
 
+        $results = array_values($results);
         return $results;
     }
 
@@ -91,7 +89,7 @@ class reflectionexportermanager {
     }
 
     // Get the details of students selected in the form.
-    private static function get_selected_students($studentids) {
+    public static function get_selected_students($studentids) {
         global $DB;
 
         $ids = implode(',', $studentids);
@@ -102,26 +100,112 @@ class reflectionexportermanager {
 
         return $results;
     }
+
     // Save the PDF filled with the students reflections.
     public static function save_pdfbase64($pdfs) {
         global $DB;
         $pdfs = json_decode($pdfs);
         $dataobjects = [];
-      
+
         foreach ($pdfs as $pdf) {
             $data = new stdClass();
             $data->userid = $pdf->uid;
             $data->courseid = $pdf->courseid;
             $data->refexid = $pdf->rid; // id o mdl_report_reflectionexporter
             $data->pdf = $pdf->pdf;
+            $data->id = $DB->insert_record('report_reflec_exporter_pdf', $data, true);
+            unset($data->pdf); // Dont send it back
             $dataobjects[] = $data;
         }
 
-        $DB->insert_records('report_reflec_exporter_pdf', $dataobjects);
+        return $dataobjects;
+    }
+
+    // Update the PDF with the supervisor comment.
+    public static function update_pdfbase64($pdfdata) {
+        global $DB;
+
+        $dataobject = new stdClass();
+        $dataobject->id = $pdfdata->id;
+        $dataobject->pdf = $pdfdata->pdf;
+
+        $DB->update_record('report_reflec_exporter_pdf', $pdfdata);
+    }
+
+    public static function get_pdfbase64($rid) {
+        global $DB;
+        error_log(print_r($rid, true));
+        $sql  = "SELECT pdf FROM {report_reflec_exporter_pdf} WHERE id = ?";
+        $params = ['id' => $rid];
+
+        $r = $DB->get_record_sql($sql, $params);
+
+        return $r->pdf;
+    }
+
+    public static function generate_zip($data) {
+        global $DB, $CFG;
+        $data = json_decode($data);
+        error_log(print_r($data, true));
+        // Increase the server timeout to handle the creation and sending of large zip files.
+        \core_php_time_limit::raise();
+
+        $userids     = implode(',', array_column($data, 'userid'));
+        $exportids   = implode(',', array_column($data, 'id'));        // Id from mdl_report_reflec_exporter_pdf.
+        $refexpids   = array_column($data, 'refexid');  // Id from mdl_report_reflectionexporter.
+        $refexpids   = $refexpids[count($refexpids) - 1];
+        $courseid   = array_column($data, 'refexid');  // Id from mdl_report_reflectionexporter.
+        $courseid   = $courseid[count($courseid) - 1];
+
+
+        $sql = "SELECT  exp.*, u.lastname, u.firstname
+                FROM mdl_user as u 
+                INNER JOIN mdl_report_reflec_exporter_pdf exp  
+                ON u.id = exp.userid
+                WHERE u.id in ($userids) AND exp.id in ($exportids ) AND exp.refexid = $refexpids";
+
+        $results = $DB->get_records_sql($sql);
+
+        // Prepare Tmp File for Zip archive
+        $file = tempnam($CFG->tempdir, '/reflections');
+        $zip = new ZipArchive();
+        $zip->open($file, ZipArchive::OVERWRITE);
+
+        foreach ($results as $result) {
+            // COllect the pdfs
+            $filename = strtoupper($result->lastname) . '_' . $result->firstname . '_EE_RPPF_.pdf';
+            $zip->addFromString($filename, base64_decode($result->pdf));
+        }
+
+        // Close and send to users
+        $zip->close();
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/zip');
+        header('Content-Length: ' . filesize($file));
+        header('Content-Disposition: attachment; filename="file.zip"');
+        header('Pragma: public');
+        readfile($file);
+        unlink($file);
+
+       die();
+
+
+    }
+
+    // Returns student records based on the reflection export created.
+    public static function get_students_from_export($rid) {
+        global $DB;
+        $record = json_decode((reflectionexportermanager::get_reflections_json($rid))->{'reflections_json'});
+        $uids = array_column($record, 'uid');
+        $uids = implode(',', $uids);
+
+        $sql = "SELECT * FROM {user} WHERE id in ($uids)";
+        $students = $DB->get_records_sql($sql);
+
+        return $students;
     }
 
 
-  
     // Collect the reflections the student selected in the form did.
     // Save data in report_reflectionexporter table.
     public static function collect_and_save_reflections($data) {
@@ -139,6 +223,7 @@ class reflectionexportermanager {
             $us->dp = $user->profile['Year'] == '11' ? 1 : '2';
             $us->firstname = $user->firstname;
             $us->lastname = $user->lastname;
+            $us->uid = $user->id;
             $us->si = $data->supervisorinitials;
             $us->reflections = reflectionexportermanager::get_user_reflections($data->cid, $assessids, $user->id);
 

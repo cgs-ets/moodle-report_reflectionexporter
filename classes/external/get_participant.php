@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *  External Web Service Template
  *
- * @package   mod_googledocs
- * @category
- * @copyright 2020 Veronica Bermegui
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    report
+ * @subpackage reflectionexporter
+ * @copyright  2022 Veronica Bermegui
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 
 namespace report_reflectionexporter\external;
 
@@ -33,8 +33,6 @@ use external_single_structure;
 use core_user_external;
 
 require_once($CFG->libdir . '/externallib.php');
-require_once($CFG->dirroot . '/mod/googledocs/lib.php');
-require_once($CFG->dirroot . '/mod/googledocs/locallib.php');
 require_once($CFG->dirroot . "/user/lib.php");
 require_once("$CFG->dirroot/user/externallib.php");
 
@@ -51,12 +49,12 @@ trait get_participant {
         return new external_function_parameters(
             array(
                 'userid' => new external_value(PARAM_RAW, 'user ID'),
-                
+                'refid' => new external_value(PARAM_RAW, 'row id from mdl_report_reflectionexporter'),
             )
         );
     }
 
-    public static function get_participant($userid) {
+    public static function get_participant($userid, $refid) {
         global $COURSE, $DB;
 
         $context = \context_course::instance($COURSE->id);
@@ -67,31 +65,37 @@ trait get_participant {
             self::get_participant_parameters(),
             array(
                 'userid' => $userid,
+                'refid' => $refid
             )
         );
         // Get the File and grading details.
-        $sql = "SELECT u.id as userid, u.firstname, u.lastname, gf.* FROM mdl_googledocs_files as gf
-                INNER JOIN mdl_user as u ON gf.userid = u.id
-                WHERE googledocid = :googledocid and gf.userid = :userid
-                ORDER BY  u.firstname";
+        $sql = "SELECT ref.userid, u.firstname, 
+                    u.lastname, ref.pdf, ref.courseid
+                FROM mdl_report_reflec_exporter_pdf AS ref
+                INNER JOIN mdl_user AS u ON ref.userid = u.id
+                WHERE ref.refexid = :refid AND ref.userid = :userid";
 
-        $results = $DB->get_records_sql($sql, array('googledocid' => $googledocid, 'userid' => $userid));
+        $params = ['refid' => $refid, 'userid' => $userid];;
+        $results = $DB->get_records_sql($sql, $params);
 
-        $filegradedata = new \stdClass();
+        $file = new \stdClass();
+        
         foreach ($results as $record) {
-            $filegradedata->fileurl = $record->url;
-            list($filegradedata->grade, $filegradedata->comment) = get_grade_comments($googledocid, $record->userid);
+            $file->pdf = $record->pdf;
+            $file->courseid = $record->courseid;
         }
-        $participant = $DB->get_record('user', array('id' => $userid));
 
+        $participant = $DB->get_record('user', array('id' => $userid));
         $user = (object) user_get_user_details($participant);
 
-        return [
+        $result = [
             'id' => $user->id,
             'fullname' => $user->fullname,
-            'fileurl' => $filegradedata->fileurl,
+            'pdf' => $file->pdf,
             'user' => $user
         ];
+
+        return $result;
     }
 
     /**
@@ -106,10 +110,7 @@ trait get_participant {
         return new external_single_structure(array(
             'id' => new external_value(PARAM_INT, 'ID of the user'),
             'fullname' => new external_value(PARAM_NOTAGS, 'The fullname of the user'),
-            'fileurl' => new external_value(PARAM_RAW, 'URL'),
-            'commentgiven' => new external_value(PARAM_RAW, 'URL'),
-            'gradegiven' => new external_value(PARAM_RAW, 'URL'),
-            'groupid' => new external_value(PARAM_INT, 'for group assignments this is the group id', VALUE_OPTIONAL),
+            'pdf' => new external_value(PARAM_RAW, 'PDF encoded in base64'),
             'user' => $userdescription
         ));
     }

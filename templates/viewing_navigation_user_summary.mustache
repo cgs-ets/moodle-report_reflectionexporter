@@ -36,7 +36,7 @@
         "profileimageurl": "https://moodle.org/pix/u/f3.png"
     }
 }}
-<h4>
+<h4 id = "user-summary">
     <a href="{{globals.config.wwwroot}}/user/view.php?id={{id}}&course={{courseid}}">
       {{#profileimageurl}}
         <img src="{{profileimageurl}}" class="img-rounded" height="40" role="presentation"/>
@@ -44,4 +44,5 @@
       {{fullname}}
       <em class='nowrap'><small> {{identity}} </small></em>
     </a>
+    
 </h4>

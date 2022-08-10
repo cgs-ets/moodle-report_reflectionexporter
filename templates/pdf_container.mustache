@@ -1,0 +1,28 @@
+{{! PDF Section }}
+<div data-region="viewer" id="viewerContainer" tabindex="0">
+    <div id="viewer" class="pdfViewer"></div>       
+</div>
+{{! Comment section }}
+<div class = "supervisor-comment">
+<form>
+  <div class="form-group">
+    <label for="comment"><strong>Supervisor comments:</strong></label>
+    <textarea class="form-control" id="comment" rows="10"></textarea>
+  </div>
+   <button type="submit" class="btn btn-primary save-show-next-btn">Save and show next</button>
+</form>
+<div class="next-action next-action-hidden" >
+<a class="action btn btn-lg" href="{{courseurl}}">
+    <img class="icon iconsize-big" alt="" aria-hidden="true" src="http://localhost/cgs/moodle/report/reflectionexporter/pix/floppy-disk.png">
+    <div class="action-text">Save for later</div>
+</a>
+<form id ="zipform" method = "post" action = "{{downloadaction}}">
+  <input name="datajson" type="hidden" value="{{datajson}}">
+<a class="action btn btn-lg" id = "download">
+    <img class="icon iconsize-big" alt="" aria-hidden="true" src="http://localhost/cgs/moodle/report/reflectionexporter/pix/zip.png">
+    <div class="action-text">Download </div>
+</a>
+</form>
+</div>
+</div>
+

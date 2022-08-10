@@ -34,5 +34,9 @@ use external_api;
 class api extends external_api {
     use get_reflections;
     use save_pdfbase64;
+    use list_participants;
+    use get_participant;
+    use update_pdfbase64;
+    use get_pdfbase64;  
 
 }

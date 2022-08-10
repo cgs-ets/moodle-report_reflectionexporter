@@ -23,19 +23,30 @@
  */
 
 define([
+    "jquery",
     "core/ajax",
     "core/log",
     "report_reflectionexporter/pdf-lib",
-], function (Ajax, Log, PDFLib) {
+    "core/templates",
+
+], function ($, Ajax, Log, PDFLib, Templates) {
     "use strict";
 
-    function init(data) {
+    function init(data, coursename) {
         var control = new Controls(data);
         control.main();
     }
 
     function Controls(data) {
         this.data = data;
+        this.CANDIDATE_PERSONAL_CODE = 'Text1';
+        this.FIRST_REFLECTION_SESSION = 'Text3';
+        this.FIRST_REFLECTION_SESSION_SUPERVISOR_INITIALS = 'Text5';
+        this.INTERIM_REFLECTION = 'Text6';
+        this.INTERIM_REFLECTION_SUPERVISOR_INITIALS = 'Text8';
+        this.FINAL_REFLECTION = 'Text9';
+        this.FINAL_REFLECTION_SUPERVISOR_INITIALS = 'Text11';
+        this.SUPERVISOR_COMMENT = 'Text12';
     }
 
     /**
@@ -44,20 +55,33 @@ define([
      */
     Controls.prototype.main = function () {
         // Get the reflections data.
-        this.getreflectionsjson();
+
+        if (this.data.new == 1) {
+            this.getreflectionsjson()
+
+        } else {
+            this.getreflectionspdf();
+        }
 
     };
 
-    Controls.prototype.getreflectionsjson = function () {
+    Controls.prototype.getreflectionspdf = function () {
+        console.log("Viene....");
+    }
+    Controls.prototype.getreflectionsjson = async function () {
         var self = this;
+
         Ajax.call([{
             methodname: "report_reflectionexporter_get_reflections",
             args: {
                 rid: this.data.rid,
             },
             done: async function (response) {
-                const pdfs = await self.processReflections(JSON.parse(response.reflecjson));
+                const users = JSON.parse(response.reflecjson);
+                const pdfs = await self.processReflections(users);
+
                 self.savePDFInDB(pdfs);
+
             },
             fail: function (reason) {
                 Log.error(reason);
@@ -74,7 +98,7 @@ define([
             const student = {
                 uid: users[i].reflections[0].userid,
                 courseid: this.data.cid,
-                rid:  this.data.rid,
+                rid: this.data.rid,
                 pdf: pdf
             };
 
@@ -100,13 +124,6 @@ define([
         // Return the base64 PDF
         return await pdfDoc.saveAsBase64();
 
-        // const pdfDataUri = await pdfDoc.saveAsBase64({
-        //     dataUri: true
-        // });
-
-        // //console.log(pdfDataUri);
-        // document.getElementById("pdf").src = pdfDataUri;
-
     };
     /**
      * Fields to complete for the student
@@ -129,14 +146,14 @@ define([
      * @param {*} field 
      */
     Controls.prototype.setFormFields = async function (user, form, field) {
-
+        var self = this;
         const fieldName = field.getName();
         switch (fieldName) {
-            case "Text1": //Candaite personal code
+            case self.CANDIDATE_PERSONAL_CODE: //Candaite personal code "Text1"
                 Y.log(user);
                 form.getTextField(fieldName).setText(String(user.id));
                 break;
-            case "Text3": // First reflection session (1st page)
+            case self.FIRST_REFLECTION_SESSION: // First reflection session (1st page) "Text3"
                 form.getTextField(fieldName).setText(JSON.parse(user.reflections[0].onlinetext));
                 break;
             case "Dropdown1": // Month
@@ -145,10 +162,10 @@ define([
             case "Dropdown2": // DP
                 form.getDropdown(fieldName).select(String(user.dp)); // just to make sure that we are sending a string
                 break;
-            case "Text5": // Supervisor initials
+            case self.FIRST_REFLECTION_SESSION_SUPERVISOR_INITIALS: // Supervisor initials "Text5"
                 form.getTextField(fieldName).setText(String(user.si));
                 break;
-            case "Text6": // Interim reflection (2nd page)
+            case self.INTERIM_REFLECTION: // Interim reflection (2nd page) "Text6"
                 form.getTextField(fieldName).setText(JSON.parse(user.reflections[1].onlinetext));
                 break;
             case "Dropdown3": // Month
@@ -157,10 +174,10 @@ define([
             case "Dropdown4": // DP
                 form.getDropdown(fieldName).select(String(user.dp));
                 break;
-            case "Text8": // Supervisor initials
+            case self.INTERIM_REFLECTION_SUPERVISOR_INITIALS: // Supervisor initials "Text8"
                 form.getTextField(fieldName).setText(String(user.si));
                 break;
-            case "Text9": // Final reflection (3rd page)
+            case self.FINAL_REFLECTION: // Final reflection (3rd page) "Text9"
                 form.getTextField(fieldName).setText(JSON.parse(user.reflections[2].onlinetext));
                 break;
             case "Dropdown5": // Month
@@ -169,7 +186,7 @@ define([
             case "Dropdown6": //DP //dp
                 form.getDropdown(fieldName).select(String(user.dp));
                 break;
-            case "Text11": // Supervisor initials
+            case self.FINAL_REFLECTION_SUPERVISOR_INITIALS: // Supervisor initials "Text11"
                 form.getTextField(fieldName).setText(String(user.si));
                 break;
         }
@@ -177,15 +194,35 @@ define([
 
     // Call WS to save pdf data in DB.
     Controls.prototype.savePDFInDB = function (pdfs) {
-        Y.log("savePDFInDB");
-        Y.log(pdfs);
+        var self = this;
+
+        const pdfjson = JSON.stringify(pdfs);
         Ajax.call([{
             methodname: "report_reflectionexporter_save_pdfbase64",
             args: {
-                pdfs: JSON.stringify(pdfs),
+                pdfs: pdfjson,
             },
             done: function (response) {
-                console.log(response);
+                
+                const context = {
+                    pdfjson: response.savedrecords,
+                    courseid: self.data.cid,
+                    coursename: self.data.coursename,
+                    showuseridentity: true,
+                    reflecid: self.data.rid,
+                    firstuserid: 0,
+                }
+
+                Templates.render('report_reflectionexporter/viewer', context)
+                    .done(function (html, js) {
+                        $(document.querySelector('.importing-animation')).fadeOut("fast", function () {
+                            Templates.replaceNodeContents($(document.querySelector('.importing-animation')), html, js);
+                            $(document.querySelector('.importing-animation')).fadeIn("fast");
+                        }.bind(this));
+                    }).fail(function (ex) {
+                        console.log(ex);
+                    });
+
             },
             fail: function (reason) {
                 Log.error(reason);

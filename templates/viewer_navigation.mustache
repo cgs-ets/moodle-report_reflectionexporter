@@ -1,22 +1,24 @@
 <div class="container-fluid">
-    <div data-region="grading-navigation" class="row grading-container">
-        <div data-region="reflectionexporter-info" class="col-md-4 col-sm" data-courseid = {{courseid}}>
+<div data-region="viewer-navigation" class="row reflection-container">
+
+<div data-region="reflectionexporter-info" class="col-md-4 col-sm" data-courseid = "{{courseid}}">
             {{! Course name & link.}}
-            <a href="{{config.wwwroot}}/course/view.php?id={{courseid}}" title="{{{coursename}}}">{{{coursename}}}</a><br/>
-        </div>
+<a href="{{globals.config.wwwroot}}/course/view.php?id={{courseid}}" id = "courseurl" title="{{{coursename}}}">Course: {{{coursename}}}</a><br/>
+</div>
         {{! Current user name and info }}
-        <div data-region="user-info" class="col-md-4 col-sm" data-pdfid="{{}}" data-userid="{{userid}}">
-            {{> report_reflectionexporter/viewing_navigation_user_info }}
-        </div>
+<div data-region="user-info" class="col-md-4 col-sm" data-rid="{{reflecid}}" data-userid="{{userid}}">
+    {{> report_reflectionexporter/viewing_navigation_user_info }}
+</div>
         {{! User selector widget }}
-        <div data-region="user-selector" class="col-md-4 col-sm">
-        <div class="alignment">
-            {{> report_reflectionexporter/viewing_navigation_user_selector }}
-        </div>
+<div data-region="user-selector" class="col-md-4 col-sm">
+    <div class="alignment">
+        {{> report_reflectionexporter/viewing_navigation_user_selector }}
+    </div>
+</div>
 </div>
 {{#js}}
-require(['report_reflectionexporter/viewing_navigation'], function(ViewingNavigation) {
-    new ViewingNavigation('[data-region="user-selector"]');
+require(['report_reflectionexporter/viewing_navigation'], function(viewingNavigation) {
+    new viewingNavigation('[data-region="user-selector"]');
 });
 {{/js}}
 

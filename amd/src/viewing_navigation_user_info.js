@@ -23,7 +23,7 @@
  * @copyright  2022 Veronica Bermegui
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later 
  */
- define(['jquery', 'core/notification', 'core/ajax', 'core/templates'], function($, notification, ajax, templates) {
+define(['jquery', 'core/notification', 'core/ajax', 'core/templates', 'report_reflectionexporter/view_pdf', 'report_reflectionexporter/viewer_panel'], function ($, notification, ajax, templates, viewPDF, ViewerPanel) {
 
     /**
      * UserInfo class.
@@ -31,7 +31,7 @@
      * @class UserInfo
      * @param {String} selector The selector for the page region containing the user navigation.
      */
-    var UserInfo = function(selector) {
+    var UserInfo = function (selector) {
         this._regionSelector = selector;
         this._region = $(selector);
         this._userCache = {};
@@ -55,11 +55,11 @@
      * Get the assignment id
      *
      * @private
-     * @method getFileId
+     * @method getRefExporterId
      * @return {Integer} assignment id
      */
-    UserInfo.prototype.getFileId = function() {
-        return this._region.attr('data-assignmentid');
+    UserInfo.prototype.getRefExporterId = function () {
+        return this._region.attr('data-rid');
     };
 
     /**
@@ -70,7 +70,7 @@
      * @param {Event} event
      * @param {Number} userid
      */
-    UserInfo.prototype._refreshUserInfo = function(event, userid) {
+    UserInfo.prototype._refreshUserInfo = function (event, userid) {
         var promise = $.Deferred();
 
         // Put the current user ID in the DOM so yui can access it.
@@ -83,19 +83,19 @@
         this._lastUserId = userid;
 
         // First insert the loading template.
-        templates.render('report_reflectionexporter/loading', {}).done(function(html, js) {
+        templates.render('report_reflectionexporter/loading', {}).done(function (html, js) {
             // Update the page.
-            this._region.fadeOut("fast", function() {
+            this._region.fadeOut("fast", function () {
                 templates.replaceNodeContents(this._region, html, js);
                 this._region.fadeIn("fast");
             }.bind(this));
 
             if (userid < 0) {
                 // Render the template.
-                templates.render('report_reflectionexporter/viewing_navigation_no_users', {}).done(function(html, js) {
+                templates.render('report_reflectionexporter/viewing_navigation_no_users', {}).done(function (html, js) {
                     if (userid == this._lastUserId) {
                         // Update the page.
-                        this._region.fadeOut("fast", function() {
+                        this._region.fadeOut("fast", function () {
                             templates.replaceNodeContents(this._region, html, js);
                             this._region.fadeIn("fast");
                         }.bind(this));
@@ -108,17 +108,16 @@
                 promise.resolve(this._userCache[userid]);
             } else {
                 // Load context from ajax.
-                var assignmentId = this.getFileId();
+                var rid = this.getRefExporterId();
                 var requests = ajax.call([{
                     methodname: 'report_reflectionexporter_get_participant',
                     args: {
                         userid: userid,
-                        assignid: assignmentId,
-                        embeduser: true
+                        refid: rid
                     }
                 }]);
 
-                requests[0].done(function(participant) {
+                requests[0].done(function (participant) {
                     if (!participant.hasOwnProperty('id')) {
                         promise.reject('No users');
                     } else {
@@ -128,49 +127,47 @@
                 }.bind(this)).fail(notification.exception);
             }
 
-            promise.done(function(context) {
-                var identityfields = $('[data-showuseridentity]').data('showuseridentity').split(','),
-                    identity = [];
+            promise.done(function (context) {
+
                 // Render the template.
-                context.courseid = $('[data-region="grading-navigation-panel"]').attr('data-courseid');
+                context.courseid = $('[data-region="viewer-navigation-panel"]').attr('data-courseid');
 
                 if (context.user) {
-                    // Build a string for the visible identity fields listed in showuseridentity config setting.
-                    $.each(identityfields, function(i, k) {
-                        if (typeof context.user[k] !== 'undefined' && context.user[k] !== '') {
-                            context.hasidentity = true;
-                            identity.push(context.user[k]);
-                        }
-                    });
-                    context.identity = identity.join(', ');
-
+                    context.identity = context.user.email;;
                     // Add profile image url to context.
                     if (context.user.profileimageurl) {
                         context.profileimageurl = context.user.profileimageurl;
                     }
                 }
 
-                templates.render('report_reflectionexporter/viewing_navigation_user_summary', context).done(function(html, js) {
+                templates.render('report_reflectionexporter/viewing_navigation_user_summary', context).done(function (html, js) {
                     // Update the page.
                     if (userid == this._lastUserId) {
-                        this._region.fadeOut("fast", function() {
+                        this._region.fadeOut("fast", function () {
                             templates.replaceNodeContents(this._region, html, js);
                             this._region.fadeIn("fast");
                         }.bind(this));
+
+                       
+
                     }
                 }.bind(this)).fail(notification.exception);
-            }.bind(this)).fail(function() {
-                // Render the template.
-                templates.render('report_reflectionexporter/viewing_navigation_no_users', {}).done(function(html, js) {
-                    // Update the page.
-                    this._region.fadeOut("fast", function() {
-                        templates.replaceNodeContents(this._region, html, js);
-                        this._region.fadeIn("fast");
-                    }.bind(this));
-                }.bind(this)).fail(notification.exception);
-            }
-            .bind(this));
+
+
+            }.bind(this)).fail(function () {
+                    // Render the template.
+                    templates.render('report_reflectionexporter/viewing_navigation_no_users', {}).done(function (html, js) {
+                        // Update the page.
+                        this._region.fadeOut("fast", function () {
+                            templates.replaceNodeContents(this._region, html, js);
+                            this._region.fadeIn("fast");
+                        }.bind(this));
+                    }.bind(this)).fail(notification.exception);
+                }
+                .bind(this));
         }.bind(this)).fail(notification.exception);
+
+
     };
 
     return UserInfo;

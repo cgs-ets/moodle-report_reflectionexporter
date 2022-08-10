@@ -7,4 +7,18 @@
         <license>Apache</license>
         <licenseversion>2.0</licenseversion>
     </library>
+     <library>
+        <location>amd/src/pdf.js</location>
+        <name>PDF.js</name>
+        <version>2.10.37</version>
+        <license>Apache</license>
+        <licenseversion>2.0</licenseversion>
+    </library>
+    <library>
+        <location>amd/src/pdf.worker.js</location>
+        <name>pdf.worker.js</name>
+        <version></version>
+        <license>Apache</license>
+        <licenseversion>2.0</licenseversion>
+    </library>
 </libraries>

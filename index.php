@@ -39,11 +39,17 @@ $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 
 echo $OUTPUT->header();
 
-$PAGE->set_title('Reflection exporter');
-$renderer = $PAGE->get_renderer('report_reflectionexporter');
-$existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php');
-$newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid]);
-$urls = ['existingproc' => $existingprocurl, 'newproc' => $newproc];
-$renderer->pick_action_icon($urls);
+
+if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
+    \core\notification::add(get_string('cantdisplayerror', 'report_reflectionexporter'), core\output\notification::NOTIFY_ERROR);
+} else {
+    $PAGE->set_title('Reflection exporter');
+
+    $renderer = $PAGE->get_renderer('report_reflectionexporter');
+    $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 0]);
+    $newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 1]);
+    $urls = ['existingproc' => $existingprocurl, 'newproc' => $newproc];
+    $renderer->pick_action_icon($urls);
+}
 
 echo $OUTPUT->footer();

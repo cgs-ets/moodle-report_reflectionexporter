@@ -39,3 +39,4 @@ $string['action-text-new'] = 'New export';
 $string['reflection-exporter-heading'] = 'Reflection exporter';
 $string['savingchanges'] = 'Saving changes';
 $string['nousersselected'] = 'No user selected';
+$string['cantdisplayerror'] = 'Reflection exporter is only functional in courses.';
