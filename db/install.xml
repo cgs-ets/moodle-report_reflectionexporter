@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="report/reflectionexporter/db" VERSION="20220726" COMMENT="XMLDB file for Moodle report/reflectionexporter"
+<XMLDB PATH="report/reflectionexporter/db" VERSION="20220811" COMMENT="XMLDB file for Moodle report/reflectionexporter"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -8,6 +8,7 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="reflections_json" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON with the information needed to generate PDFS"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="2" NOTNULL="true" DEFAULT="NS" SEQUENCE="false" COMMENT="Status of the download. It can be NS: Not Started, S: Started, F: Finished"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

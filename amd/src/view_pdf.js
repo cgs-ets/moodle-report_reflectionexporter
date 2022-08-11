@@ -191,6 +191,9 @@ define([
             //Text12: Supervisor comments.
             const commentsupervisor = form.getField('Text12');
             commentsupervisor.setText(commentEl.value);
+            
+            // Flatten the form's fields. This makes the pdf uneditable.
+            form.flatten();
             // Save the PDF with the teacher comment
             const pdf = await pdfDoc.saveAsBase64();
 
@@ -242,7 +245,7 @@ define([
                     }
 
                 } else {
-                    TODO: //mostrar la opcion para armar el zip
+                  
                     console.log("final");
                     console.log(self);
                     //Display the actions
@@ -259,23 +262,8 @@ define([
 
     ViewPDF.prototype._zipdownload = function (e) {
       //  e.preventDefault();
-         document.getElementById('zipform').submit()
-        // Ajax.call([{
-        //     methodname: "report_reflectionexporter_get_zip",
-        //     args: {
-        //         data: document.querySelector('.data-pdfjson').getAttribute('data-pdfs'),
-        //     },
-        //     done: function (response) {
-        //         console.log(response);
-        //         window.location = response.file;
-
-        //     },
-        //     fail: function (reason) {
-        //         console.log(reason);
-        //     },
-        // }, ]);
-
-        // TODO: crear un servicio que va a descargar el zip
+        document.getElementById('zipform').submit();
+     
     }
 
     return ViewPDF;

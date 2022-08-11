@@ -41,7 +41,8 @@ require_login();
 admin_externalpage_setup('report_reflectionexporter', '', null, '', array('pagelayout' => 'report'));
 
 if ($download) {
-    $file =  reflectionexportermanager::generate_zip($datajson);
+    reflectionexportermanager::generate_zip($datajson);
+    $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/report/reflectionexporter/helper.js'));
   
 }
 
@@ -50,6 +51,7 @@ $PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_pagelayout('embedded');
 
 echo $OUTPUT->header();
+
 $context = context_course::instance($id);
 
 reflectionexportermanager::get_file_url($context, $rid);
@@ -60,11 +62,9 @@ $data->rid = $rid;
 $data->cid = $id;
 $data->new = $new;
 
-
 $renderer = $PAGE->get_renderer('report_reflectionexporter');
 
-
 $renderer->render_importing_process($data);
-;
+
 
 echo $OUTPUT->footer();
