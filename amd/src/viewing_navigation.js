@@ -50,11 +50,6 @@ define(['jquery', 'core/notification', 'core/str', 'core/ajax'],
 
             $(document).on('user-changed', this._refreshSelector.bind(this));
 
-            // var userid = $('[data-region="viewer-navigation-panel"]').data('first-userid');
-
-            // if (userid) {
-            //     this._selectUserById(userid);
-            // }
 
             $(document).bind("start-loading-user", function () {
                 this._isLoading = true;

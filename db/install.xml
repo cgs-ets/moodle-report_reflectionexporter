@@ -9,6 +9,7 @@
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="reflections_json" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON with the information needed to generate PDFS"/>
         <FIELD NAME="status" TYPE="char" LENGTH="2" NOTNULL="true" DEFAULT="NS" SEQUENCE="false" COMMENT="Status of the download. It can be NS: Not Started, S: Started, F: Finished"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Time the process started"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

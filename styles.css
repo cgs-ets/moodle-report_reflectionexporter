@@ -112,6 +112,11 @@
     transform: translateY(4px);
 }
 
+
+.report_reflectionexporter .select-work {
+    width: 25%;
+}
+
 /**
 @media (max-width: 900px) {
     [data-region="pdf-comment-container"] {

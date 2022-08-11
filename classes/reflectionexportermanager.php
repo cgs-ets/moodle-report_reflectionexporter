@@ -30,7 +30,8 @@ use ZipArchive;
 
 class reflectionexportermanager {
 
-
+    const STARTED = 'S';
+    const FINISHED = 'F';
     // Get the course's assessments that have submissions and the submission type is onlinetext.
     public static function get_submitted_assessments($courseid) {
         global $DB;
@@ -134,7 +135,7 @@ class reflectionexportermanager {
 
     public static function get_pdfbase64($rid) {
         global $DB;
-        error_log(print_r($rid, true));
+        
         $sql  = "SELECT pdf FROM {report_reflec_exporter_pdf} WHERE id = ?";
         $params = ['id' => $rid];
 
@@ -179,17 +180,40 @@ class reflectionexportermanager {
 
         // Close and send to users
         $zip->close();
+        $foldername = date('Y') . ' EE RPPF.zip';
         header('Content-Description: File Transfer');
         header('Content-Type: application/zip');
         header('Content-Length: ' . filesize($file));
-        header('Content-Disposition: attachment; filename="file.zip"');
+        header('Content-Disposition: attachment; filename=" ' . $foldername . '"');
         header('Pragma: public');
         readfile($file);
         unlink($file);
 
-       die();
+        // Update status 
+      
+        reflectionexportermanager::update_download_status($refexpids);
 
+        die();
+    }
 
+    public static function update_download_status($id) {
+        global $DB;
+        // Update status 
+        $dataobject = new stdClass();
+        $dataobject->id = $id;
+        $dataobject->status = reflectionexportermanager::FINISHED;
+        
+        $DB->update_record('report_reflectionexporter', $dataobject);
+    }
+
+    public static function get_unfinished_process () {
+        global $DB;
+
+        $sql = "SELECT * FROM mdl_report_reflectionexporter WHERE status = ? ";
+        $params = ['status' => reflectionexportermanager::STARTED];
+
+        $results = $DB->get_records_sql($sql, $params);
+        
     }
 
     // Returns student records based on the reflection export created.
@@ -234,6 +258,7 @@ class reflectionexportermanager {
         $reflections = json_encode($reflections);
         $dataobject = new stdClass();
         $dataobject->reflections_json = $reflections;
+        $dataobject->timecreated = time();
         $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
 
         return $rid;

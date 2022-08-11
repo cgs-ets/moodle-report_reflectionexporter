@@ -41,7 +41,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
 
         $urls['newicon'] = new moodle_url('/report/reflectionexporter/pix/icon.png');
         $urls['existingicon'] = new moodle_url('/report/reflectionexporter/pix/continueproc.png');
-
+// TODO: add the process started in the table.
         echo $this->output->render_from_template('report_reflectionexporter/pick', $urls);
     }
 

@@ -42,7 +42,6 @@ admin_externalpage_setup('report_reflectionexporter', '', null, '', array('pagel
 
 if ($download) {
     reflectionexportermanager::generate_zip($datajson);
-    $PAGE->requires->js(new moodle_url($CFG->wwwroot . '/report/reflectionexporter/helper.js'));
   
 }
 
