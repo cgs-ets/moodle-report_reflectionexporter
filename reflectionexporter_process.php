@@ -39,7 +39,6 @@ $datajson                = optional_param('datajson', 0, PARAM_RAW); // new proc
 $finished                = optional_param('f', 0, PARAM_RAW); // new process or exisiting one
 
 require_login();
-admin_externalpage_setup('report_reflectionexporter', '', null, '', array('pagelayout' => 'report'));
 
 if ($download) {
     reflectionexportermanager::generate_zip($datajson);

@@ -36,6 +36,7 @@ if (!$course = $DB->get_record('course', array('id'=>$id))) {
 }
 
 require_login($course);
+
 $context = context_course::instance($course->id);
 
 require_capability('report/reflectionexporter:grade', $context);

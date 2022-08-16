@@ -34,7 +34,6 @@ $id                      = optional_param('cid', 0, PARAM_INT); // Course ID.
 $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course module ID.
 
 require_login();
-admin_externalpage_setup('report_reflectionexporter', '', null, '', array('pagelayout' => 'report'));
 
 $PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
