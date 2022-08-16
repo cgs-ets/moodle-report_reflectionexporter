@@ -32,7 +32,7 @@ $capabilities = array(
         'riskbitmask' => RISK_XSS,
 
         'captype' => 'write',
-        'contextlevel' => CONTEXT_MODULE,
+        'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
