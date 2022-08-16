@@ -38,13 +38,20 @@ $download                = optional_param('d', 0, PARAM_INT); // new process or 
 $datajson                = optional_param('datajson', 0, PARAM_RAW); // new process or exisiting one
 $finished                = optional_param('f', 0, PARAM_RAW); // new process or exisiting one
 
-require_login();
+if (!$course = $DB->get_record('course', array('id' => $id))) {
+    print_error('invalidcourse');
+}
+
+require_login($course);
+
+$context = context_course::instance($course->id);
 
 if ($download) {
     reflectionexportermanager::generate_zip($datajson);
-  
 }
 
+$PAGE->set_context($context);
+$PAGE->set_url('/report/reflectionexporter/reflectionexporter_process.php', ['cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => $new, 'f' => $finished]);
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 $PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_pagelayout('embedded');

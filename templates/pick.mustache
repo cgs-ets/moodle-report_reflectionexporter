@@ -7,39 +7,41 @@
    </a>
 </div>
 
-<div class = "select-work">
-<h4>Select started work</h4>
-<br>
-<table class="table table-bordered ">
-<thead>
-  <tr>
-    <th>Date Created</th>
-    <th>Status</th>
-    <th></th>
-    <th></th>
-  </tr>
-</thead>
-<tbody>
-  {{#processes}}
+{{#processfound}}
+    <div class = "select-work">
+    <h4>Select started work</h4>
+    <br>
+    <table class="table table-bordered ">
+    <thead>
     <tr>
-        <td>{{datecreated}}</td> 
-        <td>{{status}}</td> 
-        <td><a type="button" class="btn " href = "{{{actionurl}}}" title = '{{title}}'>
-            <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{existingicon}}}" /></a> 
-        </td>
-        <td>
-            <a type="button" class="btn " title = 'Delete' >
-             <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{deleteicon}}}" data-to-delete = "{{todelete}}" />
-            </a> 
-            <div class = 'deleting del-processing'>
-                {{> report_reflectionexporter/loading }}
-            </div>
-        </td>
+        <th>Date Created</th>
+        <th>Status</th>
+        <th></th>
+        <th></th>
     </tr>
-  {{/processes}}
-  </tbody>
-</table>
-</div>
+    </thead>
+    <tbody>
+    {{#processes}}
+        <tr>
+            <td>{{datecreated}}</td> 
+            <td>{{status}}</td> 
+            <td><a type="button" class="btn " href = "{{{actionurl}}}" title = '{{title}}'>
+                <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{existingicon}}}" /></a> 
+            </td>
+            <td>
+                <a type="button" class="btn " title = 'Delete' >
+                <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{deleteicon}}}" data-to-delete = "{{todelete}}" />
+                </a> 
+                <div class = 'deleting del-processing'>
+                    {{> report_reflectionexporter/loading }}
+                </div>
+            </td>
+        </tr>
+    {{/processes}}
+    </tbody>
+    </table>
+    </div>
+{{/processfound}}
 
 {{#js}}
 require(['report_reflectionexporter/delete'], function(Delete) {

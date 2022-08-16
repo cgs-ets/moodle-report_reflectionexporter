@@ -99,17 +99,22 @@ class reflectionexporter_form extends moodleform {
 
     // Custom validation should be added here.
     public function validation($data, $files) {
-
+      
         $errors = parent::validation($data, $files);
 
         if (count($data['assessments']) == 0) {
             $errors['assessments'] = get_string('assessmenterror', 'report_reflectionexporter');
         }
 
+        if (count($data['userid']) == 0) {
+            $errors['userid'] = get_string('useridterror', 'report_reflectionexporter');
+        }
+
         if (empty($data['supervisorinitials'])) {
             $errors['supervisorinitials'] = get_string('supervisorinitialserror', 'report_reflectionexporter');
         }
 
+       
         return $errors;
     }
 }

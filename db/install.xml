@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="report/reflectionexporter/db" VERSION="20220811" COMMENT="XMLDB file for Moodle report/reflectionexporter"
+<XMLDB PATH="report/reflectionexporter/db" VERSION="20220816" COMMENT="XMLDB file for Moodle report/reflectionexporter"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -7,6 +7,7 @@
     <TABLE NAME="report_reflectionexporter" COMMENT="Default comment for report_reflectionexporter, please edit me">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course id"/>
         <FIELD NAME="reflections_json" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON with the information needed to generate PDFS"/>
         <FIELD NAME="status" TYPE="char" LENGTH="2" NOTNULL="true" DEFAULT="NS" SEQUENCE="false" COMMENT="Status of the download. It can be NS: Not Started, S: Started, F: Finished"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Time the process started"/>
@@ -22,8 +23,7 @@
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The course the reflections assessments belongs to"/>
         <FIELD NAME="refexid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id from mdl_report_reflectionexporter"/>
         <FIELD NAME="pdf" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="status" TYPE="char" LENGTH="3" NOTNULL="true" DEFAULT="NC" SEQUENCE="false" COMMENT="NC: Not completed. PDF only has student reflection
-C: Completed. It has student reflection and teacher comment"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="3" NOTNULL="true" DEFAULT="NC" SEQUENCE="false" COMMENT="NC: Not completed. PDF only has student reflection C: Completed. It has student reflection and teacher comment"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

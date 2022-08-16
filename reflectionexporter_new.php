@@ -49,7 +49,6 @@ $PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 $PAGE->set_heading(format_string($course->fullname, true, array('context' => $context)));
 
-//$manager = new report_reflectionexporter\reflectionexportermanager();
 $courseurl = new moodle_url('/course/view.php', array('id' => $id));
 $aids = reflectionexportermanager::get_submitted_assessments($id);
 $mform = new reflectionexporter_form(null, ['id' => $id, 'cmid' => $cmid, 'aids' => $aids]);;
@@ -57,6 +56,7 @@ $mform = new reflectionexporter_form(null, ['id' => $id, 'cmid' => $cmid, 'aids'
 if ($mform->is_cancelled()) {
     redirect($courseurl);
 } else if ($fromform = $mform->get_data()) {
+    $fromform->courseid = $id;
     $rid = reflectionexportermanager::collect_and_save_reflections($fromform);
     $fromform->rid = $rid;
     report_reflectionexporter_filemanager_postupdate($fromform);

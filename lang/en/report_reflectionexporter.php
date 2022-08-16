@@ -31,6 +31,7 @@ $string['attachment_filemanager_help'] = 'File where the reflections will be exp
 $string['assessments'] = ' Choose one or more assessments';
 $string['assessments_help'] = 'Only assessments with submissions are displayed.';
 $string['assessmenterror'] = 'Please select an assessment';
+$string['useridterror'] = 'Please select One or more students';
 $string['supervisorinitials'] = 'Supervisor initials';
 $string['supervisorinitialserror'] = 'Please insert your initials';
 $string['activeusers'] = 'Allocated students';

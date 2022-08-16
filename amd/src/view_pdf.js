@@ -31,7 +31,7 @@ define([
     "use strict";
 
     var ViewPDF = function () {
-       
+
         $(document).on('user-changed', this._init.bind(this));
 
 
@@ -64,14 +64,14 @@ define([
                     self.pdfData = response.pdfbase64;
                     downloadurl.searchParams.append('d', 1);
                     self.completed = user[0].status == 'C' ? true : false;
-                    
+
                     const context = {
                         courseurl: document.getElementById("courseurl").getAttribute('href'),
                         downloadaction: downloadurl,
                         datajson: document.querySelector('.data-pdfjson').getAttribute('data-pdfs'),
                         completed: user[0].status == 'C' ? true : false
                     }
-                    console.log(context); 
+                    console.log(context);
 
                     Templates.render('report_reflectionexporter/pdf_container', context).done(function (html, js) {
 
@@ -140,11 +140,12 @@ define([
                             document.querySelector('button.save-show-next-btn').addEventListener('click', self._saveshownext.bind(self));
                             document.querySelector('button.save-exit-btn').addEventListener('click', self._savesandexit.bind(self));
                         } else {
-                            document.querySelector('h4.reflection-completed').removeAttribute('hidden');
+                            document.querySelector('h4.reflection-completed').classList.add('reflection-completed-display');
+                            document.querySelector('h4.reflection-completed').classList.remove('reflection-completed');
 
                             // Check if its the last student, if so, display the download button.
                             const select = document.querySelector("[data-action='change-user']");
-                 
+
                             if (select.options[select.selectedIndex].nextElementSibling == null) {
                                 self._enableDownload();
                             }
@@ -185,9 +186,6 @@ define([
 
     // Save the data in BD
     ViewPDF.prototype._save = async function (btnClicked) {
-        // get the pdf and put the value from the textarea
-        // call ajax to update the pdf saved and put it in the pdfjson. so if the user navigates, the content is in there
-        // after its adone, get the next user
 
         //Get the teacher comment from the textarea
         const commentEl = document.getElementById('comment');
@@ -232,7 +230,7 @@ define([
     }
     // Call WS to save pdf data in DB.
     ViewPDF.prototype._updatePDFInDB = function (record) {
-        console.log('_updatePDFInDB');
+
         const self = this;
         const arg = JSON.stringify(record);
         const exit = record.exit;
@@ -244,11 +242,12 @@ define([
             },
             done: function (response) {
                 console.log(response);
-                
-                  // if it comes from save and exit. redirect to the course.
-                  if (exit == '1') {
+
+                // if it comes from save and exit. redirect to the course.
+                if (exit == '1') {
                     // This way we cant go back.
                     window.location.replace(document.getElementById("courseurl").getAttribute('href'));
+                    return;
                 }
 
                 // update the pdfjson with the status, so it cant be edited anymore
@@ -276,7 +275,7 @@ define([
                     $(document).trigger('user-changed', userid);
                 }
 
-              
+
 
             },
             fail: function (reason) {

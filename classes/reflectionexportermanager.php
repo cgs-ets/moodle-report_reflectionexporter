@@ -69,7 +69,6 @@ class reflectionexportermanager {
         // Format the text to keep new lines. If the student added images, process the URL to avoid warning. 
         // The image wont be seen in the PDF.
         foreach ($results as $r) {
-
             $onlinetext = file_rewrite_pluginfile_urls($r->onlinetext, 'pluginfile.php', $context->id, 'assignsubmission_onlinetext', 'submissions_onlinetext', $r->id);
             $r->onlinetext =  json_encode(strip_tags(format_text($onlinetext, FORMAT_MARKDOWN)), JSON_HEX_QUOT | JSON_HEX_TAG);
             $r->month = date('F', $r->month);
@@ -227,10 +226,10 @@ class reflectionexportermanager {
 
     // To display the table with the processes started but not finished
     public static function get_process() {
-        global $DB;
+        global $DB, $COURSE;
 
-        $sql = "SELECT * FROM mdl_report_reflectionexporter ";
-        $params = ['status' => reflectionexportermanager::STARTED];
+        $sql = "SELECT * FROM mdl_report_reflectionexporter WHERE courseid = ?";
+        $params = ['courseid' => $COURSE->id];
 
         $results = array_values($DB->get_records_sql($sql, $params));
         return $results;
@@ -290,6 +289,7 @@ class reflectionexportermanager {
         $reflections = json_encode($reflections);
         $dataobject = new stdClass();
         $dataobject->reflections_json = $reflections;
+        $dataobject->courseid = $data->courseid;
         $dataobject->timecreated = time();
         $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
 

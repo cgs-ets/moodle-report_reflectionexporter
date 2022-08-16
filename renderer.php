@@ -44,7 +44,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['deleteicon'] = new moodle_url('/report/reflectionexporter/pix/delete.png');
         $data['newproc'] = $dataobject->newproc;
         $procs = reflectionexportermanager::get_process();
-       
+        $data['processfound'] = count($procs) > 0;
         foreach($procs as $proc) {
             $pr = new stdClass();
             $pr->datecreated = userdate($proc->timecreated, get_string('strftimedatefullshort', 'core_langconfig'));

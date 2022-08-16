@@ -109,7 +109,7 @@
 
 .report_reflectionexporter .reflection-completed-display {
     font-weight: bold;
-    color: #a74d4d;
+    /* color: #a74d4d; */
 }
 
 .report_reflectionexporter .reflection-comment-form-hide {
