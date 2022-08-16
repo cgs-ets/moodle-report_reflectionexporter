@@ -58,6 +58,14 @@ $functions = [
         'loginrequired' => true,
         'ajax' => true    // Is this service available to 'internal' ajax calls.
     ],
+    'report_reflectionexporter_delete_process' => [
+        'classname' => 'report_reflectionexporter\external\api', // Class containing a reference to the external function.
+        'methodname' => 'delete_process', // External function name.
+        'description' => 'Delete records', // Human readable description of the WS function.
+        'type' => 'write', // DB rights of the WS function.
+        'loginrequired' => true,
+        'ajax' => true    // Is this service available to 'internal' ajax calls.
+    ],
     'report_reflectionexporter_list_participants' => [
         'classname' => 'report_reflectionexporter\external\api', // Class containing a reference to the external function.
         'methodname' => 'list_participants', // External function name.

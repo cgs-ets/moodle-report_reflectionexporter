@@ -51,7 +51,6 @@ if ($mform->is_cancelled()) {
     $fromform->rid = $rid;
     report_reflectionexporter_filemanager_postupdate($fromform);
     $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1);
- ;
     redirect(new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params));
 } else {
     $context = context_course::instance($id);

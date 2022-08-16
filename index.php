@@ -31,12 +31,21 @@ require_once('reflectionexporter_form.php');
 $id                      = optional_param('cid', 0, PARAM_INT); // Course ID.
 $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course module ID.
 
-require_login();
-admin_externalpage_setup('report_reflectionexporter', '', null, '', array('pagelayout' => 'report'));
+if (!$course = $DB->get_record('course', array('id'=>$id))) {
+    print_error('invalidcourse');
+}
 
+require_login($course);
+$context = context_course::instance($course->id);
+
+require_capability('report/reflectionexporter:grade', $context);
+
+$context = context_course::instance($course->id);
+$PAGE->set_context($context);
+$PAGE->set_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]);
 $PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
-
+$PAGE->set_heading(format_string($course->fullname, true, array('context' => $context)));
 echo $OUTPUT->header();
 
 
@@ -48,8 +57,14 @@ if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
     $renderer = $PAGE->get_renderer('report_reflectionexporter');
     $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 0]);
     $newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 1]);
-    $urls = ['existingproc' => $existingprocurl, 'newproc' => $newproc];
-    $renderer->pick_action_icon($urls);
+
+    $dataobject = new stdClass();
+    $dataobject->existingproc = $existingprocurl;
+    $dataobject->newproc = $newproc;
+    $dataobject->cid = $id;
+    $dataobject->cmid = $cmid;
+
+    $renderer->pick_action_icon($dataobject);
 }
 
 echo $OUTPUT->footer();

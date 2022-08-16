@@ -22,6 +22,8 @@
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The course the reflections assessments belongs to"/>
         <FIELD NAME="refexid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id from mdl_report_reflectionexporter"/>
         <FIELD NAME="pdf" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="3" NOTNULL="true" DEFAULT="NC" SEQUENCE="false" COMMENT="NC: Not completed. PDF only has student reflection
+C: Completed. It has student reflection and teacher comment"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

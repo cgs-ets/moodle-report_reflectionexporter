@@ -73,6 +73,7 @@ class reflectionexporter_form extends moodleform {
         $options = array(
             'multiple' => true,
             'noselectionstring' => '',
+            
         );
         $mform->addElement('autocomplete', 'userid', get_string('activeusers', 'report_reflectionexporter'), $studentsarray, $options);
         $mform->addRule('userid', null, 'required');

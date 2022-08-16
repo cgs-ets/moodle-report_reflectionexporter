@@ -37,6 +37,7 @@ class api extends external_api {
     use list_participants;
     use get_participant;
     use update_pdfbase64;
-    use get_pdfbase64;  
+    use get_pdfbase64;
+    use delete_process;
 
 }

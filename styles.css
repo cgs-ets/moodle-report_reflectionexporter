@@ -3,13 +3,13 @@
 }
 
 /* Index Icons */
-#page-admin-report-reflectionexporter-index .actions {
+.report_reflectionexporter .actions {
     display: block;
     text-align: center;
     margin-bottom: 1em;
 }
 
-#page-admin-report-reflectionexporter-index .actions .action {
+.report_reflectionexporter .actions .action {
     display: inline-block;
     position: relative;
     vertical-align: top;
@@ -21,11 +21,24 @@
     border: 1px solid #aaa;
 }
 
-#page-admin-report-reflectionexporter-index .actions .action .action-text {
+.report_reflectionexporter .deleting {
+    display: none;
+}
+
+.report_reflectionexporter .actions .action .action-text {
     position: relative;
     top: .4em;
     font-size: 14px;
     white-space: normal;
+}
+
+.report_reflectionexporter .icon.reflection-exporter-action-btn {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+/* Table */
+.report_reflectionexporter .table-bordered {
+    text-align: center;
 }
 
 /* View page */
@@ -90,6 +103,19 @@
 
 }
 
+.report_reflectionexporter .reflection-completed {
+    display: none;
+}
+
+.report_reflectionexporter .reflection-completed-display {
+    font-weight: bold;
+    color: #a74d4d;
+}
+
+.report_reflectionexporter .reflection-comment-form-hide {
+    display: none;
+}
+
 /* Actions in view-panel */
 .report_reflectionexporter .next-action-hidden {
     display: none;
@@ -117,7 +143,8 @@
     width: 25%;
 }
 
-/**
+
+
 @media (max-width: 900px) {
     [data-region="pdf-comment-container"] {
     
@@ -125,6 +152,7 @@
     }
 }
 
-**/
+
 /* <a href="https://www.flaticon.com/free-icons/export" title="export icons">Export icons created by Uniconlabs - Flaticon</a> */
 /* <a href="https://www.flaticon.com/free-icons/save" title="save icons">Save icons created by Freepik - Flaticon</a> */
+/* <a href="https://www.flaticon.com/free-icons/delete" title="delete icons">Delete icons created by Freepik - Flaticon</a> */

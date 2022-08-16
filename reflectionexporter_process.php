@@ -36,6 +36,7 @@ $rid                     = required_param('rid', PARAM_INT); // id from mdl_repo
 $new                     = optional_param('n', 0, PARAM_INT); // new process or exisiting one
 $download                = optional_param('d', 0, PARAM_INT); // new process or exisiting one
 $datajson                = optional_param('datajson', 0, PARAM_RAW); // new process or exisiting one
+$finished                = optional_param('f', 0, PARAM_RAW); // new process or exisiting one
 
 require_login();
 admin_externalpage_setup('report_reflectionexporter', '', null, '', array('pagelayout' => 'report'));
@@ -56,14 +57,16 @@ $context = context_course::instance($id);
 reflectionexportermanager::get_file_url($context, $rid);
 
 $data = new stdClass();
-$data->fileurl = reflectionexportermanager::get_file_url($context, $rid);;
+$data->fileurl = reflectionexportermanager::get_file_url($context, $rid);
 $data->rid = $rid;
 $data->cid = $id;
 $data->new = $new;
+$data->finished = $finished == '1' ? true : false;
 
+if ($new == 0) {
+    $data->pdfjson = json_encode(reflectionexportermanager::get_existing_proc($rid));
+}
 $renderer = $PAGE->get_renderer('report_reflectionexporter');
-
 $renderer->render_importing_process($data);
-
 
 echo $OUTPUT->footer();

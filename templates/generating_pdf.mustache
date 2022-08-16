@@ -1,9 +1,8 @@
-<div class = 'importing-animation' data-info = "{{data}}" data-course-name =" {{coursename}}">
-    <div class="spinner-border text-primary" role="status">
-    <span class="sr-only">Loading...</span>
-    </div>
-    <p>{{message}}</p>
-
+<div class = 'importing-animation' data-info = "{{data}}" data-course-name = "{{coursename}}">
+    {{#new}}
+         {{> report_reflectionexporter/loading }}
+        <p>{{message}}</p>
+    {{/new}}
 </div>
 {{#js}}
 require(['report_reflectionexporter/reflectionexporter'], function(ReflectionExporter) {

@@ -32,6 +32,8 @@ class reflectionexportermanager {
 
     const STARTED = 'S';
     const FINISHED = 'F';
+    const PDF_COMPLETED = 'C'; // Completed. Cant edit anymore
+
     // Get the course's assessments that have submissions and the submission type is onlinetext.
     public static function get_submitted_assessments($courseid) {
         global $DB;
@@ -129,13 +131,21 @@ class reflectionexportermanager {
         $dataobject = new stdClass();
         $dataobject->id = $pdfdata->id;
         $dataobject->pdf = $pdfdata->pdf;
+        $dataobject->status = reflectionexportermanager::PDF_COMPLETED;
 
-        $DB->update_record('report_reflec_exporter_pdf', $pdfdata);
+        $DB->update_record('report_reflec_exporter_pdf', $dataobject);
+
+        $data = new stdClass();
+        $data->id = $pdfdata->refexid;
+        $data->status = reflectionexportermanager::STARTED;
+
+        $DB->update_record('report_reflectionexporter', $data);
+        // We need to update the status of the process too.
     }
 
     public static function get_pdfbase64($rid) {
         global $DB;
-        
+
         $sql  = "SELECT pdf FROM {report_reflec_exporter_pdf} WHERE id = ?";
         $params = ['id' => $rid];
 
@@ -190,7 +200,7 @@ class reflectionexportermanager {
         unlink($file);
 
         // Update status 
-      
+
         reflectionexportermanager::update_download_status($refexpids);
 
         die();
@@ -202,18 +212,40 @@ class reflectionexportermanager {
         $dataobject = new stdClass();
         $dataobject->id = $id;
         $dataobject->status = reflectionexportermanager::FINISHED;
-        
+
         $DB->update_record('report_reflectionexporter', $dataobject);
     }
 
-    public static function get_unfinished_process () {
+    public static function delete_process($rid) {
         global $DB;
 
-        $sql = "SELECT * FROM mdl_report_reflectionexporter WHERE status = ? ";
+        $r = $DB->delete_records('report_reflec_exporter_pdf', ['refexid' => $rid]);
+        $r2 = $DB->delete_records('report_reflectionexporter', ['id' => $rid]);
+
+        return $r == $r2;
+    }
+
+    // To display the table with the processes started but not finished
+    public static function get_process() {
+        global $DB;
+
+        $sql = "SELECT * FROM mdl_report_reflectionexporter ";
         $params = ['status' => reflectionexportermanager::STARTED];
 
-        $results = $DB->get_records_sql($sql, $params);
-        
+        $results = array_values($DB->get_records_sql($sql, $params));
+        return $results;
+    }
+
+    // To fill the pdfjson property in the template
+    public static function get_existing_proc($rid) {
+        global $DB;
+        $sql = "SELECT  id, userid, courseid, refexid, status
+                FROM {report_reflec_exporter_pdf} where refexid = ?";
+        $params = ['refexid' => $rid];
+
+        $results = array_values($DB->get_records_sql($sql, $params));
+
+        return $results;
     }
 
     // Returns student records based on the reflection export created.

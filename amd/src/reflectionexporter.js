@@ -32,7 +32,7 @@ define([
 ], function ($, Ajax, Log, PDFLib, Templates) {
     "use strict";
 
-    function init(data, coursename) {
+    function init(data) {
         var control = new Controls(data);
         control.main();
     }
@@ -66,8 +66,10 @@ define([
     };
 
     Controls.prototype.getreflectionspdf = function () {
-        console.log("Viene....");
+   
+        this.displayTemplate();
     }
+
     Controls.prototype.getreflectionsjson = async function () {
         var self = this;
 
@@ -203,7 +205,7 @@ define([
                 pdfs: pdfjson,
             },
             done: function (response) {
-                
+
                 const context = {
                     pdfjson: response.savedrecords,
                     courseid: self.data.cid,
@@ -228,6 +230,29 @@ define([
                 Log.error(reason);
             },
         }, ]);
+
+    }
+
+    Controls.prototype.displayTemplate = function () {
+        var self = this;
+        const context = {
+            pdfjson: self.data.pdfjson,
+            courseid: self.data.cid,
+            coursename: self.data.coursename,
+            showuseridentity: true,
+            reflecid: self.data.rid,
+            firstuserid: 0,
+        }
+
+        Templates.render('report_reflectionexporter/viewer', context)
+            .done(function (html, js) {
+                $(document.querySelector('.importing-animation')).fadeOut("fast", function () {
+                    Templates.replaceNodeContents($(document.querySelector('.importing-animation')), html, js);
+                    $(document.querySelector('.importing-animation')).fadeIn("fast");
+                }.bind(this));
+            }).fail(function (ex) {
+                console.log(ex);
+            });
     }
 
     return {

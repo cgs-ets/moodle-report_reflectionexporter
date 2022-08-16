@@ -37,22 +37,38 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
      * @param string $class extra class of this action
      * @return string
      */
-    public function pick_action_icon(array $urls) {
-
-        $urls['newicon'] = new moodle_url('/report/reflectionexporter/pix/icon.png');
-        $urls['existingicon'] = new moodle_url('/report/reflectionexporter/pix/continueproc.png');
-// TODO: add the process started in the table.
-        echo $this->output->render_from_template('report_reflectionexporter/pick', $urls);
+    public function pick_action_icon($dataobject) {
+       
+        $data['newicon'] = new moodle_url('/report/reflectionexporter/pix/icon.png');
+        $data['existingicon'] = new moodle_url('/report/reflectionexporter/pix/continueproc.png');
+        $data['deleteicon'] = new moodle_url('/report/reflectionexporter/pix/delete.png');
+        $data['newproc'] = $dataobject->newproc;
+        $procs = reflectionexportermanager::get_process();
+       
+        foreach($procs as $proc) {
+            $pr = new stdClass();
+            $pr->datecreated = userdate($proc->timecreated, get_string('strftimedatefullshort', 'core_langconfig'));
+            $f = $proc->status == 'F' ? '1' : '0';
+            $params = array('cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'rid' => $proc->id, 'n' => 0, 'f' => $f);
+            $pr->actionurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params);
+            $pr->status = $proc->status == 'F' ? 'Finished' : 'Started';
+            $pr->title = $proc->status == 'F' ? 'Show' : 'Continue';
+            $pr->deleteurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid]);;
+            $pr->todelete =  $proc->id;
+            $data['processes'] [] = $pr;
+        }
+        echo $this->output->render_from_template('report_reflectionexporter/pick', $data);
     }
 
     public function render_importing_process($data) {
-        
+
         $info = new stdClass();
         $context = context_course::instance($data->cid);
         $info->message = 'Importing reflections to PDF. Please do not close the browser';
         $data->coursename = $context->get_context_name(false, false, true);
         $info->data =  json_encode($data);
-  
+        $info->new = $data->new;
+
         echo $this->output->render_from_template('report_reflectionexporter/generating_pdf', $info);
     }
 
