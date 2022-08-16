@@ -33,10 +33,21 @@ require_once('reflectionexporter_form.php');
 $id                      = optional_param('cid', 0, PARAM_INT); // Course ID.
 $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course module ID.
 
-require_login();
+if (!$course = $DB->get_record('course', array('id'=>$id))) {
+    print_error('invalidcourse');
+}
 
+require_login($course);
+
+$context = context_course::instance($course->id);
+
+require_capability('report/reflectionexporter:grade', $context);
+
+$PAGE->set_context($context);
+$PAGE->set_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid]);
 $PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
+$PAGE->set_heading(format_string($course->fullname, true, array('context' => $context)));
 
 //$manager = new report_reflectionexporter\reflectionexportermanager();
 $courseurl = new moodle_url('/course/view.php', array('id' => $id));
