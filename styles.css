@@ -44,7 +44,7 @@
     text-align: center;
     max-height: 41vh;
     width: max-content;
-    margin-left: 20%;
+    margin-left: 0 auto;
 }
 
 table.table.table-bordered.table-responsive.started-work {
