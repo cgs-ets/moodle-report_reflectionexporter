@@ -147,7 +147,7 @@ define([
                             const select = document.querySelector("[data-action='change-user']");
 
                             if (select.options[select.selectedIndex].nextElementSibling == null) {
-                                self._enableDownload();
+                                self._enableDownloadAndSummary();
                             }
                         }
                     });
@@ -211,13 +211,16 @@ define([
             const pdf = await pdfDoc.saveAsBase64();
 
             const user = this._getUser();
+            const select = document.querySelector("[data-action='change-user']");
+
             const toUpdate = {
                 id: user[0].id,
                 userid: $('[data-action="change-user"]')[0].getAttribute('data-selected'),
                 courseid: $('[data-region="user-info"]')[0].getAttribute('data-userid'),
                 refexid: $('[data-region="user-info"]')[0].getAttribute('data-rid'),
                 pdf: pdf,
-                exit: '0'
+                exit: '0',
+                finished: select.options[select.selectedIndex].nextElementSibling == null ? '1' : '0'
             }
             if (btnClicked != 'shownext') { // CLicked on exit
                 toUpdate.exit = '1';
@@ -264,9 +267,9 @@ define([
                     const nextuser = select.options[select.selectedIndex].nextElementSibling.value;
 
                     select.setAttribute('data-selected', nextuser);
-
                     select.value = String(nextuser);
-                    // Trigger user change with the id of the next user
+
+                    // Trigger user change with the id of the next user.
                     if (!isNaN(useridnumber) && useridnumber > 0) {
                         $(document).trigger('user-changed', nextuser);
                     }
@@ -309,10 +312,60 @@ define([
         document.querySelector('.data-pdfjson').setAttribute('data-pdfs', JSON.stringify(json));
     }
 
-    ViewPDF.prototype._enableDownload = function () {
+    ViewPDF.prototype._enableDownloadAndSummary = function () {
         const self = this;
         document.querySelector('div.next-action').classList.remove('next-action-hidden');
         document.getElementById('download').addEventListener('click', self._zipdownload);
+
+        // Only display if there are no processes.
+        let notprocess = document.querySelector('.importing-animation').getAttribute('data-notprocess');
+         notprocess = parseInt(notprocess, 10);
+        console.log("NOT PROCESS");
+        console.log(notprocess);
+
+        if (notprocess > 0) {
+            document.getElementById('summary').classList.remove('btn-summary-hidden');
+            document.getElementById('summary').addEventListener('click', self._loadsummary);
+        }
+    }
+
+    ViewPDF.prototype._loadsummary = function () {
+
+        Ajax.call([{
+            methodname: "report_reflectionexporter_get_ommited",
+            args: {
+                recordid: document.querySelector('[data-region="viewer-navigation-panel"]').getAttribute('data-rid'),
+            },
+            done: function (response) {
+                console.log(response);
+                let context = {
+                    students: JSON.parse(response.context)
+                };
+                console.log(context);
+
+                Templates.render('report_reflectionexporter/students_table', context).done(function (html, js) {
+                    Templates.replaceNodeContents(document.querySelector('div.omitted-table'), html, js);
+                    var modal = document.getElementById("myModal");
+                    var span = document.getElementsByClassName("close")[0];
+                    modal.style.display = "block"
+                    span.onclick = function () {
+                        modal.style.display = "none";
+                    }
+
+                    // When the user clicks anywhere outside of the modal, close it.
+                    window.onclick = function (event) {
+                        if (event.target == modal) {
+                            modal.style.display = "none";
+                        }
+                    }
+                })
+
+
+            },
+            fail: function (reason) {
+                console.log(reason);
+            },
+        }, ]);
     }
 
     return ViewPDF;

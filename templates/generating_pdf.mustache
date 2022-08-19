@@ -1,11 +1,11 @@
-<div class = 'importing-animation' data-info = "{{data}}" data-course-name = "{{coursename}}">
+<div class = 'importing-animation' data-info = "{{data}}"  data-notprocess = "{{notprocess}}">
     {{#new}}
          {{> report_reflectionexporter/loading }}
         <p>{{message}}</p>
     {{/new}}
 </div>
 {{#js}}
-require(['report_reflectionexporter/reflectionexporter'], function(ReflectionExporter) {
-   ReflectionExporter.init(JSON.parse(document.querySelector('.importing-animation').getAttribute('data-info')))
+require(['report_reflectionexporter/validate_pdf'], function(ValidatePDF) {
+    new ValidatePDF(JSON.parse(document.querySelector('.importing-animation').getAttribute('data-info')))
 });
 {{/js}}

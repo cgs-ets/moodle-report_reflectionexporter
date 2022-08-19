@@ -32,11 +32,11 @@ require_once('reflectionexporter_form.php');
 
 $id                      = optional_param('cid', 0, PARAM_INT); // Course ID.
 $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course module ID.
-$rid                     = required_param('rid', PARAM_INT); // id from mdl_report_reflectionexporter.
-$new                     = optional_param('n', 0, PARAM_INT); // new process or exisiting one
-$download                = optional_param('d', 0, PARAM_INT); // new process or exisiting one
-$datajson                = optional_param('datajson', 0, PARAM_RAW); // new process or exisiting one
-$finished                = optional_param('f', 0, PARAM_RAW); // new process or exisiting one
+$rid                     = required_param('rid', PARAM_INT); // Id from mdl_report_reflectionexporter.
+$new                     = optional_param('n', 0, PARAM_INT); // New process or exisiting one.
+$download                = optional_param('d', 0, PARAM_INT); // Download the zip file.
+$datajson                = optional_param('datajson', 0, PARAM_RAW); // JSON with the information needed to display PDF.
+$finished                = optional_param('f', 0, PARAM_RAW); // Finished process.
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('invalidcourse');
@@ -67,11 +67,14 @@ $data->fileurl = reflectionexportermanager::get_file_url($context, $rid);
 $data->rid = $rid;
 $data->cid = $id;
 $data->new = $new;
+$data->cmid = $cmid;
 $data->finished = $finished == '1' ? true : false;
 
 if ($new == 0) {
     $data->pdfjson = json_encode(reflectionexportermanager::get_existing_proc($rid));
+    $data->notprocess = count(json_decode(reflectionexportermanager::get_no_reflections_json($rid)));
 }
+
 $renderer = $PAGE->get_renderer('report_reflectionexporter');
 $renderer->render_importing_process($data);
 

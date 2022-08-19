@@ -1,0 +1,20 @@
+<div class="omitted-table">
+    <table class="table table-bordered table-responsive">
+    <thead class = "thead-dark">
+        <tr>
+            <th>Student</th>
+            <th>IB Code</th>
+            <th>Missing reflection(s)</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#students}}
+            <tr>
+                <td>{{student}}</td>
+                <td>{{ibcode}}</td>
+                <td>{{reason}}</td>
+            </tr>
+        {{/students}}
+        </tbody>
+    </table>
+</div>

@@ -1,4 +1,6 @@
-#fitem_id_assessments #id_assessments {
+#id_assessments,
+#id_assessments2,
+#id_assessments3 {
     width: 30%;
 }
 
@@ -36,9 +38,17 @@
     width: 1.5rem;
     height: 1.5rem;
 }
+
 /* Table */
 .report_reflectionexporter .table-bordered {
     text-align: center;
+    max-height: 41vh;
+    width: max-content;
+    margin-left: 20%;
+}
+
+table.table.table-bordered.table-responsive.started-work {
+    margin: 0;
 }
 
 /* View page */
@@ -94,12 +104,11 @@
 }
 
 .report_reflectionexporter .next-action {
-    /* text-align: center; */
     margin-top: 4px;
     width: fit-content;
     margin: auto;
     padding: 2rem;
-    display: flex; /* Align form and button TODO: fijarme que el download funcione*/
+    display: flex;
 
 }
 
@@ -109,7 +118,6 @@
 
 .report_reflectionexporter .reflection-completed-display {
     font-weight: bold;
-    /* color: #a74d4d; */
 }
 
 .report_reflectionexporter .reflection-comment-form-hide {
@@ -131,9 +139,12 @@
     margin-top: 1rem;
 }
 
+a.btn-summary-hidden {
+    display: none;
+}
+
 /* Press effect */
 .report_reflectionexporter .next-action a:active {
-    /* background-color: #3e8e41; */
     box-shadow: 1px 2px 6px 5px slategrey;
     transform: translateY(4px);
 }
@@ -144,10 +155,59 @@
 }
 
 
+/* The Modal (background) */
+.reflection-exporter-modal {
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1;
+    /* Sit on top */
+    padding-top: 100px;
+    /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    overflow: auto;
+    /* Enable scroll if needed */
+    background-color: rgb(0, 0, 0);
+    /* Fallback color */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Black w/ opacity */
+}
+
+/* Modal Content */
+.reflection-exporter-modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+}
+
+/* The Close Button */
+.reflection-exporter-modal-content .close {
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.reflection-exporter-modal-content .close:hover,
+.reflection-exporter-modal-content .close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 
 @media (max-width: 900px) {
     [data-region="pdf-comment-container"] {
-    
+
         flex-direction: column;
     }
 }
@@ -155,4 +215,5 @@
 
 /* <a href="https://www.flaticon.com/free-icons/export" title="export icons">Export icons created by Uniconlabs - Flaticon</a> */
 /* <a href="https://www.flaticon.com/free-icons/save" title="save icons">Save icons created by Freepik - Flaticon</a> */
+/* <a href="https://www.flaticon.com/free-icons/delete" title="delete icons">Delete icons created by Freepik - Flaticon</a> */
 /* <a href="https://www.flaticon.com/free-icons/delete" title="delete icons">Delete icons created by Freepik - Flaticon</a> */

@@ -63,8 +63,8 @@ trait get_reflections {
                 'rid' => $rid,
             )
         );
-        $manager = new reflectionexportermanager();
-        $result = $manager->get_reflections_json($rid);
+       
+        $result = reflectionexportermanager::get_reflections_json($rid);
 
         return array(
             'reflecjson' => $result->reflections_json,

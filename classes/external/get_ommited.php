@@ -17,9 +17,10 @@
 /**
  *  External Web Service Template
  *
- * @package    report
- * @subpackage reflectionexporter
- * @copyright  2022 Veronica Bermegui
+ * @package   report_reflectionexporter
+ * @category
+ * @copyright 2022 Veronica Bermegui
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace report_reflectionexporter\external;
@@ -33,22 +34,22 @@ use report_reflectionexporter\reflectionexportermanager;
 
 require_once($CFG->libdir . '/externallib.php');
 
-trait get_pdfbase64 {
+trait get_ommited {
 
     /**
      * Returns description of method parameters
      * @return external_function_parameters
      *
      */
-    public static function get_pdfbase64_parameters() {
+    public static function get_ommited_parameters() {
         return new external_function_parameters(
             array(
-                'recorid' => new external_value(PARAM_RAW, 'JSON with updated pdf encoded in base64'),
+                'recordid' => new external_value(PARAM_TEXT, 'Id of the record to check not processed'),
             )
         );
     }
 
-    public static function get_pdfbase64($recorid) {
+    public static function get_ommited($recordid) {
         global $COURSE;
 
         $context = \context_user::instance($COURSE->id);
@@ -57,16 +58,29 @@ trait get_pdfbase64 {
 
         // Parameters validation.
         self::validate_parameters(
-            self::get_pdfbase64_parameters(),
+            self::get_ommited_parameters(),
             array(
-                'recorid' => $recorid,
+                'recordid' => $recordid,
             )
         );
+       
+        $notprocessed = json_decode(reflectionexportermanager::get_no_reflections_json($recordid));
+        $context = [];
 
-        $result = reflectionexportermanager::get_pdfbase64($recorid);
-        
+        foreach($notprocessed as $np) {
+            $data = new \stdClass();
+            $data->student = "$np->firstname $np->lastname";
+            $data->ibcode = $np->id;
+            $data->reason = $np->missing;
+            $context[] = $data;
+        }
+
+        $ctx = json_encode($context);
+        //Generate the context the template will need to display the table.
+
+      //  $results = $r == true ? 'OK' : "NOT OK";
         return array(
-            'pdfbase64' => $result,
+            'context' => $ctx,
             
         );
     }
@@ -77,10 +91,10 @@ trait get_pdfbase64 {
      * @return external_single_structure
      *
      */
-    public static function get_pdfbase64_returns() {
+    public static function get_ommited_returns() {
         return new external_single_structure(
             array(
-                'pdfbase64' => new external_value(PARAM_TEXT, 'PDF in base64'),
+                'context' => new external_value(PARAM_TEXT, 'Template context'),
             )
         );
     }

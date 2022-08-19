@@ -65,6 +65,7 @@ trait update_pdfbase64 {
         );
        
         $pdfdata = json_decode($pdf);
+        
         reflectionexportermanager::update_pdfbase64($pdfdata);
 
         return array(

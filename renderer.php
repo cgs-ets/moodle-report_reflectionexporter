@@ -45,6 +45,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['newproc'] = $dataobject->newproc;
         $procs = reflectionexportermanager::get_process();
         $data['processfound'] = count($procs) > 0;
+        
         foreach($procs as $proc) {
             $pr = new stdClass();
             $pr->datecreated = userdate($proc->timecreated, get_string('strftimedatefullshort', 'core_langconfig'));
@@ -67,6 +68,8 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $info->message = 'Importing reflections to PDF. Please do not close the browser';
         $data->coursename = $context->get_context_name(false, false, true);
         $info->data =  json_encode($data);
+     
+        $info->notprocess = count(json_decode(reflectionexportermanager::get_no_reflections_json($data->rid)));
         $info->new = $data->new;
 
         echo $this->output->render_from_template('report_reflectionexporter/generating_pdf', $info);
@@ -83,4 +86,6 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
 
         echo $this->output->render_from_template('report_reflectionexporter/viewer', $data);
     }
+
+    
 }

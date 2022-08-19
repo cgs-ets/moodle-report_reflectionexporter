@@ -59,7 +59,7 @@ trait list_participants {
 
         $context = \context_course::instance($COURSE->id);
         self::validate_context($context);
-        error_log($rid);
+      
         // Parameters validation.
         self::validate_parameters(
             self::list_participants_parameters(),

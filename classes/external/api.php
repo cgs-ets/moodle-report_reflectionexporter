@@ -39,5 +39,6 @@ class api extends external_api {
     use update_pdfbase64;
     use get_pdfbase64;
     use delete_process;
+    use get_ommited;
 
 }

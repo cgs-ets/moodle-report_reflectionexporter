@@ -63,7 +63,6 @@ class reflectionexporter_form extends moodleform {
         $mform->addRule('supervisorinitials', null, 'required');
 
         // Allocated students.
-        //$manager = new reflectionexportermanager();
         reflectionexportermanager::get_active_users($this->_customdata['id']);
         $students =  reflectionexportermanager::get_active_users($this->_customdata['id']); //($manager->get_active_users($this->_customdata['id']));
         $studentsarray = array();
@@ -77,19 +76,43 @@ class reflectionexporter_form extends moodleform {
         );
         $mform->addElement('autocomplete', 'userid', get_string('activeusers', 'report_reflectionexporter'), $studentsarray, $options);
         $mform->addRule('userid', null, 'required');
-        // Assessments.
+
+        // Assessments. One for each reflection. As they could be in different order and I need a way to know which one is 1st, 2nd and 3rd
         $assessarray = array();
         $results = $this->_customdata['aids']; // Assignment ids.
 
+        // 1st reflection
         $assessarray[] = '';
         foreach ($results as $result) {
             $assessarray[$result->id] = $result->assignmentname;
         }
 
         $mform->addElement('select', 'assessments', get_string('assessments', 'report_reflectionexporter'), $assessarray);
-        $mform->getElement('assessments')->setMultiple(true);
+        $mform->getElement('assessments')->setMultiple(false);
         $mform->addRule('assessments', null, 'required');
         $mform->addHelpButton('assessments', 'assessments', 'report_reflectionexporter');
+
+        // 2nd reflection
+
+        $assessarray2[] = '';
+        foreach ($results as $result) {
+            $assessarray2[$result->id] = $result->assignmentname;
+        }
+
+        $mform->addElement('select', 'assessments2', get_string('assessments2', 'report_reflectionexporter'), $assessarray2);
+        $mform->getElement('assessments2')->setMultiple(false);
+        $mform->addRule('assessments2', null, 'required');
+        $mform->addHelpButton('assessments2', 'assessments2', 'report_reflectionexporter');
+
+        $assessarray3[] = '';
+        foreach ($results as $result) {
+            $assessarray3[$result->id] = $result->assignmentname;
+        }
+
+        $mform->addElement('select', 'assessments3', get_string('assessments3', 'report_reflectionexporter'), $assessarray3);
+        $mform->getElement('assessments3')->setMultiple(false);
+        $mform->addRule('assessments3', null, 'required');
+        $mform->addHelpButton('assessments3', 'assessments3', 'report_reflectionexporter');
 
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
@@ -101,9 +124,15 @@ class reflectionexporter_form extends moodleform {
     public function validation($data, $files) {
       
         $errors = parent::validation($data, $files);
-
-        if (count($data['assessments']) == 0) {
+       
+        if ($data['assessments']  == 0) {
             $errors['assessments'] = get_string('assessmenterror', 'report_reflectionexporter');
+        }
+        if ( $data['assessments2'] == 0) {
+            $errors['assessments2'] = get_string('assessment2error', 'report_reflectionexporter');
+        }
+        if ( $data['assessments3'] == 0) {
+            $errors['assessments3'] = get_string('assessment3error', 'report_reflectionexporter');
         }
 
         if (count($data['userid']) == 0) {
@@ -114,7 +143,6 @@ class reflectionexporter_form extends moodleform {
             $errors['supervisorinitials'] = get_string('supervisorinitialserror', 'report_reflectionexporter');
         }
 
-       
         return $errors;
     }
 }

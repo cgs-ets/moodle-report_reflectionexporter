@@ -23,21 +23,29 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Reflection exporter';
-$string['heading'] = 'Reflection exporter';
-$string['returntocourse'] = 'Return to course';
-$string['attachment_filemanager'] = 'EE/RPPF file';
-$string['attachment_filemanager_help'] = 'File where the reflections will be exported to.';
-$string['assessments'] = ' Choose one or more assessments';
-$string['assessments_help'] = 'Only assessments with submissions are displayed.';
-$string['assessmenterror'] = 'Please select an assessment';
-$string['useridterror'] = 'Please select One or more students';
-$string['supervisorinitials'] = 'Supervisor initials';
-$string['supervisorinitialserror'] = 'Please insert your initials';
-$string['activeusers'] = 'Allocated students';
-$string['action-text-continue'] = 'Continue export';
-$string['action-text-new'] = 'New export';
-$string['reflection-exporter-heading'] = 'Reflection exporter';
-$string['savingchanges'] = 'Saving changes';
-$string['nousersselected'] = 'No user selected';
-$string['cantdisplayerror'] = 'Reflection exporter is only functional in courses.';
+$string['pluginname']                       = 'Reflection exporter';
+$string['heading']                          = 'Reflection exporter';
+$string['returntocourse']                   = 'Return to course';
+$string['attachment_filemanager']           = 'EE/RPPF file';
+$string['attachment_filemanager_help']      = 'File where the reflections will be exported to.';
+$string['assessments']                      = '1<sup>st</sup> reflection';
+$string['assessments_help']                 = 'Only assessments with submission type <strong>online text</strong> are displayed.';
+$string['assessments2']                     = '2<sup>nd</sup> reflection';
+$string['assessments2_help']                = 'Only assessments with submission type <strong>online text</strong> are displayed.';
+$string['assessments3']                     = '3<sup>rd</sup> reflection';
+$string['assessments3_help']                = 'Only assessments with submission type <strong>online text</strong> are displayed.';
+$string['assessmenterror']                  = 'Please select the assessment corresponding to the 1<sup>st</sup> reflection';
+$string['assessment2error']                 = 'Please select the assessment corresponding to the  2<sup>nd</sup> reflection';
+$string['assessment3error']                 = 'Please select the assessment corresponding to the 3<sup>rd</sup> reflection';
+$string['useridterror']                     = 'Please select One or more students';
+$string['supervisorinitials']               = 'Supervisor initials';
+$string['supervisorinitialserror']          = 'Please insert your initials';
+$string['activeusers']                      = 'Allocated students';
+$string['action-text-continue']             = 'Continue export';
+$string['action-text-new']                  = 'New export';
+$string['reflection-exporter-heading']      = 'Reflection exporter';
+$string['savingchanges']                    = 'Saving changes';
+$string['nousersselected']                  = 'No user selected';
+$string['cantdisplayerror']                 = 'Reflection exporter is only functional in courses.';
+$string['noprocesserror']                   = 'The selected students did not complete their reflections';
+$string['wrongfileformat']                  = 'The PDF provided cannot be processed';

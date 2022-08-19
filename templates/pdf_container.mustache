@@ -14,13 +14,15 @@
         </div>
         <button type="submit" class="btn btn-primary save-show-next-btn">Save and show next</button>
         <button type="submit" class="btn btn-primary save-exit-btn">Save and exit</button>
-    </form>
-    
+    </form>   
   
     <div class="next-action next-action-hidden" >
-
+        <a class="action btn btn-lg btn-summary-hidden" id = "summary" title = 'Omitted students'>
+                <img class="icon iconsize-big" alt="" aria-hidden="true" src="http://localhost/cgs/moodle/report/reflectionexporter/pix/clipboard.png">
+                <div class="action-text">Summary</div>
+            </a>
         <form id ="zipform" method = "post" action = "{{downloadaction}}">
-        <input name="datajson" type="hidden" value="{{datajson}}">
+             <input name="datajson" type="hidden" value="{{datajson}}">
             <a class="action btn btn-lg" id = "download" title = 'Downloads the full batch'>
                 <img class="icon iconsize-big" alt="" aria-hidden="true" src="http://localhost/cgs/moodle/report/reflectionexporter/pix/zip.png">
                 <div class="action-text">Download </div>
@@ -28,5 +30,19 @@
         </form>
 
     </div>
+
+<div id="myModal" class="reflection-exporter-modal">
+
+  <!-- Modal content -->
+  <div class="reflection-exporter-modal-content">
+    <span class="close">&times;</span>
+    <div class = "omitted-table-container">
+        <div class = "omitted-table"></div>
+    </div>
+  </div>
+
 </div>
+</div>
+
+
 

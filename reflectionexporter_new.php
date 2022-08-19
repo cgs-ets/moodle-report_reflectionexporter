@@ -54,14 +54,20 @@ $aids = reflectionexportermanager::get_submitted_assessments($id);
 $mform = new reflectionexporter_form(null, ['id' => $id, 'cmid' => $cmid, 'aids' => $aids]);;
 
 if ($mform->is_cancelled()) {
-    redirect($courseurl);
+    redirect(new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]));
 } else if ($fromform = $mform->get_data()) {
     $fromform->courseid = $id;
     $rid = reflectionexportermanager::collect_and_save_reflections($fromform);
-    $fromform->rid = $rid;
-    report_reflectionexporter_filemanager_postupdate($fromform);
-    $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1);
-    redirect(new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params));
+
+    if ($rid == 0) { // No students reflections found with the data provided.
+        redirect(new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid, 'np' => 1]));
+    } else {
+        $fromform->rid = $rid;
+        report_reflectionexporter_filemanager_postupdate($fromform);
+        $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1);
+        
+        redirect(new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params));
+    }
 } else {
     $context = context_course::instance($id);
     $entry = report_reflectionexporter_filemanager_prep($context);

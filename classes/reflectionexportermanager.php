@@ -76,6 +76,7 @@ class reflectionexportermanager {
 
 
         $results = array_values($results);
+
         return $results;
     }
 
@@ -88,6 +89,17 @@ class reflectionexportermanager {
         $result = $DB->get_record_sql($sql, $params);
 
         return $result;
+    }
+
+    // Get the no_reflections_json column.
+    public static function get_no_reflections_json($rid) {
+        global $DB;
+        $sql = "SELECT no_reflections_json FROM {report_reflectionexporter} WHERE id = ?";
+        $params = ['id' => $rid];
+
+        $result = $DB->get_record_sql($sql, $params);
+
+        return $result->no_reflections_json;
     }
 
     // Get the details of students selected in the form.
@@ -134,14 +146,28 @@ class reflectionexportermanager {
 
         $DB->update_record('report_reflec_exporter_pdf', $dataobject);
 
-        $data = new stdClass();
-        $data->id = $pdfdata->refexid;
-        $data->status = reflectionexportermanager::STARTED;
+        // $data = new stdClass();
+        // $data->id = $pdfdata->refexid;
+        // $data->status = reflectionexportermanager::STARTED;
 
-        $DB->update_record('report_reflectionexporter', $data);
+        if ($pdfdata->finished == '1') {
+            $status =  reflectionexportermanager::FINISHED;
+        } else {
+            $status =  reflectionexportermanager::STARTED;
+        }
+
+        reflectionexportermanager::update_process_status($pdfdata->refexid, $status);
+        //$DB->update_record('report_reflectionexporter', $data);
         // We need to update the status of the process too.
     }
 
+    public static function update_process_status($rid, $status) {
+        global $DB;
+        $dataobject = new stdClass();
+        $dataobject->id = $rid;
+        $dataobject->status = $status;
+        $DB->update_record('report_reflectionexporter', $dataobject);
+    }
     public static function get_pdfbase64($rid) {
         global $DB;
 
@@ -268,9 +294,12 @@ class reflectionexportermanager {
 
         $users = reflectionexportermanager::get_selected_students($data->userid);
         $reflections = [];
+        $noreflections = [];
+        $selectedorder = [$data->assessments, $data->assessments2, $data->assessments3];
+
 
         foreach ($users as $user) {
-            $assessids = implode(',', $data->assessments);
+            $assessids = implode(',', $selectedorder);
             profile_load_custom_fields($user);
 
             $us = new stdClass();
@@ -280,20 +309,76 @@ class reflectionexportermanager {
             $us->lastname = $user->lastname;
             $us->uid = $user->id;
             $us->si = $data->supervisorinitials;
-            $us->reflections = reflectionexportermanager::get_user_reflections($data->cid, $assessids, $user->id);
+            $ref = reflectionexportermanager::get_user_reflections($data->cid, $assessids, $user->id);
 
-            $reflections[] = $us;
+            $us->reflections = reflectionexportermanager::map_assessment_order($ref, $selectedorder);
+
+            if (count($us->reflections) < 3) {
+                $us->missing = reflectionexportermanager::get_missing_assignments($us->reflections, $selectedorder);
+                unset($us->reflections); // we dont need the reflection
+                $noreflections[]  = $us;
+            } else {
+                $reflections[] = $us;
+            }
         }
 
-        // Save the reflection data in the DB.
-        $reflections = json_encode($reflections);
-        $dataobject = new stdClass();
-        $dataobject->reflections_json = $reflections;
-        $dataobject->courseid = $data->courseid;
-        $dataobject->timecreated = time();
-        $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
+        // Check that $reflections has something to process. In case they all fail, let the user know.
+        if (count($reflections) == 0) {
+            $rid = 0;
+        } else {
+
+            // Save the reflection data in the DB.
+            // Check if there are no reflections or if they are less than three.
+
+            $dataobject = new stdClass();
+            $dataobject->reflections_json = json_encode($reflections);
+            $dataobject->no_reflections_json = json_encode($noreflections);
+            $dataobject->courseid = $data->courseid;
+            $dataobject->timecreated = time();
+
+            $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
+        }
 
         return $rid;
+    }
+
+    // Order the assesments based on the selection the teacher did on the form
+    private static function map_assessment_order($reflections, $order) {
+
+        $reflectionsaux = [];
+
+        foreach ($reflections as $reflection) {
+            //get the index to set the order
+            $key =  array_search($reflection->assignment, $order);
+            $reflectionsaux[$key] = $reflection;
+        }
+
+        return $reflectionsaux;
+    }
+
+    private static function get_missing_assignments($reflections, $assessids) {
+
+        $missingassesments = '';
+        $assignments = array_column($reflections, 'assignment');
+        $missing = array_diff($assessids, $assignments);
+
+        foreach ($missing as $m) {
+            $missingassesments .= reflectionexportermanager::get_assessment_name($m) . ' ,';
+        }
+
+        $missingassesments = substr($missingassesments, 0, -1); // Remove last comma.
+        return $missingassesments;
+    }
+
+    private static function get_assessment_name($assesmentid) {
+        global $DB;
+
+        $sql = "SELECT name FROM mdl_assign where id = ?;";
+        $params = ['id' => $assesmentid];
+
+        $result = $DB->get_record_sql($sql, $params);
+
+        return $result->name;
     }
 
     // Get the pdf the user submitted in the form.

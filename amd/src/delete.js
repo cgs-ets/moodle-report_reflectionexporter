@@ -29,8 +29,11 @@ define([
     "use strict";
 
     var Delete = function () {
-        console.log('Delete');
-        this._addEventListeners();
+       
+        if (document.querySelector("tbody") != null) {
+
+            this._addEventListeners();
+        }
     }
 
 
@@ -49,17 +52,17 @@ define([
     }
 
     Delete.prototype._deleteService = function (e) {
+      
         const self = this;
-        console.log(e);
-       console.log(e.srcElement.parentElement.parentElement.parentElement);
-        self.rowIndex = e.srcElement.parentElement.parentElement.parentElement.rowIndex;
-        console.log(self);
-        e.preventDefault();
+       
+        self.rowIndex = e.srcElement.parentElement.parentElement.parentElement.rowIndex - 1;
+
         // Call the service
-        console.log(e);
+       
         //Hide the bin and show the processing
-        e.target.classList.add('deleting');
-        document.querySelector('div.deleting').classList.remove('deleting');
+        e.srcElement.parentElement.classList.add('deleting');
+        e.srcElement.parentElement.nextElementSibling.classList.remove('deleting');
+      
         Ajax.call([{
             methodname: "report_reflectionexporter_delete_process",
             args: {
@@ -68,7 +71,13 @@ define([
             done: function (response) {
                 console.log(response);
                 // remove table row
+               
                 document.querySelector("tbody").deleteRow(self.rowIndex);
+
+                // check if its the last row. if so, remove the table completely
+                if (document.querySelector("tbody").rows.length == 0) {
+                    document.querySelector('div.select-work').classList.add('deleting');
+                }
 
             },
             fail: function (reason) {
