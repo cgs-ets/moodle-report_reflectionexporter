@@ -32,9 +32,7 @@ define([
     "use strict";
 
     var ValidatePDF = function (data) {
-        console.log("ValidatePDF");
         this._isForm(data);
-
     }
 
 
@@ -47,16 +45,13 @@ define([
 
         if (fields.length == 0) {
             // take the user back to t
-            console.log(data);
-            console.log(fields);
-            const link  = URL.relativeUrl('/report/reflectionexporter/index.php', {
+            const link = URL.relativeUrl('/report/reflectionexporter/index.php', {
                 cid: data.cid,
                 cmid: data.cmid,
                 rid: data.rid,
                 wf: 1,
             });
-
-            console.log(link);
+           
             window.location.replace(link);
             return;
         } else {

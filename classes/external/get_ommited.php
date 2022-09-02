@@ -63,11 +63,11 @@ trait get_ommited {
                 'recordid' => $recordid,
             )
         );
-       
+
         $notprocessed = json_decode(reflectionexportermanager::get_no_reflections_json($recordid));
         $context = [];
 
-        foreach($notprocessed as $np) {
+        foreach ($notprocessed as $np) {
             $data = new \stdClass();
             $data->student = "$np->firstname $np->lastname";
             $data->ibcode = $np->id;
@@ -75,13 +75,11 @@ trait get_ommited {
             $context[] = $data;
         }
 
+        // Generate the context the template will need to display the table.
         $ctx = json_encode($context);
-        //Generate the context the template will need to display the table.
-
-      //  $results = $r == true ? 'OK' : "NOT OK";
         return array(
             'context' => $ctx,
-            
+
         );
     }
 

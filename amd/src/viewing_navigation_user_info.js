@@ -23,7 +23,7 @@
  * @copyright  2022 Veronica Bermegui
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later 
  */
-define(['jquery', 'core/notification', 'core/ajax', 'core/templates', 'report_reflectionexporter/view_pdf', 'report_reflectionexporter/viewer_panel'], function ($, notification, ajax, templates, viewPDF, ViewerPanel) {
+define(['jquery', 'core/notification', 'core/ajax', 'core/templates' /*, 'report_reflectionexporter/view_pdf', 'report_reflectionexporter/viewer_panel'*/], function ($, notification, ajax, templates /*, viewPDF, ViewerPanel*/) {
 
     /**
      * UserInfo class.
@@ -148,7 +148,7 @@ define(['jquery', 'core/notification', 'core/ajax', 'core/templates', 'report_re
                             this._region.fadeIn("fast");
                         }.bind(this));
 
-                       
+
 
                     }
                 }.bind(this)).fail(notification.exception);

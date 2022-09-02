@@ -28,7 +28,6 @@ defined('MOODLE_INTERNAL') || die();
 
 use external_function_parameters;
 use external_value;
-use external_single_structure;
 use core_user_external;
 use external_multiple_structure;
 use report_reflectionexporter\reflectionexportermanager;
@@ -40,7 +39,7 @@ require_once($CFG->dirroot . "/user/lib.php");
 require_once("$CFG->dirroot/user/externallib.php");
 
 /**
- * Trait implementing the external function mod_googledocs_delete_files
+ * Trait implementing the external function report_reflectionexporter_list_participants
  */
 trait list_participants {
 
@@ -59,7 +58,7 @@ trait list_participants {
 
         $context = \context_course::instance($COURSE->id);
         self::validate_context($context);
-      
+
         // Parameters validation.
         self::validate_parameters(
             self::list_participants_parameters(),
@@ -75,7 +74,7 @@ trait list_participants {
         foreach ($participants as $participant) {
             $details[] = user_get_user_details($participant, null, $userfields);
         }
-   
+
         return $details;
     }
 
@@ -89,7 +88,7 @@ trait list_participants {
         $unneededproperties = [
             'auth', 'confirmed', 'lang', 'calendartype', 'theme', 'timezone', 'mailformat',
             'skype', 'yahoo', 'aim', 'msn', 'address', 'email', 'phone1', 'phone2', 'department', 'institution',
-            'interests', 'firstaccess','lastaccess', 'suspended', 'customfields', 'preferences', 'recordid'
+            'interests', 'firstaccess', 'lastaccess', 'suspended', 'customfields', 'preferences', 'recordid'
         ];
         // Remove unneeded properties for consistency with the previous version.
         foreach ($unneededproperties as $prop) {
@@ -99,7 +98,7 @@ trait list_participants {
         $userdescription->keys['fullname']->type = PARAM_NOTAGS;
         $userdescription->keys['profileimageurlsmall']->required = VALUE_OPTIONAL;
         $userdescription->keys['profileimageurl']->required = VALUE_OPTIONAL;
-      
+
         return new external_multiple_structure($userdescription);
     }
 }

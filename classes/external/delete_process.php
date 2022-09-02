@@ -63,13 +63,12 @@ trait delete_process {
                 'rid' => $rid,
             )
         );
-       
-        
+
         $r = reflectionexportermanager::delete_process($rid);
         $results = $r == true ? 'OK' : "NOT OK";
         return array(
             'result' => $results,
-            
+
         );
     }
 

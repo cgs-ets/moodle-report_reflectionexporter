@@ -40,10 +40,7 @@ trait save_pdfbase64 {
      */
     public static function save_pdfbase64_parameters() {
         return new external_function_parameters(
-            array(
-                'pdfs' => new external_value(PARAM_RAW, 'JSON with pdfs encoded in base64'),
-
-            )
+            array('pdfs' => new external_value(PARAM_RAW, 'JSON with pdfs encoded in base64'))
         );
     }
 
@@ -57,31 +54,23 @@ trait save_pdfbase64 {
         // Parameters validation.
         self::validate_parameters(
             self::save_pdfbase64_parameters(),
-            array(
-                'pdfs' => $pdfs,
-            )
+            array('pdfs' => $pdfs)
         );
-
 
         $json = reflectionexportermanager::save_pdfbase64($pdfs);
 
-        return array(
-            'savedrecords' => json_encode($json),
-
-        );
+        return array('savedrecords' => json_encode($json));
     }
 
     /**
      * Describes the structure of the function return value.
-     * Returns the URL of the file for the student
+     * Returns the URL of the file for the student.
      * @return external_single_structure
      *
      */
     public static function save_pdfbase64_returns() {
         return new external_single_structure(
-            array(
-                'savedrecords' => new external_value(PARAM_TEXT, 'JSON with the created record'),
-            )
+            array('savedrecords' => new external_value(PARAM_TEXT, 'JSON with the created record'))
         );
     }
 }

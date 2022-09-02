@@ -35,6 +35,8 @@ $cmid                    = optional_param('cmid', 0, PARAM_INT);   // Course mod
 $nothingtoprocess        = optional_param('np', 0, PARAM_INT);    // Nothing could be processed.
 $wrongformat             = optional_param('wf', 0, PARAM_INT);   // The PDF is not correct.
 $rid                     = optional_param('rid', 0, PARAM_INT); 
+$download                = optional_param('d', 0, PARAM_INT); // Download the zip file.
+$datajson                = optional_param('datajson', 0, PARAM_RAW); // JSON with the information needed to display PDF.
 
 if (!$course = $DB->get_record('course', array('id'=>$id))) {
     print_error('invalidcourse');
@@ -52,6 +54,11 @@ $PAGE->set_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => 
 $PAGE->add_body_class('report_reflectionexporter');
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 $PAGE->set_heading(format_string($course->fullname, true, array('context' => $context)));
+
+if ($download) {
+    reflectionexportermanager::generate_zip($datajson);
+}
+
 echo $OUTPUT->header();
 
 if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
@@ -71,6 +78,7 @@ if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
 
     }
 
+  
     $renderer = $PAGE->get_renderer('report_reflectionexporter');
     $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 0]);
     $newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 1]);

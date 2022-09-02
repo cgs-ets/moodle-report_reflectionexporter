@@ -57,6 +57,7 @@ if ($mform->is_cancelled()) {
     redirect(new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]));
 } else if ($fromform = $mform->get_data()) {
     $fromform->courseid = $id;
+   
     $rid = reflectionexportermanager::collect_and_save_reflections($fromform);
 
     if ($rid == 0) { // No students reflections found with the data provided.

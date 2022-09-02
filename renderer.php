@@ -42,22 +42,37 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['newicon'] = new moodle_url('/report/reflectionexporter/pix/icon.png');
         $data['existingicon'] = new moodle_url('/report/reflectionexporter/pix/continueproc.png');
         $data['deleteicon'] = new moodle_url('/report/reflectionexporter/pix/delete.png');
+        $data['zipicon'] = new moodle_url('/report/reflectionexporter/pix/zip_2.png');
         $data['newproc'] = $dataobject->newproc;
         $procs = reflectionexportermanager::get_process();
         $data['processfound'] = count($procs) > 0;
-        
+      
         foreach($procs as $proc) {
             $pr = new stdClass();
             $pr->datecreated = userdate($proc->timecreated, get_string('strftimedatefullshort', 'core_langconfig'));
-            $f = $proc->status == 'F' ? '1' : '0';
+
+            if ($proc->status == 'F') {
+                $pr->finished = 1;
+                $f = 1;
+                $pr->status = 'Finished';
+                $pr->title = 'Show';
+                $pr->datajson = json_encode(reflectionexportermanager::get_existing_proc($proc->id));
+                
+            } else {
+                $f = 0;
+                $proc->finished = 1;
+                $pr->status = 'Started';
+                $pr->title = 'Continue';
+            }
+
             $params = array('cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'rid' => $proc->id, 'n' => 0, 'f' => $f);
             $pr->actionurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params);
-            $pr->status = $proc->status == 'F' ? 'Finished' : 'Started';
-            $pr->title = $proc->status == 'F' ? 'Show' : 'Continue';
-            $pr->deleteurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid]);;
+            $pr->deleteurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid]);
+           
             $pr->todelete =  $proc->id;
             $data['processes'] [] = $pr;
         }
+      
         echo $this->output->render_from_template('report_reflectionexporter/pick', $data);
     }
 

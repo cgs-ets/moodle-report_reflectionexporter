@@ -32,7 +32,7 @@ class reflectionexportermanager {
 
     const STARTED = 'S';
     const FINISHED = 'F';
-    const PDF_COMPLETED = 'C'; // Completed. Cant edit anymore
+    const PDF_COMPLETED = 'C'; // Completed. Cant edit anymore.
 
     // Get the course's assessments that have submissions and the submission type is onlinetext.
     public static function get_submitted_assessments($courseid) {
@@ -145,11 +145,6 @@ class reflectionexportermanager {
         $dataobject->status = reflectionexportermanager::PDF_COMPLETED;
 
         $DB->update_record('report_reflec_exporter_pdf', $dataobject);
-
-        // $data = new stdClass();
-        // $data->id = $pdfdata->refexid;
-        // $data->status = reflectionexportermanager::STARTED;
-
         if ($pdfdata->finished == '1') {
             $status =  reflectionexportermanager::FINISHED;
         } else {
@@ -157,8 +152,7 @@ class reflectionexportermanager {
         }
 
         reflectionexportermanager::update_process_status($pdfdata->refexid, $status);
-        //$DB->update_record('report_reflectionexporter', $data);
-        // We need to update the status of the process too.
+        
     }
 
     public static function update_process_status($rid, $status) {
@@ -286,11 +280,30 @@ class reflectionexportermanager {
         return $students;
     }
 
+    // Teacher is filling the form onbehalf of other teacher(s). 
+    // Get the data needed: students ids, groups id, supervisor initials for each student
+    public static function process_groupselectionjson($groups) {
+        $groups = json_decode($groups);
+        $studentids = [];
+        $supervisorids = []; //Map where index = student id, value = supervisor initial.
+        foreach ($groups as $group) {
+            foreach($group->students as $student) {
 
+                $studentids[] = $student->id;
+                $supervisorids[$student->id] = $group->si;
+            }
+        }
+        return [$studentids, $supervisorids];
+        
+    } 
     // Collect the reflections the student selected in the form did.
     // Save data in report_reflectionexporter table.
     public static function collect_and_save_reflections($data) {
         global $DB;
+
+        if (isset($data->onbehalf)) { 
+            list($data->userid, $supervisorids) = reflectionexportermanager::process_groupselectionjson($data->groupselectionjson);
+        }
 
         $users = reflectionexportermanager::get_selected_students($data->userid);
         $reflections = [];
@@ -308,7 +321,7 @@ class reflectionexportermanager {
             $us->firstname = $user->firstname;
             $us->lastname = $user->lastname;
             $us->uid = $user->id;
-            $us->si = $data->supervisorinitials;
+            $us->si = isset($data->onbehalf) ? $supervisorids[$user->id] : $data->supervisorinitials;
             $ref = reflectionexportermanager::get_user_reflections($data->cid, $assessids, $user->id);
 
             $us->reflections = reflectionexportermanager::map_assessment_order($ref, $selectedorder);
@@ -406,5 +419,100 @@ class reflectionexportermanager {
             null,
             true
         );
+    }
+
+    // Return groups that have members in it and it has at least a teacher.
+    public static function get_groups_with_teachers($courseid) {
+        $groups = groups_get_all_groups($courseid, 0, 0, 'g.*', true);
+        $groupsaux = [];
+        foreach ($groups as $group) {
+            list($students, $teachers)  = reflectionexportermanager::get_students_teachers_in_group($group->members, $courseid);
+            // Add the separated teachers and students
+            $group->students = $students;
+            $group->teachers = $teachers;
+            unset($group->members); // We dont need them anymore.
+            if (count($teachers) > 0) {
+                $groupsaux[$group->id] = $group;
+            }
+        }
+
+        return $groupsaux;
+    }
+
+
+    // Traverse the group members and classify them in students and teachers.
+    public static function get_students_teachers_in_group($users, $courseid) {
+        global $DB;
+        $context = context_course::instance($courseid);
+        $teachers = [];
+        $students = [];
+ 
+        foreach ($users as  $userid) {
+            $roles = get_user_roles($context, $userid, true);
+            foreach ($roles as $role) {
+                if (in_array($role->roleid, [3, 4])) { // Role id = 3 --> Editing Teacher. Role id = 4 --> Non editing teacher.
+
+                    $teachers[] = $userid;
+                }
+
+                if (in_array($role->roleid, [5])) { // Role id = 5 -->Student.
+                    
+                    $students[] = $userid;
+                }
+            }
+        }
+        // Collect the data we need 
+        if (count($students) > 0 && count($teachers)) {
+
+            $students = implode(',', $students);
+            $students = array_values($DB->get_records_sql("SELECT id, firstname, lastname FROM mdl_user WHERE id in ($students)" ));
+            $teachers = implode(',', $teachers);
+            $teachers = array_values($DB->get_records_sql("SELECT id, firstname, lastname FROM mdl_user WHERE id in ($teachers)" ));
+        }
+       
+       
+        return [$students, $teachers];
+    }
+
+    // Get the teachers details we will add in the textinputs in the form.
+    public static function get_teacher_from_selector($data) {
+        $context = context_course::instance($data->courseid);
+        $users = get_users_by_capability($context, 'report/reflectionexporter:grade', 'u.id, u.firstname, u.lastname', 'u.lastname', '', $data->groupid);
+        $userctx = [];
+
+        foreach ($users as $user) {
+
+            $firstname = substr($user->firstname, 0, 1);
+            $lastname = substr($user->lastname, 0, 1);
+            $user->si = "$firstname.$lastname";
+            $user->userid = $user->id;
+            $user->groupid = $data->groupid;
+            $user->name = $data->groupname;
+
+            $userctx[] = $user;
+        }
+
+        return $userctx;
+    }
+
+    public static function get_students_in_group($courseid) {
+        $context = context_course::instance($courseid);
+        // $groups = groups_get_all_groups($courseid, 0, 0, 'id', true);
+
+        // foreach ($groups as $group) {
+        //     $group->students = get_users_by_capability($context, 'mod/assign:submit', 'u.id', '', $group->id);
+        //     $roles = get_user_roles($context, $userid, true);
+        //     foreach ($roles as $role) {
+        //         if (!in_array($role->roleid, [5])) { // Role id = 3 --> Editing Teacher.
+        //             //  Role id = 4 --> Non editing teacher.
+        //             continue;
+        //         }
+
+        //         $teachers[] = $userid;
+        //     }
+
+        // }
+
+        // return json_encode(array_values($groups));
     }
 }

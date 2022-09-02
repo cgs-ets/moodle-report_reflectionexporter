@@ -32,7 +32,7 @@ use report_reflectionexporter\reflectionexportermanager;
 class reflectionexporter_form extends moodleform {
 
     public function definition() {
-
+        global $PAGE;
         $mform = $this->_form; // Don't forget the underscore.
 
         // Hidden elements.
@@ -56,26 +56,111 @@ class reflectionexporter_form extends moodleform {
         $mform->addHelpButton('attachment_filemanager', 'attachment_filemanager', 'report_reflectionexporter');
         $mform->addRule('attachment_filemanager', null, 'required');
 
-        // Supervisor initials.
+        /**
+         * Ask if the user is going to generate the reflections for their student OR do it on behalf of others.
+         * If its on behalf of others, open the option to select the groups --> Each group will have the teacher 
+         * responsible for the students in the group reflection.
+         */
+        $mform->addElement('checkbox', 'onbehalf', get_string('onbehalf', 'report_reflectionexporter'));
+
+        // Supervisor initials.  DEFAULT. Teacher is doing their job only.
         $attributes = array('size' => '6');
         $mform->addElement('text', 'supervisorinitials', get_string('supervisorinitials', 'report_reflectionexporter'), $attributes);
         $mform->settype('supervisorinitials', PARAM_TEXT);
-        $mform->addRule('supervisorinitials', null, 'required');
+        $mform->hideIf('supervisorinitials', 'onbehalf', 'checked');
 
-        // Allocated students.
+        // Teacher is doing another teachers job.
+
+        // Group selection.
+        $groups = reflectionexportermanager::get_groups_with_teachers($this->_customdata['id']);
+
+        $grouparray = array();
+        $grouparrayaux = array();
+        $studentsingroups = array();
+        $teachersingroups = array();
+
+        foreach ($groups as $groupid => $group) {
+            $id = $groupid;
+            $grouparray[$id] = $group->name;
+            $data = new stdClass();
+            $data->groupname = $group->name;
+            $data->groupid = $groupid;
+            $data->courseid =  $this->_customdata['id'];
+            $data->teachers = $group->teachers;
+            $data->students = $group->students;
+            $grouparrayaux[] = $data;
+        }
+        $select =  $mform->addElement('select', 'coursegroups', get_string('coursegroups', 'report_reflectionexporter'), $grouparray);
+        $select->setMultiple(true);
+        $mform->addHelpButton('coursegroups', 'coursegroups', 'report_reflectionexporter');
+        $mform->hideIf('coursegroups', 'onbehalf', 'notchecked');
+
+        // Add the Teachers found based on the groups. Keep them all hidden unless the teacher picks the group this teacher belongs to.
+        foreach ($grouparrayaux as $aux) {
+
+            $details = $aux->teachers;
+            foreach ($details as $detail) {
+                $fieldname = "teacher_" . $aux->groupid . '_' . $detail->id; // 
+                $si = substr($detail->firstname, 0, 1) . '.' . substr($detail->lastname, 0, 1);
+                $label = get_string('teacheringroup', 'report_reflectionexporter', ['firstname' => $detail->firstname, 'lastname' => $detail->lastname,]);
+               
+                $mform->addElement('text', $fieldname, $label, array('size' => '6', 'class' => 'teacher-initial-field-hide'));
+                $mform->settype($fieldname, PARAM_TEXT);
+                $mform->setDefault($fieldname, $si);
+                $mform->hideIf($fieldname, 'onbehalf', 'notchecked');
+               
+                $detail->si = $si;
+                $detail->groupid = $aux->groupid;
+                $detail->students = $aux->students;
+                $teachersingroups[] = $detail;
+            }
+
+            $stdaux = new stdClass();
+            $stdaux->groupid = $aux->groupid;
+            $stdaux->students = $aux->students;
+            $studentsingroups[] = $stdaux;
+        }
+
+        // Keep a JSON to keep track of the groups selected.
+        $mform->addElement('text', 'groupselectionjson', 'Group Selection JSON'/*, ['hidden' => true]*/);
+        $mform->settype('groupselectionjson', PARAM_TEXT);
+        $mform->setDefault('groupselectionjson', '[]');
+        $mform->disabledIf('groupselectionjson', 'onbehalf', 'notchecked');
+        // Auxiliar input to keep a reference to the full list of teachers in the groups. This is used in the JS.
+        $mform->addElement('text', 'groupselectionjsonaux', 'Group Selection JSON AUX'/*, ['hidden' => true]*/);
+        $mform->settype('groupselectionjsonaux', PARAM_TEXT);
+        $mform->setDefault('groupselectionjsonaux', json_encode($teachersingroups));
+        $mform->disabledIf('groupselectionjsonaux', 'onbehalf', 'notchecked');
+
+
+        // Allocated students. Only if the teacher is filling the form on behalf of another teacher, because if that is the case, thenwe ha
         reflectionexportermanager::get_active_users($this->_customdata['id']);
-        $students =  reflectionexportermanager::get_active_users($this->_customdata['id']); //($manager->get_active_users($this->_customdata['id']));
+
+        $students =  reflectionexportermanager::get_active_users($this->_customdata['id']);
         $studentsarray = array();
+
         foreach ($students as $uid => $student) {
             $studentsarray[$uid] = $student->firstname . ' ' . $student->lastname;
         }
+
         $options = array(
             'multiple' => true,
-            'noselectionstring' => '',
-            
+            'noselectionstring' => 'Select students',
+            'valuehtmlcallback' => function ($value) {
+                global $DB, $OUTPUT;
+                $user = $DB->get_record('user', ['id' => (int)$value], '*', IGNORE_MISSING);
+                if (!$user || !user_can_view_profile($user)) {
+                    return false;
+                }
+                $details = user_get_user_details($user);
+                return $OUTPUT->render_from_template(
+                    'core_search/form-user-selector-suggestion',
+                    $details
+                );
+            }
         );
         $mform->addElement('autocomplete', 'userid', get_string('activeusers', 'report_reflectionexporter'), $studentsarray, $options);
-        $mform->addRule('userid', null, 'required');
+        $mform->hideIf('userid', 'onbehalf', 'checked');
 
         // Assessments. One for each reflection. As they could be in different order and I need a way to know which one is 1st, 2nd and 3rd
         $assessarray = array();
@@ -118,29 +203,34 @@ class reflectionexporter_form extends moodleform {
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         $buttonarray[] = $mform->createElement('cancel');
         $mform->addGroup($buttonarray, 'buttonar', '', ' ', false);
+
+        $PAGE->requires->js_call_amd('report_reflectionexporter/supervisor_initial_control', 'init', []);
     }
 
     // Custom validation should be added here.
     public function validation($data, $files) {
-      
+
         $errors = parent::validation($data, $files);
        
         if ($data['assessments']  == 0) {
             $errors['assessments'] = get_string('assessmenterror', 'report_reflectionexporter');
         }
-        if ( $data['assessments2'] == 0) {
+        if ($data['assessments2'] == 0) {
             $errors['assessments2'] = get_string('assessment2error', 'report_reflectionexporter');
         }
-        if ( $data['assessments3'] == 0) {
+        if ($data['assessments3'] == 0) {
             $errors['assessments3'] = get_string('assessment3error', 'report_reflectionexporter');
         }
 
-        if (count($data['userid']) == 0) {
-            $errors['userid'] = get_string('useridterror', 'report_reflectionexporter');
-        }
+        if(!isset($data['onbehalf'])) {
 
-        if (empty($data['supervisorinitials'])) {
-            $errors['supervisorinitials'] = get_string('supervisorinitialserror', 'report_reflectionexporter');
+            if (count($data['userid']) == 0) {
+                $errors['userid'] = get_string('useridterror', 'report_reflectionexporter');
+            }
+    
+            if (empty($data['supervisorinitials'])) {
+                $errors['supervisorinitials'] = get_string('supervisorinitialserror', 'report_reflectionexporter');
+            }
         }
 
         return $errors;

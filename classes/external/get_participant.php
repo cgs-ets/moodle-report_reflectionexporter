@@ -69,8 +69,8 @@ trait get_participant {
             )
         );
         // Get the File and grading details.
-        $sql = "SELECT ref.userid, u.firstname, 
-                    u.lastname, ref.pdf, ref.courseid
+        $sql = "SELECT ref.userid, u.firstname,
+                u.lastname, ref.pdf, ref.courseid
                 FROM mdl_report_reflec_exporter_pdf AS ref
                 INNER JOIN mdl_user AS u ON ref.userid = u.id
                 WHERE ref.refexid = :refid AND ref.userid = :userid";
@@ -79,7 +79,7 @@ trait get_participant {
         $results = $DB->get_records_sql($sql, $params);
 
         $file = new \stdClass();
-        
+
         foreach ($results as $record) {
             $file->pdf = $record->pdf;
             $file->courseid = $record->courseid;

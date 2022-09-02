@@ -59,16 +59,14 @@ trait get_reflections {
         // Parameters validation.
         self::validate_parameters(
             self::get_reflections_parameters(),
-            array(
-                'rid' => $rid,
-            )
+            array('rid' => $rid)
         );
-       
+
         $result = reflectionexportermanager::get_reflections_json($rid);
 
         return array(
             'reflecjson' => $result->reflections_json,
-            
+
         );
     }
 
