@@ -38,8 +38,8 @@ class reflectionexportermanager {
     public static function get_submitted_assessments($courseid) {
         global $DB;
 
-        $sql = "SELECT distinct assign.id, assign.name AS 'assignmentname' FROM {assign} as assign 
-                JOIN {assign_submission} as asub 
+        $sql = "SELECT distinct assign.id, assign.name AS 'assignmentname' FROM {assign} as assign
+                JOIN {assign_submission} as asub
                 ON assign.id = asub.assignment
                 JOIN {assignsubmission_onlinetext} as onlinetxt ON assign.id = onlinetxt.assignment
                 WHERE assign.course = ? AND asub.status = ?";
@@ -57,23 +57,23 @@ class reflectionexportermanager {
 
         $sql = "SELECT onlinetxt.*, asub.timemodified AS 'month', asub.userid
                 FROM {assignsubmission_onlinetext} AS onlinetxt
-                JOIN {assign_submission} AS asub 
-                ON onlinetxt.submission = asub.id               
-                WHERE asub.status = ? 
+                JOIN {assign_submission} AS asub
+                ON onlinetxt.submission = asub.id
+                WHERE asub.status = ?
                 AND asub.assignment IN ($assessids)
                 AND asub.userid = ?;";
 
         $params = ['status' => 'submitted', 'userid' => $userid];
         $results = $DB->get_records_sql($sql, $params);
         $context = $context = context_course::instance($courseid);
-        // Format the text to keep new lines. If the student added images, process the URL to avoid warning. 
+        // Format has to me FORMAT_MOODLE otherwise the text might be too long and wont be display propery.
+        // If the student added images, process the URL to avoid warning.
         // The image wont be seen in the PDF.
         foreach ($results as $r) {
             $onlinetext = file_rewrite_pluginfile_urls($r->onlinetext, 'pluginfile.php', $context->id, 'assignsubmission_onlinetext', 'submissions_onlinetext', $r->id);
-            $r->onlinetext =  json_encode(strip_tags(format_text($onlinetext, FORMAT_MARKDOWN)), JSON_HEX_QUOT | JSON_HEX_TAG);
+            $r->onlinetext =  json_encode(strip_tags(format_text($onlinetext, FORMAT_MOODLE)), JSON_HEX_QUOT | JSON_HEX_TAG);
             $r->month = date('F', $r->month);
         }
-
 
         $results = array_values($results);
 
@@ -152,7 +152,7 @@ class reflectionexportermanager {
         }
 
         reflectionexportermanager::update_process_status($pdfdata->refexid, $status);
-        
+
     }
 
     public static function update_process_status($rid, $status) {
@@ -189,8 +189,8 @@ class reflectionexportermanager {
 
 
         $sql = "SELECT  exp.*, u.lastname, u.firstname
-                FROM mdl_user as u 
-                INNER JOIN mdl_report_reflec_exporter_pdf exp  
+                FROM mdl_user as u
+                INNER JOIN mdl_report_reflec_exporter_pdf exp
                 ON u.id = exp.userid
                 WHERE u.id in ($userids) AND exp.id in ($exportids ) AND exp.refexid = $refexpids";
 
@@ -218,7 +218,7 @@ class reflectionexportermanager {
         readfile($file);
         unlink($file);
 
-        // Update status 
+        // Update status
 
         reflectionexportermanager::update_download_status($refexpids);
 
@@ -227,7 +227,7 @@ class reflectionexportermanager {
 
     public static function update_download_status($id) {
         global $DB;
-        // Update status 
+        // Update status
         $dataobject = new stdClass();
         $dataobject->id = $id;
         $dataobject->status = reflectionexportermanager::FINISHED;
@@ -280,7 +280,7 @@ class reflectionexportermanager {
         return $students;
     }
 
-    // Teacher is filling the form onbehalf of other teacher(s). 
+    // Teacher is filling the form onbehalf of other teacher(s).
     // Get the data needed: students ids, groups id, supervisor initials for each student
     public static function process_groupselectionjson($groups) {
         $groups = json_decode($groups);
@@ -294,14 +294,14 @@ class reflectionexportermanager {
             }
         }
         return [$studentids, $supervisorids];
-        
-    } 
+
+    }
     // Collect the reflections the student selected in the form did.
     // Save data in report_reflectionexporter table.
     public static function collect_and_save_reflections($data) {
         global $DB;
 
-        if (isset($data->onbehalf)) { 
+        if (isset($data->onbehalf)) {
             list($data->userid, $supervisorids) = reflectionexportermanager::process_groupselectionjson($data->groupselectionjson);
         }
 
@@ -446,7 +446,7 @@ class reflectionexportermanager {
         $context = context_course::instance($courseid);
         $teachers = [];
         $students = [];
- 
+
         foreach ($users as  $userid) {
             $roles = get_user_roles($context, $userid, true);
             foreach ($roles as $role) {
@@ -456,12 +456,12 @@ class reflectionexportermanager {
                 }
 
                 if (in_array($role->roleid, [5])) { // Role id = 5 -->Student.
-                    
+
                     $students[] = $userid;
                 }
             }
         }
-        // Collect the data we need 
+        // Collect the data we need
         if (count($students) > 0 && count($teachers)) {
 
             $students = implode(',', $students);
@@ -469,8 +469,8 @@ class reflectionexportermanager {
             $teachers = implode(',', $teachers);
             $teachers = array_values($DB->get_records_sql("SELECT id, firstname, lastname FROM mdl_user WHERE id in ($teachers)" ));
         }
-       
-       
+
+
         return [$students, $teachers];
     }
 
