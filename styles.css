@@ -1,7 +1,8 @@
-#id_assessments,
+select#id_assessments,
 #id_assessments2,
 #id_assessments3 {
-    width: 30%;
+    min-width: 30%;
+    height: auto;
 }
 
 /* Form. */
@@ -79,6 +80,35 @@ table.table.table-bordered.table-responsive.started-work {
     padding: 6px;
 }
 
+.path-report-reflectionexporter [data-region="viewer-navigation"] {
+    padding: 6px;
+}
+
+.path-report-reflectionexporter [data-region="reflectionexporter-info"] {
+    overflow-y: hidden;
+}
+
+.path-report-reflectionexporter [data-region="reflectionexporter-info"] {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}
+
+.path-report-reflectionexporter [data-region="user-info"] {
+    height: 60px;
+}
+
+.path-report-reflectionexporter [data-region="user-selector"] .alignment {
+    float: right;
+    width: 320px;
+    text-align: center;
+    margin-top: 7px;
+}
+
+.path-report-reflectionexporter select.custom-select {
+    width: 15rem;
+    display: inline-block;
+}
 .row.reflection-container {
     margin-bottom: 2%;
 }
