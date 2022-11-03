@@ -11,7 +11,8 @@ select#id_assessments,
 }
 
 div#fitem_id_groupselectionjson,
-div#fitem_id_groupselectionjsonaux {
+div#fitem_id_groupselectionjsonaux,
+div#fitem_id_groupscount {
     display: none;
 }
 

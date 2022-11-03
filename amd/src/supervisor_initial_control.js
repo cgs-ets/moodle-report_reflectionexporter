@@ -51,70 +51,73 @@ define(['jquery'], function ($) {
         self.initListeners();
     };
 
-    // Add event listener to the select 
+    // Add event listener to the select
     SupervisorInitialControl.prototype.initListeners = function () {
         const self = this;
+        // Chek there are  groups in the course.
+        if (document.getElementById('id_coursegroups') != null) {
 
-        document.getElementById('id_coursegroups').addEventListener('change', (function (e) {
-            // Add selected teachers to the JSON.
-            $(e.target).find('option:selected').each(function (index, option) {
-                const groupid = option.value;
+            document.getElementById('id_coursegroups').addEventListener('change', (function (e) {
+                // Add selected teachers to the JSON.
+                $(e.target).find('option:selected').each(function (index, option) {
+                    const groupid = option.value;
 
-                // look for the teacher in the group.
-                const teacher = document.querySelectorAll(`[id^= id_teacher_${groupid}]`)[0];
-                // Get the div that has the id fitem_id_teacher_groupid_techerid.
-                let teacherid = `fitem_${teacher.getAttribute('id')}`;
-                const dEl = document.getElementById(teacherid);
-                teacherid = teacherid.split('_');
-                teacherid = teacherid[teacherid.length - 1];
+                    // look for the teacher in the group.
+                    const teacher = document.querySelectorAll(`[id^= id_teacher_${groupid}]`)[0];
+                    // Get the div that has the id fitem_id_teacher_groupid_techerid.
+                    let teacherid = `fitem_${teacher.getAttribute('id')}`;
+                    const dEl = document.getElementById(teacherid);
+                    teacherid = teacherid.split('_');
+                    teacherid = teacherid[teacherid.length - 1];
 
-                dEl.classList.remove('teacher-initial-field-hide');
-                const details = {
-                    groupid: groupid,
-                    teacherid: teacherid,
-                    delete: 0
-                };
-                self.updateTeacherSelectionJSON(details);
-                //self.updateStudentSelectionJSON(details);
-            });
+                    dEl.classList.remove('teacher-initial-field-hide');
+                    const details = {
+                        groupid: groupid,
+                        teacherid: teacherid,
+                        delete: 0
+                    };
+                    self.updateTeacherSelectionJSON(details);
+                    //self.updateStudentSelectionJSON(details);
+                });
 
-            // Control that the unselect elements are not part of the JSON. (Example: Selected all first and then unselect some)
-            $('#id_coursegroups option:not(:selected)').each(function (index, option) {
-                const groupid = option.value;
-                // look for the teacher in the group.
-                const teacher = document.querySelectorAll(`[id^= id_teacher_${groupid}]`)[0];
-                let teacherid = `fitem_${teacher.getAttribute('id')}`;
-                const dEl = document.getElementById(teacherid);
-                teacherid = teacherid.split('_');
-                teacherid = teacherid[teacherid.length - 1];
-                dEl.classList.add('teacher-initial-field-hide');
-                const details = {
-                    groupid: groupid,
-                    teacherid: teacherid,
-                    delete: 1
-                };
-                self.updateTeacherSelectionJSON(details);
+                // Control that the unselect elements are not part of the JSON. (Example: Selected all first and then unselect some)
+                $('#id_coursegroups option:not(:selected)').each(function (index, option) {
+                    const groupid = option.value;
+                    // look for the teacher in the group.
+                    const teacher = document.querySelectorAll(`[id^= id_teacher_${groupid}]`)[0];
+                    let teacherid = `fitem_${teacher.getAttribute('id')}`;
+                    const dEl = document.getElementById(teacherid);
+                    teacherid = teacherid.split('_');
+                    teacherid = teacherid[teacherid.length - 1];
+                    dEl.classList.add('teacher-initial-field-hide');
+                    const details = {
+                        groupid: groupid,
+                        teacherid: teacherid,
+                        delete: 1
+                    };
+                    self.updateTeacherSelectionJSON(details);
 
 
-            })
+                })
 
-        }).bind(self));
+            }).bind(self));
 
-        // Add listener to the teachers initial inputs to pick up any changes done.
-        const supervisorintials = document.querySelectorAll("[id^= id_teacher_]");
-        $(supervisorintials).each(function (index, sinput) {
-            sinput.addEventListener('change', function (e) {
-                let teacherid = e.target.getAttribute('id');
-                teacherid = teacherid.split('_');
-                teacherid = teacherid[teacherid.length - 1];
-                console.log(e.target.value)
-                const data = {
-                    id: teacherid,
-                    si: e.target.value
-                };
-                self.updateTeacherInitial(data);
-            });
-        }).bind(self);
+            // Add listener to the teachers initial inputs to pick up any changes done.
+            const supervisorintials = document.querySelectorAll("[id^= id_teacher_]");
+            $(supervisorintials).each(function (index, sinput) {
+                sinput.addEventListener('change', function (e) {
+                    let teacherid = e.target.getAttribute('id');
+                    teacherid = teacherid.split('_');
+                    teacherid = teacherid[teacherid.length - 1];
+                    console.log(e.target.value)
+                    const data = {
+                        id: teacherid,
+                        si: e.target.value
+                    };
+                    self.updateTeacherInitial(data);
+                });
+            }).bind(self);
+        }
     }
 
     SupervisorInitialControl.prototype.updateTeacherSelectionJSON = function (details) {
@@ -158,7 +161,7 @@ define(['jquery'], function ($) {
         jsoninput.forEach(function (teacher) {
             if (teacher.id == data.id) {
                 teacher.si = data.si;
-                
+
             }
         }, data);
 

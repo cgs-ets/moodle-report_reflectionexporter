@@ -45,7 +45,7 @@ require_capability('report/reflectionexporter:grade', $context);
 
 $PAGE->set_context($context);
 $PAGE->set_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid]);
-$PAGE->add_body_class('report_reflectionexporter');
+$PAGE->add_body_classes(['report_reflectionexporter','limitedwidth']);
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 $PAGE->set_heading(format_string($course->fullname, true, array('context' => $context)));
 
@@ -57,7 +57,7 @@ if ($mform->is_cancelled()) {
     redirect(new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]));
 } else if ($fromform = $mform->get_data()) {
     $fromform->courseid = $id;
-   
+
     $rid = reflectionexportermanager::collect_and_save_reflections($fromform);
 
     if ($rid == 0) { // No students reflections found with the data provided.
@@ -66,7 +66,7 @@ if ($mform->is_cancelled()) {
         $fromform->rid = $rid;
         report_reflectionexporter_filemanager_postupdate($fromform);
         $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1);
-        
+
         redirect(new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params));
     }
 } else {
