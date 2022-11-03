@@ -33,8 +33,6 @@ use external_multiple_structure;
 use report_reflectionexporter\reflectionexportermanager;
 
 require_once($CFG->libdir . '/externallib.php');
-require_once($CFG->dirroot . '/mod/googledocs/lib.php');
-require_once($CFG->dirroot . '/mod/googledocs/locallib.php');
 require_once($CFG->dirroot . "/user/lib.php");
 require_once("$CFG->dirroot/user/externallib.php");
 
