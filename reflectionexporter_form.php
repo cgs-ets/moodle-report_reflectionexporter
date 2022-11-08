@@ -161,7 +161,7 @@ class reflectionexporter_form extends moodleform {
                 if (!$user || !user_can_view_profile($user)) {
                     return false;
                 }
-                $details = user_get_user_details($user);
+                $details = reflectionexportermanager::get_user_details($user);
                 return $OUTPUT->render_from_template(
                     'core_search/form-user-selector-suggestion',
                     $details

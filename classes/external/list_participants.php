@@ -70,7 +70,7 @@ trait list_participants {
         $details = [];
 
         foreach ($participants as $participant) {
-            $details[] = user_get_user_details($participant, null, $userfields);
+            $details[] = reflectionexportermanager::get_user_details($participant, $userfields);
         }
 
         return $details;

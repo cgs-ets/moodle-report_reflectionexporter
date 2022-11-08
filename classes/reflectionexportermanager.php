@@ -495,24 +495,92 @@ class reflectionexportermanager {
         return $userctx;
     }
 
-    public static function get_students_in_group($courseid) {
-        $context = context_course::instance($courseid);
-        // $groups = groups_get_all_groups($courseid, 0, 0, 'id', true);
+    public static function get_user_details($user, array $userfields = array()){
+        global $USER, $DB, $CFG, $PAGE;
+        require_once($CFG->dirroot . "/user/profile/lib.php"); // Custom field library.
+        require_once($CFG->dirroot . "/lib/filelib.php");      // File handling on description and friends.
 
-        // foreach ($groups as $group) {
-        //     $group->students = get_users_by_capability($context, 'mod/assign:submit', 'u.id', '', $group->id);
-        //     $roles = get_user_roles($context, $userid, true);
-        //     foreach ($roles as $role) {
-        //         if (!in_array($role->roleid, [5])) { // Role id = 3 --> Editing Teacher.
-        //             //  Role id = 4 --> Non editing teacher.
-        //             continue;
-        //         }
+        $defaultfields = user_get_default_fields();
 
-        //         $teachers[] = $userid;
-        //     }
+        if (empty($userfields)) {
+            $userfields = $defaultfields;
+        }
 
-        // }
+        foreach ($userfields as $thefield) {
+            if (!in_array($thefield, $defaultfields)) {
+                throw new moodle_exception('invaliduserfield', 'error', '', $thefield);
+            }
+        }
 
-        // return json_encode(array_values($groups));
+        // Make sure id and fullname are included.
+        if (!in_array('id', $userfields)) {
+            $userfields[] = 'id';
+        }
+
+        if (!in_array('fullname', $userfields)) {
+            $userfields[] = 'fullname';
+        }
+
+        $userdetails = array();
+        $userdetails['id'] = $user->id;
+
+        if (in_array('username', $userfields)) {
+            $userdetails['username'] = $user->username;
+        }
+        if ($isadmin or $canviewfullnames) {
+            if (in_array('firstname', $userfields)) {
+                $userdetails['firstname'] = $user->firstname;
+            }
+            if (in_array('lastname', $userfields)) {
+                $userdetails['lastname'] = $user->lastname;
+            }
+        }
+        $userdetails['fullname'] = fullname($user, $canviewfullnames);
+
+        if (in_array('customfields', $userfields)) {
+            $categories = profile_get_user_fields_with_data_by_category($user->id);
+            $userdetails['customfields'] = array();
+            foreach ($categories as $categoryid => $fields) {
+                foreach ($fields as $formfield) {
+                    if ($formfield->is_visible() and !$formfield->is_empty()) {
+
+                        // TODO: Part of MDL-50728, this conditional coding must be moved to
+                        // proper profile fields API so they are self-contained.
+                        // We only use display_data in fields that require text formatting.
+                        if ($formfield->field->datatype == 'text' or $formfield->field->datatype == 'textarea') {
+                            $fieldvalue = $formfield->display_data();
+                        } else {
+                            // Cases: datetime, checkbox and menu.
+                            $fieldvalue = $formfield->data;
+                        }
+
+                        $userdetails['customfields'][] =
+                            array('name' => $formfield->field->name, 'value' => $fieldvalue,
+                                'type' => $formfield->field->datatype, 'shortname' => $formfield->field->shortname);
+                    }
+                }
+            }
+            // Unset customfields if it's empty.
+            if (empty($userdetails['customfields'])) {
+                unset($userdetails['customfields']);
+            }
+        }
+
+        // Profile image.
+        if (in_array('profileimageurl', $userfields)) {
+            $userpicture = new \user_picture($user);
+            $userpicture->size = 1; // Size f1.
+            $userdetails['profileimageurl'] = $userpicture->get_url($PAGE)->out(false);
+        }
+        if (in_array('profileimageurlsmall', $userfields)) {
+            if (!isset($userpicture)) {
+                $userpicture = new user_picture($user);
+            }
+            $userpicture->size = 0; // Size f2.
+            $userdetails['profileimageurlsmall'] = $userpicture->get_url($PAGE)->out(false);
+        }
+
+        return $userdetails;
     }
+
 }

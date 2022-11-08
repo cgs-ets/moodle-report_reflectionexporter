@@ -26,6 +26,7 @@
 $string['pluginname']                       = 'Reflection exporter';
 $string['heading']                          = 'Reflection exporter';
 $string['returntocourse']                   = 'Return to course';
+$string['reflectionexporter:grade']         = 'Reflection exporter: grade';
 $string['attachment_filemanager']           = 'EE/RPPF file';
 $string['attachment_filemanager_help']      = 'File where the reflections will be exported to.';
 $string['assessments']                      = '1<sup>st</sup> reflection';
