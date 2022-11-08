@@ -142,7 +142,7 @@ class reflectionexporter_form extends moodleform {
         $mform->setDefault('groupselectionjsonaux', json_encode($teachersingroups));
         $mform->disabledIf('groupselectionjsonaux', 'onbehalf', 'notchecked');
 
-        // Allocated students. Only if the teacher is filling the form on behalf of another teacher, because if that is the case, thenwe ha
+        // Allocated students. Only if the teacher is filling the form on behalf of another teacher.
         reflectionexportermanager::get_active_users($this->_customdata['id']);
 
         $students = reflectionexportermanager::get_active_users($this->_customdata['id']);
