@@ -99,6 +99,10 @@ table.table.table-bordered.table-responsive.started-work {
     height: 60px;
 }
 
+.path-report-reflectionexporter [data-region="user-info"] em.nowrap {
+    display: flow-root;
+}
+
 .path-report-reflectionexporter [data-region="user-selector"] .alignment {
     float: right;
     width: 320px;

@@ -28,14 +28,16 @@ use moodle_url;
 use stdClass;
 use ZipArchive;
 
-class reflectionexportermanager {
+class reflectionexportermanager
+{
 
     const STARTED = 'S';
     const FINISHED = 'F';
     const PDF_COMPLETED = 'C'; // Completed. Cant edit anymore.
 
     // Get the course's assessments that have submissions and the submission type is onlinetext.
-    public static function get_submitted_assessments($courseid) {
+    public static function get_submitted_assessments($courseid)
+    {
         global $DB;
 
         $sql = "SELECT distinct assign.id, assign.name AS 'assignmentname' FROM {assign} as assign
@@ -52,7 +54,8 @@ class reflectionexportermanager {
     }
 
     // Get the reflections the student submitted.
-    public static function get_user_reflections($courseid, $assessids, $userid) {
+    public static function get_user_reflections($courseid, $assessids, $userid)
+    {
         global $DB;
 
         $sql = "SELECT onlinetxt.*, asub.timemodified AS 'month', asub.userid
@@ -81,7 +84,8 @@ class reflectionexportermanager {
     }
 
     // Get the reflections_json column.
-    public static function get_reflections_json($rid) {
+    public static function get_reflections_json($rid)
+    {
         global $DB;
         $sql = "SELECT reflections_json FROM {report_reflectionexporter} WHERE id = ?";
         $params = ['id' => $rid];
@@ -92,7 +96,8 @@ class reflectionexportermanager {
     }
 
     // Get the no_reflections_json column.
-    public static function get_no_reflections_json($rid) {
+    public static function get_no_reflections_json($rid)
+    {
         global $DB;
         $sql = "SELECT no_reflections_json FROM {report_reflectionexporter} WHERE id = ?";
         $params = ['id' => $rid];
@@ -103,7 +108,8 @@ class reflectionexportermanager {
     }
 
     // Get the details of students selected in the form.
-    public static function get_selected_students($studentids) {
+    public static function get_selected_students($studentids)
+    {
         global $DB;
 
         $ids = implode(',', $studentids);
@@ -116,7 +122,8 @@ class reflectionexportermanager {
     }
 
     // Save the PDF filled with the students reflections.
-    public static function save_pdfbase64($pdfs) {
+    public static function save_pdfbase64($pdfs)
+    {
         global $DB;
         $pdfs = json_decode($pdfs);
         $dataobjects = [];
@@ -136,7 +143,8 @@ class reflectionexportermanager {
     }
 
     // Update the PDF with the supervisor comment.
-    public static function update_pdfbase64($pdfdata) {
+    public static function update_pdfbase64($pdfdata)
+    {
         global $DB;
 
         $dataobject = new stdClass();
@@ -152,17 +160,18 @@ class reflectionexportermanager {
         }
 
         reflectionexportermanager::update_process_status($pdfdata->refexid, $status);
-
     }
 
-    public static function update_process_status($rid, $status) {
+    public static function update_process_status($rid, $status)
+    {
         global $DB;
         $dataobject = new stdClass();
         $dataobject->id = $rid;
         $dataobject->status = $status;
         $DB->update_record('report_reflectionexporter', $dataobject);
     }
-    public static function get_pdfbase64($rid) {
+    public static function get_pdfbase64($rid)
+    {
         global $DB;
 
         $sql  = "SELECT pdf FROM {report_reflec_exporter_pdf} WHERE id = ?";
@@ -173,10 +182,11 @@ class reflectionexportermanager {
         return $r->pdf;
     }
 
-    public static function generate_zip($data) {
+    public static function generate_zip($data)
+    {
         global $DB, $CFG;
         $data = json_decode($data);
-        error_log(print_r($data, true));
+       
         // Increase the server timeout to handle the creation and sending of large zip files.
         \core_php_time_limit::raise();
 
@@ -225,7 +235,8 @@ class reflectionexportermanager {
         die();
     }
 
-    public static function update_download_status($id) {
+    public static function update_download_status($id)
+    {
         global $DB;
         // Update status
         $dataobject = new stdClass();
@@ -235,7 +246,8 @@ class reflectionexportermanager {
         $DB->update_record('report_reflectionexporter', $dataobject);
     }
 
-    public static function delete_process($rid) {
+    public static function delete_process($rid)
+    {
         global $DB;
 
         $r = $DB->delete_records('report_reflec_exporter_pdf', ['refexid' => $rid]);
@@ -245,7 +257,8 @@ class reflectionexportermanager {
     }
 
     // To display the table with the processes started but not finished
-    public static function get_process() {
+    public static function get_process()
+    {
         global $DB, $COURSE;
 
         $sql = "SELECT * FROM mdl_report_reflectionexporter WHERE courseid = ?";
@@ -256,7 +269,8 @@ class reflectionexportermanager {
     }
 
     // To fill the pdfjson property in the template
-    public static function get_existing_proc($rid) {
+    public static function get_existing_proc($rid)
+    {
         global $DB;
         $sql = "SELECT  id, userid, courseid, refexid, status
                 FROM {report_reflec_exporter_pdf} where refexid = ?";
@@ -268,7 +282,8 @@ class reflectionexportermanager {
     }
 
     // Returns student records based on the reflection export created.
-    public static function get_students_from_export($rid) {
+    public static function get_students_from_export($rid)
+    {
         global $DB;
         $record = json_decode((reflectionexportermanager::get_reflections_json($rid))->{'reflections_json'});
         $uids = array_column($record, 'uid');
@@ -282,23 +297,23 @@ class reflectionexportermanager {
 
     // Teacher is filling the form onbehalf of other teacher(s).
     // Get the data needed: students ids, groups id, supervisor initials for each student
-    public static function process_groupselectionjson($groups) {
+    public static function process_groupselectionjson($groups)
+    {
         $groups = json_decode($groups);
         $studentids = [];
         $supervisorids = []; //Map where index = student id, value = supervisor initial.
         foreach ($groups as $group) {
-            foreach($group->students as $student) {
-
+            foreach ($group->students as $student) {
                 $studentids[] = $student->id;
                 $supervisorids[$student->id] = $group->si;
             }
         }
         return [$studentids, $supervisorids];
-
     }
     // Collect the reflections the student selected in the form did.
     // Save data in report_reflectionexporter table.
-    public static function collect_and_save_reflections($data) {
+    public static function collect_and_save_reflections($data)
+    {
         global $DB;
 
         if (isset($data->onbehalf)) {
@@ -339,7 +354,6 @@ class reflectionexportermanager {
         if (count($reflections) == 0) {
             $rid = 0;
         } else {
-
             // Save the reflection data in the DB.
             // Check if there are no reflections or if they are less than three.
 
@@ -356,7 +370,8 @@ class reflectionexportermanager {
     }
 
     // Order the assesments based on the selection the teacher did on the form
-    private static function map_assessment_order($reflections, $order) {
+    private static function map_assessment_order($reflections, $order)
+    {
 
         $reflectionsaux = [];
 
@@ -369,7 +384,8 @@ class reflectionexportermanager {
         return $reflectionsaux;
     }
 
-    private static function get_missing_assignments($reflections, $assessids) {
+    private static function get_missing_assignments($reflections, $assessids)
+    {
 
         $missingassesments = '';
         $assignments = array_column($reflections, 'assignment');
@@ -383,7 +399,8 @@ class reflectionexportermanager {
         return $missingassesments;
     }
 
-    private static function get_assessment_name($assesmentid) {
+    private static function get_assessment_name($assesmentid)
+    {
         global $DB;
 
         $sql = "SELECT name FROM mdl_assign where id = ?;";
@@ -395,7 +412,8 @@ class reflectionexportermanager {
     }
 
     // Get the pdf the user submitted in the form.
-    public static function get_file_url($context, $rid) {
+    public static function get_file_url($context, $rid)
+    {
         $fs = get_file_storage();
         $files = $fs->get_area_files($context->id, 'report_reflectionexporter', 'attachment', $rid);
         foreach ($files as $f) {
@@ -407,7 +425,8 @@ class reflectionexportermanager {
     }
 
     // Get the active users in the course.
-    public static function get_active_users($courseid) {
+    public static function get_active_users($courseid)
+    {
         $context = context_course::instance($courseid);
         return  get_enrolled_users(
             $context,
@@ -422,7 +441,8 @@ class reflectionexportermanager {
     }
 
     // Return groups that have members in it and it has at least a teacher.
-    public static function get_groups_with_teachers($courseid) {
+    public static function get_groups_with_teachers($courseid)
+    {
         $groups = groups_get_all_groups($courseid, 0, 0, 'g.*', true);
         $groupsaux = [];
         foreach ($groups as $group) {
@@ -441,33 +461,31 @@ class reflectionexportermanager {
 
 
     // Traverse the group members and classify them in students and teachers.
-    public static function get_students_teachers_in_group($users, $courseid) {
+    public static function get_students_teachers_in_group($users, $courseid)
+    {
         global $DB;
         $context = context_course::instance($courseid);
         $teachers = [];
         $students = [];
 
-        foreach ($users as  $userid) {
+        foreach ($users as $userid) {
             $roles = get_user_roles($context, $userid, true);
             foreach ($roles as $role) {
                 if (in_array($role->roleid, [3, 4])) { // Role id = 3 --> Editing Teacher. Role id = 4 --> Non editing teacher.
-
                     $teachers[] = $userid;
                 }
 
                 if (in_array($role->roleid, [5])) { // Role id = 5 -->Student.
-
                     $students[] = $userid;
                 }
             }
         }
         // Collect the data we need
         if (count($students) > 0 && count($teachers)) {
-
             $students = implode(',', $students);
-            $students = array_values($DB->get_records_sql("SELECT id, firstname, lastname FROM mdl_user WHERE id in ($students)" ));
+            $students = array_values($DB->get_records_sql("SELECT id, firstname, lastname FROM mdl_user WHERE id in ($students)"));
             $teachers = implode(',', $teachers);
-            $teachers = array_values($DB->get_records_sql("SELECT id, firstname, lastname FROM mdl_user WHERE id in ($teachers)" ));
+            $teachers = array_values($DB->get_records_sql("SELECT id, firstname, lastname FROM mdl_user WHERE id in ($teachers)"));
         }
 
 
@@ -475,13 +493,13 @@ class reflectionexportermanager {
     }
 
     // Get the teachers details we will add in the textinputs in the form.
-    public static function get_teacher_from_selector($data) {
+    public static function get_teacher_from_selector($data)
+    {
         $context = context_course::instance($data->courseid);
         $users = get_users_by_capability($context, 'report/reflectionexporter:grade', 'u.id, u.firstname, u.lastname', 'u.lastname', '', $data->groupid);
         $userctx = [];
 
         foreach ($users as $user) {
-
             $firstname = substr($user->firstname, 0, 1);
             $lastname = substr($user->lastname, 0, 1);
             $user->si = "$firstname.$lastname";
@@ -495,7 +513,8 @@ class reflectionexportermanager {
         return $userctx;
     }
 
-    public static function get_user_details($user, array $userfields = array()){
+    public static function get_user_details($user, array $userfields = array())
+    {
         global $USER, $DB, $CFG, $PAGE;
         require_once($CFG->dirroot . "/user/profile/lib.php"); // Custom field library.
         require_once($CFG->dirroot . "/lib/filelib.php");      // File handling on description and friends.
@@ -527,15 +546,16 @@ class reflectionexportermanager {
         if (in_array('username', $userfields)) {
             $userdetails['username'] = $user->username;
         }
-        if ($isadmin or $canviewfullnames) {
-            if (in_array('firstname', $userfields)) {
+
+        if (in_array('firstname', $userfields)) {
                 $userdetails['firstname'] = $user->firstname;
-            }
-            if (in_array('lastname', $userfields)) {
-                $userdetails['lastname'] = $user->lastname;
-            }
         }
-        $userdetails['fullname'] = fullname($user, $canviewfullnames);
+        if (in_array('lastname', $userfields)) {
+                $userdetails['lastname'] = $user->lastname;
+        }
+
+        $userdetails['fullname'] = fullname($user);
+        $userdetails['email'] = $user->email;
 
         if (in_array('customfields', $userfields)) {
             $categories = profile_get_user_fields_with_data_by_category($user->id);
@@ -543,7 +563,6 @@ class reflectionexportermanager {
             foreach ($categories as $categoryid => $fields) {
                 foreach ($fields as $formfield) {
                     if ($formfield->is_visible() and !$formfield->is_empty()) {
-
                         // TODO: Part of MDL-50728, this conditional coding must be moved to
                         // proper profile fields API so they are self-contained.
                         // We only use display_data in fields that require text formatting.
@@ -582,5 +601,4 @@ class reflectionexportermanager {
 
         return $userdetails;
     }
-
 }

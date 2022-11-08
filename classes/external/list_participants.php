@@ -68,7 +68,6 @@ trait list_participants {
         $participants = reflectionexportermanager::get_students_from_export($rid);
         $userfields = user_get_default_fields();
         $details = [];
-
         foreach ($participants as $participant) {
             $details[] = reflectionexportermanager::get_user_details($participant, $userfields);
         }

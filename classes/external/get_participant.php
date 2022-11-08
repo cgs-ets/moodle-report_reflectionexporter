@@ -31,6 +31,7 @@ use external_function_parameters;
 use external_value;
 use external_single_structure;
 use core_user_external;
+use report_reflectionexporter\reflectionexportermanager;
 
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . "/user/lib.php");
@@ -86,7 +87,7 @@ trait get_participant {
         }
 
         $participant = $DB->get_record('user', array('id' => $userid));
-        $user = (object) user_get_user_details($participant);
+        $user = (object) reflectionexportermanager::get_user_details($participant);
 
         $result = [
             'id' => $user->id,
