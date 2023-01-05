@@ -71,8 +71,8 @@ if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
         \core\notification::add(get_string('noprocesserror', 'report_reflectionexporter'), core\output\notification::NOTIFY_ERROR);
     }
 
-    if ($wrongformat == 1) { // The PDF is not a form
-        // delete the record
+    if ($wrongformat == 1) { // The PDF is not a form.
+        // Delete the record.
         reflectionexportermanager::delete_process($rid);
         \core\notification::add(get_string('wrongfileformat', 'report_reflectionexporter'), core\output\notification::NOTIFY_ERROR);
 

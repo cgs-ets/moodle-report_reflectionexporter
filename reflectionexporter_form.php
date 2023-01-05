@@ -61,7 +61,7 @@ class reflectionexporter_form extends moodleform {
         // Open the option to select the groups --> Each group will have the teacher responsible for the students in the group reflection.
 
         $mform->addElement('checkbox', 'onbehalf', get_string('onbehalf', 'report_reflectionexporter'));
-        $mform->disabledIf('onbehalf','groupscount', 'eq', 0);
+        $mform->disabledIf('onbehalf', 'groupscount', 'eq', 0);
         $mform->addHelpButton('onbehalf', 'onbehalf', 'report_reflectionexporter');
         // Supervisor initials.  DEFAULT. Teacher is doing their job only.
 
@@ -181,10 +181,10 @@ class reflectionexporter_form extends moodleform {
             $assessarray[$result->id] = $result->assignmentname;
         }
 
-        $mform->addElement('select', 'assessments', get_string('assessments', 'report_reflectionexporter'), $assessarray);
-        $mform->getElement('assessments')->setMultiple(false);
-        $mform->addRule('assessments', null, 'required');
-        $mform->addHelpButton('assessments', 'assessments', 'report_reflectionexporter');
+        $mform->addElement('select', 'assessments1', get_string('assessments', 'report_reflectionexporter'), $assessarray, ['class' => 'assessment-reflection-exporter']);
+        $mform->getElement('assessments1')->setMultiple(false);
+        $mform->addRule('assessments1', null, 'required');
+        $mform->addHelpButton('assessments1', 'assessments', 'report_reflectionexporter');
 
         // 2nd reflection
 
@@ -221,7 +221,7 @@ class reflectionexporter_form extends moodleform {
 
         $errors = parent::validation($data, $files);
 
-        if ($data['assessments'] == 0) {
+        if ($data['assessments1'] == 0) {
             $errors['assessments'] = get_string('assessmenterror', 'report_reflectionexporter');
         }
         if ($data['assessments2'] == 0) {
@@ -231,7 +231,7 @@ class reflectionexporter_form extends moodleform {
             $errors['assessments3'] = get_string('assessment3error', 'report_reflectionexporter');
         }
 
-        if(!isset($data['onbehalf'])) {
+        if (!isset($data['onbehalf'])) {
 
             if (count($data['userid']) == 0) {
                 $errors['userid'] = get_string('useridterror', 'report_reflectionexporter');

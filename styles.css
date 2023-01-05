@@ -1,271 +1,262 @@
-select#id_assessments,
+#id_assessments1,
 #id_assessments2,
 #id_assessments3 {
-    min-width: 30%;
-    height: auto;
+  min-width: 30%;
+  height: auto;
 }
 
 /* Form. */
 .form-group.row.fitem.teacher-initial-field-hide {
-    display: none;
+  display: none;
 }
 
 div#fitem_id_groupselectionjson,
 div#fitem_id_groupselectionjsonaux,
 div#fitem_id_groupscount {
-    display: none;
+  display: none;
 }
 
 /* Index Icons */
 .report_reflectionexporter .actions {
-    display: block;
-    text-align: center;
-    margin-bottom: 1em;
+  display: block;
+  text-align: center;
+  margin-bottom: 1em;
 }
 
 .report_reflectionexporter .actions .action {
-    display: inline-block;
-    position: relative;
-    vertical-align: top;
-    width: 150px;
-    text-align: center;
-    overflow: hidden;
-    margin: .5em;
-    padding: 1em;
-    border: 1px solid #aaa;
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+  width: 150px;
+  text-align: center;
+  overflow: hidden;
+  margin: 0.5em;
+  padding: 1em;
+  border: 1px solid #aaa;
 }
 
 .report_reflectionexporter .deleting {
-    display: none;
+  display: none;
 }
 
 .report_reflectionexporter .actions .action .action-text {
-    position: relative;
-    top: .4em;
-    font-size: 14px;
-    white-space: normal;
+  position: relative;
+  top: 0.4em;
+  font-size: 14px;
+  white-space: normal;
 }
 
 .report_reflectionexporter .icon.reflection-exporter-action-btn {
-    width: 1.5rem;
-    height: 1.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 /* Download button */
 
 button.reflection-exporter-download-index {
-    border: none;
-    background: white;
+  border: none;
+  background: white;
 }
 
 /* Table */
 .report_reflectionexporter .table-bordered {
-    text-align: center;
-    max-height: 41vh;
-    width: max-content;
-    margin: 0 auto;
+  text-align: center;
+  max-height: 41vh;
+  width: max-content;
+  margin: 0 auto;
 }
 
 table.table.table-bordered.table-responsive.started-work {
-    margin: 0;
+  margin: 0;
 }
 
 /* View page */
 
 .report_reflectionexporter [data-region="viewer-navigation-panel"] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    margin: 0;
-    padding: 6px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  padding: 6px;
 }
 
 .path-report-reflectionexporter [data-region="viewer-navigation"] {
-    padding: 6px;
+  padding: 6px;
 }
 
 .path-report-reflectionexporter [data-region="reflectionexporter-info"] {
-    overflow-y: hidden;
+  overflow-y: hidden;
 }
 
 .path-report-reflectionexporter [data-region="reflectionexporter-info"] {
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
 }
 
 .path-report-reflectionexporter [data-region="user-info"] {
-    height: 60px;
+  height: 60px;
 }
 
 .path-report-reflectionexporter [data-region="user-info"] em.nowrap {
-    display: flow-root;
+  display: flow-root;
 }
 
 .path-report-reflectionexporter [data-region="user-selector"] .alignment {
-    float: right;
-    width: 320px;
-    text-align: center;
-    margin-top: 7px;
+  float: right;
+  width: 320px;
+  text-align: center;
+  margin-top: 7px;
 }
 
 .path-report-reflectionexporter select.custom-select {
-    width: 15rem;
-    display: inline-block;
+  width: 15rem;
+  display: inline-block;
 }
 .row.reflection-container {
-    margin-bottom: 2%;
+  margin-bottom: 2%;
 }
 
 /* pdf viewer */
 .report_reflectionexporter .pdf-page {
-    display: block;
-    margin-bottom: 1rem;
+  display: block;
+  margin-bottom: 1rem;
 }
 
 .report_reflectionexporter #viewer {
-    width: fit-content;
-    height: 84vh;
-    border: 1px solid #74869f;
-    ;
-    overflow-y: scroll;
-    /* background-color: white; */
-    padding: 1rem;
+  width: fit-content;
+  height: 84vh;
+  border: 1px solid #74869f;
+  overflow-y: scroll;
+  /* background-color: white; */
+  padding: 1rem;
 }
 
 .report_reflectionexporter #content-wrapper {
-    display: inline-block;
-    overflow: auto;
-    bottom: 0;
-    height: 100%;
+  display: inline-block;
+  overflow: auto;
+  bottom: 0;
+  height: 100%;
 }
 
 [data-region="pdf-comment-container"] {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 .report_reflectionexporter .supervisor-comment {
-    margin: 2rem;
-    width: 100%;
+  margin: 2rem;
+  width: 100%;
 }
 
 .report_reflectionexporter .comment_error {
-    border: 2px solid red;
+  border: 2px solid red;
 }
 
 .report_reflectionexporter .next-action {
-    margin-top: 4px;
-    width: fit-content;
-    margin: auto;
-    padding: 2rem;
-    display: flex;
-
+  margin-top: 4px;
+  width: fit-content;
+  margin: auto;
+  padding: 2rem;
+  display: flex;
 }
 
 .report_reflectionexporter .reflection-completed {
-    display: none;
+  display: none;
 }
 
 .report_reflectionexporter .reflection-completed-display {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .report_reflectionexporter .reflection-comment-form-hide {
-    display: none;
+  display: none;
 }
 
 /* Actions in view-panel */
 .report_reflectionexporter .next-action-hidden {
-    display: none;
+  display: none;
 }
 
 .report_reflectionexporter .next-action a {
-    margin: 2rem;
-    padding: 2rem;
-    box-shadow: 1px 2px 6px 5px slategrey;
+  margin: 2rem;
+  padding: 2rem;
+  box-shadow: 1px 2px 6px 5px slategrey;
 }
 
 .report_reflectionexporter .next-action .action-text {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 
-
 a.btn-summary-hidden {
-    display: none;
+  display: none;
 }
 
 /* Press effect */
 .report_reflectionexporter .next-action a:active {
-    box-shadow: 1px 2px 6px 5px slategrey;
-    transform: translateY(4px);
+  box-shadow: 1px 2px 6px 5px slategrey;
+  transform: translateY(4px);
 }
-
 
 .report_reflectionexporter .select-work {
-    width: 25%;
+  width: 25%;
 }
-
 
 /* The Modal (background) */
 .reflection-exporter-modal {
-    display: none;
-    /* Hidden by default */
-    position: fixed;
-    /* Stay in place */
-    z-index: 1;
-    /* Sit on top */
-    padding-top: 100px;
-    /* Location of the box */
-    left: 0;
-    top: 0;
-    width: 100%;
-    /* Full width */
-    height: 100%;
-    /* Full height */
-    overflow: auto;
-    /* Enable scroll if needed */
-    background-color: rgb(0, 0, 0);
-    /* Fallback color */
-    background-color: rgba(0, 0, 0, 0.4);
-    /* Black w/ opacity */
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  padding-top: 100px;
+  /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
 }
 
 /* Modal Content */
 .reflection-exporter-modal-content {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 50%;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
 }
 
 /* The Close Button */
 .reflection-exporter-modal-content .close {
-    color: #aaaaaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    margin-bottom: 1rem;
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
 .reflection-exporter-modal-content .close:hover,
 .reflection-exporter-modal-content .close:focus {
-    color: #000;
-    text-decoration: none;
-    cursor: pointer;
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
 }
-
-
 
 @media (max-width: 900px) {
-    [data-region="pdf-comment-container"] {
-
-        flex-direction: column;
-    }
+  [data-region="pdf-comment-container"] {
+    flex-direction: column;
+  }
 }
-
 
 /* <a href="https://www.flaticon.com/free-icons/export" title="export icons">Export icons created by Uniconlabs - Flaticon</a> */
 /* <a href="https://www.flaticon.com/free-icons/save" title="save icons">Save icons created by Freepik - Flaticon</a> */

@@ -38,7 +38,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
      * @return string
      */
     public function pick_action_icon($dataobject) {
-       
+
         $data['newicon'] = new moodle_url('/report/reflectionexporter/pix/icon.png');
         $data['existingicon'] = new moodle_url('/report/reflectionexporter/pix/continueproc.png');
         $data['deleteicon'] = new moodle_url('/report/reflectionexporter/pix/delete.png');
@@ -46,8 +46,8 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['newproc'] = $dataobject->newproc;
         $procs = reflectionexportermanager::get_process();
         $data['processfound'] = count($procs) > 0;
-      
-        foreach($procs as $proc) {
+
+        foreach ($procs as $proc) {
             $pr = new stdClass();
             $pr->datecreated = userdate($proc->timecreated, get_string('strftimedatefullshort', 'core_langconfig'));
 
@@ -57,7 +57,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
                 $pr->status = 'Finished';
                 $pr->title = 'Show';
                 $pr->datajson = json_encode(reflectionexportermanager::get_existing_proc($proc->id));
-                
+
             } else {
                 $f = 0;
                 $proc->finished = 1;
@@ -68,11 +68,11 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
             $params = array('cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'rid' => $proc->id, 'n' => 0, 'f' => $f);
             $pr->actionurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params);
             $pr->deleteurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid]);
-           
-            $pr->todelete =  $proc->id;
+
+            $pr->todelete = $proc->id;
             $data['processes'] [] = $pr;
         }
-      
+
         echo $this->output->render_from_template('report_reflectionexporter/pick', $data);
     }
 
@@ -82,8 +82,8 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $context = context_course::instance($data->cid);
         $info->message = 'Importing reflections to PDF. Please do not close the browser';
         $data->coursename = $context->get_context_name(false, false, true);
-        $info->data =  json_encode($data);
-     
+        $info->data = json_encode($data);
+
         $info->notprocess = count(json_decode(reflectionexportermanager::get_no_reflections_json($data->rid)));
         $info->new = $data->new;
 
@@ -102,5 +102,5 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         echo $this->output->render_from_template('report_reflectionexporter/viewer', $data);
     }
 
-    
+
 }
