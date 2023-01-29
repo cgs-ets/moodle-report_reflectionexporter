@@ -324,7 +324,7 @@ class reflectionexportermanager {
 
             if (count($us->reflections) < 3) {
                 $us->missing = self::get_missing_assignments($us->reflections, $selectedorder);
-                unset($us->reflections); // we dont need the reflection
+                unset($us->reflections); // We dont need the reflection.
                 $noreflections[]  = $us;
             } else {
                 $reflections[] = $us;
@@ -336,7 +336,6 @@ class reflectionexportermanager {
             $rid = 0;
         } else {
             // Save the reflection data in the DB.
-            // Check if there are no reflections or if they are less than three.
 
             $dataobject = new stdClass();
             $dataobject->reflections_json = json_encode($reflections);
