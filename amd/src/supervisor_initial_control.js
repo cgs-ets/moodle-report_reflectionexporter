@@ -61,18 +61,15 @@ define(['jquery'], function ($) {
                 // Add selected teachers to the JSON.
                 $(e.target).find('option:selected').each(function (index, option) {
                     const groupid = option.value;
-
                     // look for the teacher in the group.
                     const teacher = document.querySelectorAll(`[id^= id_teacher_${groupid}]`)[0];
                     // Get the div that has the id fitem_id_teacher_groupid_techerid.
-                    let teacherid = `fitem_${teacher.getAttribute('id')}`;
-                    const dEl = document.getElementById(teacherid);
                     // For some reason the id in moodle uat is id_teacher_groupid_teacherid_label
-                    // teacherid = teacherid.split('_');
-                    // teacherid = teacherid[teacherid.length - 1];
-                    teacherid = teacherid.split('_').findLast(e => { if (!isNaN(parseInt(e))) return e });
+                    let teacherid = teacher.getAttribute('id').replace('_label','');
                     console.log(teacherid);
 
+                    const dEl = document.getElementById(`fitem_${teacherid}`);
+                    teacherid = teacherid.split('_').findLast(e => { if (!isNaN(parseInt(e))) return e });
                     dEl.classList.remove('teacher-initial-field-hide');
                     const details = {
                         groupid: groupid,
@@ -88,10 +85,11 @@ define(['jquery'], function ($) {
                     const groupid = option.value;
                     // look for the teacher in the group.
                     const teacher = document.querySelectorAll(`[id^= id_teacher_${groupid}]`)[0];
-                    let teacherid = `fitem_${teacher.getAttribute('id')}`;
-                    const dEl = document.getElementById(teacherid);
-                    teacherid = teacherid.split('_');
-                    teacherid = teacherid[teacherid.length - 1];
+                    // Get the div that has the id fitem_id_teacher_groupid_techerid.
+                    // For some reason the id in moodle uat is id_teacher_groupid_teacherid_label
+                    let teacherid = teacher.getAttribute('id').replace('_label','');
+                    const dEl = document.getElementById(`fitem_${teacherid}`);
+                    teacherid = teacherid.split('_').findLast(e => { if (!isNaN(parseInt(e))) return e });
                     dEl.classList.add('teacher-initial-field-hide');
                     const details = {
                         groupid: groupid,
