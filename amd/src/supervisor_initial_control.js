@@ -67,8 +67,11 @@ define(['jquery'], function ($) {
                     // Get the div that has the id fitem_id_teacher_groupid_techerid.
                     let teacherid = `fitem_${teacher.getAttribute('id')}`;
                     const dEl = document.getElementById(teacherid);
-                    teacherid = teacherid.split('_');
-                    teacherid = teacherid[teacherid.length - 1];
+                    // For some reason the id in moodle uat is id_teacher_groupid_teacherid_label
+                    // teacherid = teacherid.split('_');
+                    // teacherid = teacherid[teacherid.length - 1];
+                    teacherid = teacherid.split('_').findLast(e => { if (!isNaN(parseInt(e))) return e });
+                    console.log(teacherid);
 
                     dEl.classList.remove('teacher-initial-field-hide');
                     const details = {
