@@ -50,7 +50,7 @@ function report_reflectionexporter_pluginfile($course, $cm, $context, $filearea,
     if ($context->contextlevel != CONTEXT_COURSE) {
         return false;
     }
-   
+
     // Make sure the filearea is one of those used by the plugin.
     if ($filearea !== 'attachment') {
         return false;
@@ -68,7 +68,7 @@ function report_reflectionexporter_pluginfile($course, $cm, $context, $filearea,
     // Extract the filename / filepath from the $args array.
     $filename = array_pop($args); // The last item in the $args array.
     if (!$args) {
-        $filepath = '/'; 
+        $filepath = '/';
     } else {
         $filepath = '/' . implode('/', $args) . '/'; // $args contains elements of the filepath
     }
@@ -76,7 +76,7 @@ function report_reflectionexporter_pluginfile($course, $cm, $context, $filearea,
     // Retrieve the file from the Files API.
     $fs = get_file_storage();
     $file = $fs->get_file($context->id, 'report_reflectionexporter', 'attachment', $itemid, $filepath, $filename);
-   
+
     if (!$file) {
         return false; // The file does not exist.
     }
@@ -126,3 +126,5 @@ function report_reflectionexporter_filemanager_postupdate($entry) {
         $entry->rid
     );
 }
+
+

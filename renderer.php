@@ -68,7 +68,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
             $params = array('cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'rid' => $proc->id, 'n' => 0, 'f' => $f);
             $pr->actionurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params);
             $pr->deleteurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid]);
-
+            $pr->downloadurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'd' => 1]);
             $pr->todelete = $proc->id;
             $data['processes'] [] = $pr;
         }

@@ -62,8 +62,12 @@ button.reflection-exporter-download-index {
 .report_reflectionexporter .table-bordered {
   text-align: center;
   max-height: 41vh;
-  width: max-content;
+  /*width: max-content;*/
   margin: 0 auto;
+}
+
+div.omitted-table .table-responsive {
+ display: inline-table;
 }
 
 table.table.table-bordered.table-responsive.started-work {
@@ -159,7 +163,7 @@ table.table.table-bordered.table-responsive.started-work {
   width: fit-content;
   margin: auto;
   padding: 2rem;
-  display: flex;
+  /*display: flex;*/
 }
 
 .report_reflectionexporter .reflection-completed {
@@ -200,7 +204,7 @@ a.btn-summary-hidden {
 }
 
 .report_reflectionexporter .select-work {
-  width: 25%;
+  width: fit-content;
 }
 
 /* The Modal (background) */
@@ -256,6 +260,14 @@ a.btn-summary-hidden {
   [data-region="pdf-comment-container"] {
     flex-direction: column;
   }
+
+  .report_reflectionexporter .next-action {
+  margin-top: 4px;
+  width: fit-content;
+  margin: auto;
+  padding: 2rem;
+  /*display: flex;*/
+}
 }
 
 /* <a href="https://www.flaticon.com/free-icons/export" title="export icons">Export icons created by Uniconlabs - Flaticon</a> */

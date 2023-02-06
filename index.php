@@ -38,8 +38,8 @@ $rid                     = optional_param('rid', 0, PARAM_INT);
 $download                = optional_param('d', 0, PARAM_INT); // Download the zip file.
 $datajson                = optional_param('datajson', 0, PARAM_RAW); // JSON with the information needed to display PDF.
 
-if (!$course = $DB->get_record('course', array('id'=>$id))) {
-    print_error('invalidcourse');
+if (!$course = $DB->get_record('course', array('id' => $id))) {
+    throw new moodle_exception('invalidcourse');
 }
 
 require_login($course);
@@ -67,7 +67,7 @@ if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
     $PAGE->set_title('Reflection exporter');
 
     if ($nothingtoprocess == 1) {
-        //noprocesserror
+        // No process error.
         \core\notification::add(get_string('noprocesserror', 'report_reflectionexporter'), core\output\notification::NOTIFY_ERROR);
     }
 
@@ -77,7 +77,6 @@ if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
         \core\notification::add(get_string('wrongfileformat', 'report_reflectionexporter'), core\output\notification::NOTIFY_ERROR);
 
     }
-
 
     $renderer = $PAGE->get_renderer('report_reflectionexporter');
     $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 0]);
