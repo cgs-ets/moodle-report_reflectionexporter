@@ -299,10 +299,10 @@ class reflectionexportermanager {
         global $DB;
 
         if (isset($data->onbehalf)) {
-            list($data->userid, $supervisorids) = self::process_groupselectionjson($data->groupselectionjson);
+            list($data->refexporteruserid, $supervisorids) = self::process_groupselectionjson($data->groupselectionjson);
         }
 
-        $users = self::get_selected_students($data->userid);
+        $users = self::get_selected_students($data->refexporteruserid);
         $reflections = [];
         $noreflections = [];
         $selectedorder = [$data->assessments1, $data->assessments2, $data->assessments3];

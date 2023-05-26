@@ -143,7 +143,7 @@ class reflectionexporter_form extends moodleform {
         $mform->disabledIf('groupselectionjsonaux', 'onbehalf', 'notchecked');
 
         // Allocated students. Only if the teacher is filling the form on behalf of another teacher.
-        reflectionexportermanager::get_active_users($this->_customdata['id']);
+        //reflectionexportermanager::get_active_users($this->_customdata['id']);
 
         $students = reflectionexportermanager::get_active_users($this->_customdata['id']);
         $studentsarray = array();
@@ -168,8 +168,9 @@ class reflectionexporter_form extends moodleform {
                 );
             }
         );
-        $mform->addElement('autocomplete', 'userid', get_string('activeusers', 'report_reflectionexporter'), $studentsarray, $options);
-        $mform->hideIf('userid', 'onbehalf', 'checked');
+
+        $mform->addElement('autocomplete', 'refexporteruserid', get_string('activeusers', 'report_reflectionexporter'), $studentsarray, $options);
+        $mform->hideIf('refexporteruserid', 'onbehalf', 'checked');
 
         // Assessments. One for each reflection. As they could be in different order and I need a way to know which one is 1st, 2nd and 3rd
         $assessarray = array();
@@ -233,8 +234,8 @@ class reflectionexporter_form extends moodleform {
 
         if (!isset($data['onbehalf'])) {
 
-            if (count($data['userid']) == 0) {
-                $errors['userid'] = get_string('useridterror', 'report_reflectionexporter');
+            if (count($data['refexporteruserid']) == 0) {
+                $errors['refexporteruserid'] = get_string('useridterror', 'report_reflectionexporter');
             }
 
             if (empty($data['supervisorinitials'])) {
