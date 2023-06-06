@@ -15,6 +15,8 @@
 
 /**
  *
+ * Gets the Extended Essay (EE) ib form in PDF format and imports the
+ * reflections into it.
  *
  * @package    report
  * @subpackage reflectionexporter
@@ -66,7 +68,7 @@ define([
     };
 
     Controls.prototype.getreflectionspdf = function () {
-   
+
         this.displayTemplate();
     }
 
@@ -101,6 +103,7 @@ define([
                 uid: users[i].reflections[0].userid,
                 courseid: this.data.cid,
                 rid: this.data.rid,
+                formname: this.data.ibform,
                 pdf: pdf
             };
 
@@ -142,10 +145,10 @@ define([
      *  Month third page: Dropdown5
      *  DP: Dropdown6
      *  supervisor id: Text11
-     * 
-     * @param {*} user 
-     * @param {*} form 
-     * @param {*} field 
+     *
+     * @param {*} user
+     * @param {*} form
+     * @param {*} field
      */
     Controls.prototype.setFormFields = async function (user, form, field) {
         var self = this;
@@ -212,6 +215,7 @@ define([
                     coursename: self.data.coursename,
                     showuseridentity: true,
                     reflecid: self.data.rid,
+                    formname: self.data.ibform,
                     firstuserid: 0,
                 }
 

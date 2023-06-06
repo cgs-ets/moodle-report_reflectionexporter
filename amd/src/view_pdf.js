@@ -31,10 +31,7 @@ define([
     "use strict";
 
     var ViewPDF = function () {
-
         $(document).on('user-changed', this._init.bind(this));
-
-
     }
 
     ViewPDF.prototype._init = function () {
@@ -50,7 +47,6 @@ define([
 
             const user = self._getUser();
 
-            console.log(user);
             // Call the service that returns the PDF.
             Ajax.call([{
                 methodname: "report_reflectionexporter_get_pdfbase64",
@@ -71,7 +67,6 @@ define([
                         datajson: document.querySelector('.data-pdfjson').getAttribute('data-pdfs'),
                         completed: user[0].status == 'C' ? true : false
                     }
-                    console.log(context);
 
                     Templates.render('report_reflectionexporter/pdf_container', context).done(function (html, js) {
 

@@ -24,11 +24,11 @@
 
 define([
     'report_reflectionexporter/pdf-lib',
-    'report_reflectionexporter/reflectionexporter',
+    'report_reflectionexporter/dispatchjob',
     'core/url'
 
 
-], function (PDFLib, ReflectionExporter, URL) {
+], function (PDFLib, Dispatcher, URL) {
     "use strict";
 
     var ValidatePDF = function (data) {
@@ -44,18 +44,18 @@ define([
         const fields = form.getFields();
 
         if (fields.length == 0) {
-            // take the user back to t
+            // take the user back.
             const link = URL.relativeUrl('/report/reflectionexporter/index.php', {
                 cid: data.cid,
                 cmid: data.cmid,
                 rid: data.rid,
                 wf: 1,
             });
-           
+
             window.location.replace(link);
             return;
         } else {
-            ReflectionExporter.init(JSON.parse(document.querySelector('.importing-animation').getAttribute('data-info')))
+            Dispatcher.init(JSON.parse(document.querySelector('.importing-animation').getAttribute('data-info')))
         }
     }
 
