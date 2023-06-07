@@ -78,19 +78,13 @@ if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
 
     }
 
-    $renderer = $PAGE->get_renderer('report_reflectionexporter');
-    $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 0]);
-    $newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 1]);
+     // Title
+     echo html_writer::tag('h2', get_string('reflection-exporter-heading', 'report_reflectionexporter'));
 
-    $dataobject = new stdClass();
-    $dataobject->existingproc = $existingprocurl;
-    $dataobject->newproc = $newproc;
-    $dataobject->cid = $id;
-    $dataobject->cmid = $cmid;
-    $dataobject->reporturl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]);
-    $dataobject->courseurl = new moodle_url('/course/view.php', ['id' => $id]);
+     $renderer = $PAGE->get_renderer('report_reflectionexporter');
 
-    $renderer->pick_action_icon($dataobject);
+     echo $renderer->render_selector($id, $cmid);
+
 }
 
 echo $OUTPUT->footer();

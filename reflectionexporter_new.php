@@ -29,11 +29,13 @@ require_once('../../config.php');
 require_once('lib.php');
 require_once($CFG->libdir . '/adminlib.php');
 require_once('reflectionexporter_form.php');
+require_once('reflectionexporter_tok_form.php');
 
 $id                      = optional_param('cid', 0, PARAM_INT); // Course ID.
 $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course module ID.
+$ibform                  = required_param('ibform', PARAM_RAW); // Course module ID.
 
-if (!$course = $DB->get_record('course', array('id'=>$id))) {
+if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('invalidcourse');
 }
 
@@ -51,27 +53,39 @@ $PAGE->set_heading(format_string($course->fullname, true, array('context' => $co
 
 $courseurl = new moodle_url('/course/view.php', array('id' => $id));
 $aids = reflectionexportermanager::get_submitted_assessments($id);
-$mform = new reflectionexporter_form(null, ['id' => $id, 'cmid' => $cmid, 'aids' => $aids]);;
+
+switch ($ibform) {
+    case 'EE_RPPF':
+        $mform = new reflectionexporter_form(null, ['id' => $id, 'cmid' => $cmid, 'aids' => $aids, 'ibform' => $ibform]);
+        break;
+    case 'TK_PPF':
+        $choices = reflectionexportermanager::get_tok_prescribed_title_choice_activity($id);
+        $mform = new reflectionexporter_tok_form(null, ['id' => $id, 'cmid' => $cmid, 'aids' => $aids, 'choices' => $choices, 'ibform' => $ibform]);
+        break;
+}
+
 
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]));
 } else if ($fromform = $mform->get_data()) {
     $fromform->courseid = $id;
 
-    $rid = reflectionexportermanager::collect_and_save_reflections($fromform);
+    switch ($fromform->ibform) {
+        case 'EE_RPPF':
+            reflectionexportermanager::process_ee_form($fromform, $id, $cmid);
+            break;
+        case 'TK_PPF':
+            reflectionexportermanager::process_tok_form($fromform, $id, $cmid);
+            break;
 
-    if ($rid == 0) { // No students reflections found with the data provided.
-        redirect(new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid, 'np' => 1]));
-    } else {
-        $fromform->rid = $rid;
-        report_reflectionexporter_filemanager_postupdate($fromform);
-        $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1);
-
-        redirect(new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params));
+        default:
+            # code...
+            break;
     }
+
 } else {
     $context = context_course::instance($id);
-    $entry = report_reflectionexporter_filemanager_prep($context);
+    $entry = report_reflectionexporter_filemanager_prep($context, $ibform);
     $mform->set_data($entry);
 }
 

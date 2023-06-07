@@ -22,7 +22,13 @@
  * @copyright  2021 Veronica Bermegui
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die;
+
+const IB_FORMS_FILEAREA = ['EE_RPPF' => 'attachment','TK_PPF' => 'tokattachment'];
+const IB_FORM_NAME = ['EE/RPPF' => 'EE_RPPF',
+                      'TK/PPF' => 'TK_PPF',
+                     ];
 
 function report_reflectionexporter_extend_navigation_course($navigation, $course, $context) {
 
@@ -52,7 +58,7 @@ function report_reflectionexporter_pluginfile($course, $cm, $context, $filearea,
     }
 
     // Make sure the filearea is one of those used by the plugin.
-    if ($filearea !== 'attachment') {
+    if ($filearea !== 'attachment' && $filearea !== 'tokattachment') {
         return false;
     }
 
@@ -75,7 +81,7 @@ function report_reflectionexporter_pluginfile($course, $cm, $context, $filearea,
 
     // Retrieve the file from the Files API.
     $fs = get_file_storage();
-    $file = $fs->get_file($context->id, 'report_reflectionexporter', 'attachment', $itemid, $filepath, $filename);
+    $file = $fs->get_file($context->id, 'report_reflectionexporter', $filearea, $itemid, $filepath, $filename);
 
     if (!$file) {
         return false; // The file does not exist.
@@ -85,32 +91,48 @@ function report_reflectionexporter_pluginfile($course, $cm, $context, $filearea,
     send_stored_file($file, 86400, 0, $forcedownload, $options);
 }
 
-function report_reflectionexporter_filemanager_prep($context) {
+function report_reflectionexporter_filemanager_prep($context, $ibform) {
     global $CFG, $USER;
     $maxbytes = $CFG->maxbytes;
-    if (empty($entry->id)) {
+
+    $filearea = IB_FORMS_FILEAREA[$ibform];
+
+    if (!isset($entry)) {
         $entry = new stdClass;
         $entry->id = 0;
     }
+
     $options = array(
         'subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('.pdf')
     );
 
+    $field = '';
+
+    switch ($ibform) {
+        case 'EE_RPPF':
+            $field = 'attachment';
+            break;
+        case 'TK_PPF':
+            $field = 'tokattachment';
+            break;
+    }
+
     $entry = file_prepare_standard_filemanager(
         $entry,
-        'attachment',
+        $field,
         $options,
         $context,
         'report_reflectionexporter',
-        'attachment',
+        $filearea,
         $USER->id
     );
+
 
     return $entry;
 }
 
 function report_reflectionexporter_filemanager_postupdate($entry) {
-    global $CFG, $USER;
+    global $CFG;
     $maxbytes = $CFG->maxbytes;
     $options = array(
         'subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('.pdf')
@@ -123,6 +145,25 @@ function report_reflectionexporter_filemanager_postupdate($entry) {
         $context,
         'report_reflectionexporter',
         'attachment',
+        $entry->rid
+    );
+}
+
+function report_reflectionexporter_tok_filemanager_postupdate($entry) {
+    global $CFG;
+    $maxbytes = $CFG->maxbytes;
+    $options = array(
+        'subdirs' => 0, 'maxbytes' => $maxbytes, 'maxfiles' => 1, 'accepted_types' => array('.pdf')
+    );
+
+    $context = context_course::instance($entry->cid);
+    $entry = file_postupdate_standard_filemanager(
+        $entry,
+        'tokattachment',
+        $options,
+        $context,
+        'report_reflectionexporter',
+        'tokattachment',
         $entry->rid
     );
 }

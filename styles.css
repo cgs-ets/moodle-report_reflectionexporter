@@ -114,6 +114,14 @@ table.table.table-bordered.table-responsive.started-work {
   margin-top: 7px;
 }
 
+/* Actions buttons for tok exporter*/
+.path-report-reflectionexporter [data-region="tok-exporter-actions"] {
+    position: absolute;
+    margin-top: 15%;
+    margin-left: 40%;
+    display: flex;
+}
+
 .path-report-reflectionexporter select.custom-select {
   width: 15rem;
   display: inline-block;
@@ -183,7 +191,8 @@ table.table.table-bordered.table-responsive.started-work {
   display: none;
 }
 
-.report_reflectionexporter .next-action a {
+.report_reflectionexporter .next-action a,
+.path-report-reflectionexporter [data-region="tok-exporter-actions"] a {
   margin: 2rem;
   padding: 2rem;
   box-shadow: 1px 2px 6px 5px slategrey;
@@ -198,7 +207,8 @@ a.btn-summary-hidden {
 }
 
 /* Press effect */
-.report_reflectionexporter .next-action a:active {
+.report_reflectionexporter .next-action a:active,
+.path-report-reflectionexporter [data-region="tok-exporter-actions"] a:active {
   box-shadow: 1px 2px 6px 5px slategrey;
   transform: translateY(4px);
 }

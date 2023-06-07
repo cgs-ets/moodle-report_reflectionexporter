@@ -37,6 +37,7 @@ $new                     = optional_param('n', 0, PARAM_INT); // New process or 
 $download                = optional_param('d', 0, PARAM_INT); // Download the zip file.
 $datajson                = optional_param('datajson', 0, PARAM_RAW); // JSON with the information needed to display PDF.
 $finished                = optional_param('f', 0, PARAM_RAW); // Finished process.
+$ibform                  = required_param('ibform', PARAM_TEXT);
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('invalidcourse');
@@ -60,14 +61,13 @@ echo $OUTPUT->header();
 
 $context = context_course::instance($id);
 
-reflectionexportermanager::get_file_url($context, $rid);
-
 $data = new stdClass();
-$data->fileurl = reflectionexportermanager::get_file_url($context, $rid);
+$data->fileurl = reflectionexportermanager::get_file_url($context, $rid, $ibform);
 $data->rid = $rid;
 $data->cid = $id;
 $data->new = $new;
 $data->cmid = $cmid;
+$data->ibform = $ibform;
 $data->finished = $finished == '1' ? true : false;
 
 if ($new == 0) {

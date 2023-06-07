@@ -13,9 +13,15 @@
 
     You should have received a copy of the GNU General Public License
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+    @package    report
+    @subpackage reflectionexporter
+    @copyright  2022 Veronica Bermegui
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 }}
+
 {{!
-    @template mod_assign/grading_navigation_user_summary
+    Based on  @template mod_assign/grading_navigation_user_summary
 
     Shown when the real data for a user has been loaded. Display in the top left corner.
 
@@ -40,9 +46,9 @@
     <a href="{{globals.config.wwwroot}}/user/view.php?id={{id}}&course={{courseid}}">
       {{#profileimageurl}}
         <img src="{{profileimageurl}}" class="img-rounded" height="40" role="presentation"/>
-      {{/profileimageurl}} 
+      {{/profileimageurl}}
       {{fullname}}
       <em class='nowrap'><small> {{identity}} </small></em>
     </a>
-    
+
 </h4>

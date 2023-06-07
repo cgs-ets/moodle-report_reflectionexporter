@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="report/reflectionexporter/db" VERSION="20220817" COMMENT="XMLDB file for Moodle report/reflectionexporter"
+<XMLDB PATH="report/reflectionexporter/db" VERSION="20230606" COMMENT="XMLDB file for Moodle report/reflectionexporter"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -11,6 +11,7 @@
         <FIELD NAME="reflections_json" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON with the information needed to generate PDFS"/>
         <FIELD NAME="no_reflections_json" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Collects the users that did not have reflections or are incomplete"/>
         <FIELD NAME="status" TYPE="char" LENGTH="2" NOTNULL="true" DEFAULT="NS" SEQUENCE="false" COMMENT="Status of the download. It can be NS: Not Started, S: Started, F: Finished"/>
+        <FIELD NAME="formname" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="EE_RPPF" SEQUENCE="false" COMMENT="Name of the IB form we are trying to import"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Time the process started"/>
       </FIELDS>
       <KEYS>
@@ -24,6 +25,7 @@
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The course the reflections assessments belongs to"/>
         <FIELD NAME="refexid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="id from mdl_report_reflectionexporter"/>
         <FIELD NAME="pdf" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="formname" TYPE="char" LENGTH="10" NOTNULL="false" DEFAULT="EE_RPPF" SEQUENCE="false" COMMENT="Name of the IB form we are trying to import"/>
         <FIELD NAME="status" TYPE="char" LENGTH="3" NOTNULL="true" DEFAULT="NC" SEQUENCE="false" COMMENT="NC: Not completed. PDF only has student reflection C: Completed. It has student reflection and teacher comment"/>
       </FIELDS>
       <KEYS>

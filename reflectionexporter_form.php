@@ -38,10 +38,15 @@ class reflectionexporter_form extends moodleform {
         // Hidden elements.
         $mform->addElement('hidden', 'cid', $this->_customdata['id']);
         $mform->settype('cid', PARAM_RAW); // To be able to pre-fill the form.
+
         $mform->addElement('hidden', 'cmid', $this->_customdata['cmid']);
         $mform->settype('cmid', PARAM_INT); // To be able to pre-fill the form.
+
         $mform->addElement('hidden', 'aids', json_encode($this->_customdata['aids']));
         $mform->settype('aids', PARAM_RAW); // To be able to pre-fill the form.
+
+        $mform->addElement('hidden', 'ibform', $this->_customdata['ibform']);
+        $mform->settype('ibform', PARAM_TEXT);
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
@@ -136,6 +141,7 @@ class reflectionexporter_form extends moodleform {
         $mform->settype('groupselectionjson', PARAM_TEXT);
         $mform->setDefault('groupselectionjson', '[]');
         $mform->disabledIf('groupselectionjson', 'onbehalf', 'notchecked');
+
         // Auxiliar input to keep a reference to the full list of teachers in the groups. This is used in the JS.
         $mform->addElement('text', 'groupselectionjsonaux', 'Group Selection JSON AUX');
         $mform->settype('groupselectionjsonaux', PARAM_TEXT);
@@ -143,8 +149,6 @@ class reflectionexporter_form extends moodleform {
         $mform->disabledIf('groupselectionjsonaux', 'onbehalf', 'notchecked');
 
         // Allocated students. Only if the teacher is filling the form on behalf of another teacher.
-        //reflectionexportermanager::get_active_users($this->_customdata['id']);
-
         $students = reflectionexportermanager::get_active_users($this->_customdata['id']);
         $studentsarray = array();
 
@@ -172,7 +176,8 @@ class reflectionexporter_form extends moodleform {
         $mform->addElement('autocomplete', 'refexporteruserid', get_string('activeusers', 'report_reflectionexporter'), $studentsarray, $options);
         $mform->hideIf('refexporteruserid', 'onbehalf', 'checked');
 
-        // Assessments. One for each reflection. As they could be in different order and I need a way to know which one is 1st, 2nd and 3rd
+        // Assessments.
+        // One for each reflection. As they could be in different order and I need a way to know which one is 1st, 2nd and 3rd
         $assessarray = array();
         $results = $this->_customdata['aids']; // Assignment ids.
 

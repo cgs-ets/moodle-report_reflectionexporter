@@ -25,7 +25,18 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$ADMIN->add('reports', new admin_externalpage('report_reflectionexporter', get_string('pluginname', 'report_reflectionexporter'), "$CFG->wwwroot/report/reflectionexporter/index.php", 'moodle/backup:backupcourse'));
-
-// No report settings.
-$settings = null;
+if ($ADMIN->fulltree) {
+    $settings->add(new admin_setting_heading('report_reflectionexporter', '', ''));
+    $settings->add(new admin_setting_configtextarea('report_reflectionexporter_forms',
+                    get_string('ibform', 'report_reflectionexporter'),
+                    get_string('ibform_desc', 'report_reflectionexporter'),
+                    'EE/RPPF'));
+    $settings->add(new admin_setting_configtext('report_reflectionexporter_school_name',
+                    get_string('schoolname', 'report_reflectionexporter'),
+                    get_string('ibform_desc', 'report_reflectionexporter'),
+                    ''));
+    $settings->add(new admin_setting_configtext('report_reflectionexporter_school_number',
+                    get_string('schoolnumber', 'report_reflectionexporter'),
+                    get_string('ibform_desc', 'report_reflectionexporter'),
+                    ''));
+}

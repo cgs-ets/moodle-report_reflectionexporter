@@ -15,7 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *  External Web Service Template
+ *  Gets the onlinetext submissions for the assessments that
+ *  were created to either collect reflections (EE form) or forms (ToK)
  *
  * @package    report
  * @subpackage reflectionexporter

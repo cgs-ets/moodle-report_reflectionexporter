@@ -24,8 +24,10 @@
 namespace report_reflectionexporter;
 
 use context_course;
+use moodle_exception;
 use moodle_url;
 use stdClass;
+use user_picture;
 use ZipArchive;
 
 class reflectionexportermanager {
@@ -39,7 +41,8 @@ class reflectionexportermanager {
     public static function get_submitted_assessments($courseid) {
         global $DB;
 
-        $sql = "SELECT distinct assign.id, assign.name AS 'assignmentname' FROM {assign} as assign
+        $sql = "SELECT distinct assign.id, assign.name AS 'assignmentname'
+                FROM {assign} as assign
                 JOIN {assign_submission} as asub
                 ON assign.id = asub.assignment
                 JOIN {assignsubmission_onlinetext} as onlinetxt ON assign.id = onlinetxt.assignment
@@ -53,7 +56,7 @@ class reflectionexportermanager {
     }
 
     // Get the reflections the student submitted.
-    public static function get_user_reflections($courseid, $assessids, $userid) {
+    public static function get_user_reflections($courseid, $assessids, $userid, $ibform) {
         global $DB;
 
         $sql = "SELECT onlinetxt.*, asub.timemodified AS 'month', asub.userid
@@ -71,9 +74,22 @@ class reflectionexportermanager {
         // If the student added images, process the URL to avoid warning.
         // The image wont be seen in the PDF.
         foreach ($results as $r) {
-            $onlinetext = file_rewrite_pluginfile_urls($r->onlinetext, 'pluginfile.php', $context->id, 'assignsubmission_onlinetext', 'submissions_onlinetext', $r->id);
+            $onlinetext = file_rewrite_pluginfile_urls($r->onlinetext,
+                                    'pluginfile.php',
+                                    $context->id,
+                                    'assignsubmission_onlinetext',
+                                    'submissions_onlinetext',
+                                    $r->id);
             $r->onlinetext = json_encode(strip_tags(format_text($onlinetext, FORMAT_MOODLE)), JSON_HEX_QUOT | JSON_HEX_TAG);
-            $r->month = date('F', $r->month);
+            // Depending on the form the date has different format.
+            switch ($ibform) {
+                case 'EE_RPPF':
+                    $r->month = date('F', $r->month);
+                    break;
+                case 'TK_PPF':
+                    $r->month = date("d/m/Y", $r->month);
+                    break;
+            }
         }
 
         $results = array_values($results);
@@ -126,10 +142,11 @@ class reflectionexportermanager {
             $data = new stdClass();
             $data->userid = $pdf->uid;
             $data->courseid = $pdf->courseid;
-            $data->refexid = $pdf->rid; // id o mdl_report_reflectionexporter
+            $data->refexid = $pdf->rid; // Id of mdl_report_reflectionexporter.
             $data->pdf = $pdf->pdf;
+            $data->formname = $pdf->formname;
             $data->id = $DB->insert_record('report_reflec_exporter_pdf', $data, true);
-            unset($data->pdf); // Dont send it back
+            unset($data->pdf); // Dont send it back.
             $dataobjects[] = $data;
         }
 
@@ -195,20 +212,20 @@ class reflectionexportermanager {
 
         $results = $DB->get_records_sql($sql);
 
-        // Prepare Tmp File for Zip archive
+        // Prepare Tmp File for Zip archive.
         $file = tempnam($CFG->tempdir, '/reflections');
         $zip = new ZipArchive();
         $zip->open($file, ZipArchive::OVERWRITE);
 
         foreach ($results as $result) {
-            // COllect the pdfs
-            $filename = strtoupper($result->lastname) . '_' . $result->firstname . '_EE_RPPF_.pdf';
+            // Collect the pdfs.
+            $filename = strtoupper($result->lastname) . '_' . $result->firstname . '_' .$result->formname .'.pdf';
             $zip->addFromString($filename, base64_decode($result->pdf));
         }
 
-        // Close and send to users
+        // Close and send to users.
         $zip->close();
-        $foldername = date('Y') . ' EE RPPF.zip';
+        $foldername = date('Y') . '_' .$result->formname . '.zip';
         header('Content-Description: File Transfer');
         header('Content-Type: application/zip');
         header('Content-Length: ' . filesize($file));
@@ -226,7 +243,7 @@ class reflectionexportermanager {
 
     public static function update_download_status($id) {
         global $DB;
-        // Update status
+        // Update status.
         $dataobject = new stdClass();
         $dataobject->id = $id;
         $dataobject->status = self::FINISHED;
@@ -243,22 +260,25 @@ class reflectionexportermanager {
         return $r == $r2;
     }
 
-    // To display the table with the processes started but not finished
-    public static function get_process() {
+    // To display the table with the processes started but not finished.
+    public static function get_process($ibform) {
         global $DB, $COURSE;
 
-        $sql = "SELECT * FROM mdl_report_reflectionexporter WHERE courseid = ?";
-        $params = ['courseid' => $COURSE->id];
+        $sql = "SELECT *
+                FROM mdl_report_reflectionexporter
+                WHERE courseid = ? AND formname = ?";
+        $params = ['courseid' => $COURSE->id, 'formname' => $ibform];
 
         $results = array_values($DB->get_records_sql($sql, $params));
         return $results;
     }
 
-    // To fill the pdfjson property in the template
+    // To fill the pdfjson property in the template.
     public static function get_existing_proc($rid) {
         global $DB;
-        $sql = "SELECT  id, userid, courseid, refexid, status
-                FROM {report_reflec_exporter_pdf} where refexid = ?";
+        $sql = "SELECT id, userid, courseid, refexid, status, formname
+                FROM {report_reflec_exporter_pdf}
+                WHERE refexid = ?";
         $params = ['refexid' => $rid];
 
         $results = array_values($DB->get_records_sql($sql, $params));
@@ -273,14 +293,17 @@ class reflectionexportermanager {
         $uids = array_column($record, 'uid');
         $uids = implode(',', $uids);
 
-        $sql = "SELECT * FROM {user} WHERE id in ($uids)";
+        $sql = "SELECT *
+                FROM {user}
+                WHERE id IN ($uids)";
+
         $students = $DB->get_records_sql($sql);
 
         return $students;
     }
 
     // Teacher is filling the form onbehalf of other teacher(s).
-    // Get the data needed: students ids, groups id, supervisor initials for each student
+    // Get the data needed: students ids, groups id, supervisor initials for each student.
     public static function process_groupselectionjson($groups) {
         $groups = json_decode($groups);
         $studentids = [];
@@ -318,7 +341,7 @@ class reflectionexportermanager {
             $us->lastname = $user->lastname;
             $us->uid = $user->id;
             $us->si = isset($data->onbehalf) ? $supervisorids[$user->id] : $data->supervisorinitials;
-            $ref = self::get_user_reflections($data->cid, $assessids, $user->id);
+            $ref = self::get_user_reflections($data->cid, $assessids, $user->id, $data->ibform);
 
             $us->reflections = self::map_assessment_order($ref, $selectedorder);
 
@@ -342,6 +365,7 @@ class reflectionexportermanager {
             $dataobject->no_reflections_json = json_encode($noreflections);
             $dataobject->courseid = $data->courseid;
             $dataobject->timecreated = time();
+            $dataobject->formname = IB_FORM_NAME[$data->ibform];
 
             $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
         }
@@ -349,13 +373,13 @@ class reflectionexportermanager {
         return $rid;
     }
 
-    // Order the assesments based on the selection the teacher did on the form
+    // Order the assesments based on the selection the teacher did on the form.
     private static function map_assessment_order($reflections, $order) {
 
         $reflectionsaux = [];
 
         foreach ($reflections as $reflection) {
-            // get the index to set the order
+            // Get the index to set the order.
             $key = array_search($reflection->assignment, $order);
             $reflectionsaux[$key] = $reflection;
         }
@@ -389,13 +413,15 @@ class reflectionexportermanager {
     }
 
     // Get the pdf the user submitted in the form.
-    public static function get_file_url($context, $rid) {
+    public static function get_file_url($context, $rid, $ibform) {
         $fs = get_file_storage();
-        $files = $fs->get_area_files($context->id, 'report_reflectionexporter', 'attachment', $rid);
+        $filearea = IB_FORMS_FILEAREA[$ibform];
+        $files = $fs->get_area_files($context->id, 'report_reflectionexporter', $filearea, $rid);
+        $filename = '';
         foreach ($files as $f) {
             $filename = $f->get_filename();
         }
-        $url = moodle_url::make_pluginfile_url($context->id, 'report_reflectionexporter', 'attachment', $rid, '/', $filename, false);
+        $url = moodle_url::make_pluginfile_url($context->id, 'report_reflectionexporter', $filearea, $rid, '/', $filename, false);
 
         return $url->__toString();
     }
@@ -421,7 +447,7 @@ class reflectionexportermanager {
         $groupsaux = [];
         foreach ($groups as $group) {
             list($students, $teachers)  = self::get_students_teachers_in_group($group->members, $courseid);
-            // Add the separated teachers and students
+            // Add the separated teachers and students.
             $group->students = $students;
             $group->teachers = $teachers;
             unset($group->members); // We dont need them anymore.
@@ -453,7 +479,7 @@ class reflectionexportermanager {
                 }
             }
         }
-        // Collect the data we need
+        // Collect the data we need.
         if (count($students) > 0 && count($teachers)) {
             $students = implode(',', $students);
             $students = array_values($DB->get_records_sql("SELECT id, firstname, lastname FROM mdl_user WHERE id in ($students)"));
@@ -485,7 +511,7 @@ class reflectionexportermanager {
     }
 
     public static function get_user_details($user, array $userfields = array()) {
-        global $USER, $DB, $CFG, $PAGE;
+        global $CFG, $PAGE;
         require_once($CFG->dirroot . "/user/profile/lib.php"); // Custom field library.
         require_once($CFG->dirroot . "/lib/filelib.php");      // File handling on description and friends.
 
@@ -571,4 +597,153 @@ class reflectionexportermanager {
 
         return $userdetails;
     }
+
+    // The prescribed title the student selects comes form a choice activity.
+    public static function get_tok_prescribed_title($courseid, $users, $choiceid) {
+        global $DB;
+
+        $sql = "SELECT u.id AS 'userid', co.text AS 'prescribedtitle'
+                FROM {choice} c
+                JOIN {choice_options} co ON c.id = co.choiceid
+                JOIN {choice_answers} ca ON c.id = ca.choiceid AND ca.optionid = co.id
+                JOIN {user} u ON u.id = ca.userid
+                WHERE c.course = ? AND u.id IN ($users) AND c.id = ?";
+
+        $params = ['course' => $courseid, 'id' => $choiceid];
+
+        $results = $DB->get_records_sql($sql, $params);
+
+        return $results;
+    }
+
+    public static function get_tok_prescribed_title_choice_activity($courseid) {
+        global $DB;
+
+        $sql = "SELECT c.id, c.name
+                FROM mdl_choice c
+                WHERE c.course = ?";
+             $params = ['course' => $courseid];
+
+        $results = $DB->get_records_sql($sql, $params);
+
+        return $results;
+    }
+
+      /**
+     *  Process the Extended Essay (EE) export.
+     */
+    public static function process_ee_form($fromform, $id, $cmid) {
+        $rid = self::collect_and_save_reflections($fromform);
+        if ($rid == 0) { // No students reflections found with the data provided.
+            redirect(new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid, 'np' => 1]));
+        } else {
+            $fromform->rid = $rid;
+            report_reflectionexporter_filemanager_postupdate($fromform);
+            $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1, 'ibform' => $fromform->ibform);
+            redirect(new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params));
+        }
+    }
+
+      /**
+     * Process the Extended Theory Of Knowledge.
+     *  Get the title choice made by the students
+     *  Get the 3 interactions from the assessment
+     *  Get the feedback(s) comment given in the 3 assessments.
+     */
+    public static function process_tok_form($fromform, $id, $cmid) {
+        $rid = self::collect_and_save_interactions($fromform, $id);
+        if ($rid == 0) { // No students interactions found with the data provided.
+            redirect(new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid, 'np' => 1]));
+        } else {
+            $fromform->rid = $rid;
+            report_reflectionexporter_tok_filemanager_postupdate($fromform);
+            $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1, 'ibform' => $fromform->ibform);
+            redirect(new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params));
+        }
+    }
+
+    private static function collect_and_save_interactions($data, $courseid) {
+        global $DB, $CFG;
+        $interactions   = [];
+        $nointeractions = [];
+        $selectedorder  = [$data->interaction1, $data->interaction2, $data->interaction3];
+        $users          = self::get_active_users($courseid);
+        $userids        = implode(',', array_keys($users));
+        $titles         = self::get_tok_prescribed_title($courseid, $userids, $data->titlechoiceid);
+
+        foreach ($users as $user) {
+            $assessids = implode(',', $selectedorder);
+            profile_load_custom_fields($user);
+
+            $std                  = new stdClass();
+            $std->id              = $user->profile['IBCode']; // Personal code.
+            $std->uid             = $user->id;
+            $std->firstname       = $user->firstname;
+            $std->lastname        = $user->lastname;
+            $std->session         = $data->session;
+            $std->teachersname    = $data->teachersname;
+            $std->prescribedtitle = isset($titles[$user->id]) ? ($titles[$user->id])->prescribedtitle : '';
+            $std->schoolname      = $CFG->report_reflectionexporter_school_name;
+            $std->schoolnumber    = $CFG->report_reflectionexporter_school_number;
+
+            $ref = self::get_user_reflections($data->cid, $assessids, $user->id, $data->ibform);
+            $std->interactions = self::map_assessment_order($ref, $selectedorder);
+            $comments = self::get_feedback_comments($assessids, $std);
+            $std->comments = $comments;
+
+            if (count($std->interactions) < 3) {
+                $std->missing = self::get_missing_assignments($std->interactions, $selectedorder);
+                unset($std->interactions); // We dont need the reflection.
+                $nointeractions[]  = $std;
+            } else {
+                $interactions[] = $std;
+            }
+        }
+
+        if (count($interactions) == 0) {
+            $rid = 0;
+        } else {
+            // Save the reflection data in the DB.
+            $dataobject = new stdClass();
+            $dataobject->reflections_json = json_encode($interactions);
+            $dataobject->no_reflections_json = json_encode($nointeractions);
+            $dataobject->courseid = $data->courseid;
+            $dataobject->formname = IB_FORM_NAME[$data->ibform];
+            $dataobject->status = self::FINISHED; // Tok ibforms.
+            $dataobject->timecreated = time();
+
+            $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
+        }
+
+        return $rid;
+    }
+
+    /**
+     * For TOK forms, the teacher can give feedback comments to the assessments
+     * with the interactions.
+     */
+    private static function get_feedback_comments($assesmentids, $student) {
+        global $DB;
+
+        $sql = "SELECT ac.assignment, ac.commenttext
+                FROM {assignfeedback_comments} ac
+                JOIN {assign_grades} ag
+                ON ac.assignment = ag.assignment
+                WHERE  ag.userid = ?
+                AND ac.assignment IN ($assesmentids);";
+
+        $paramsarray = ['userid' => $student->uid];
+
+        $results = $DB->get_records_sql($sql, $paramsarray);
+        $comments = '';
+
+        foreach ($results as $comment) {
+
+            $comments .= strip_tags(format_text($comment->commenttext, FORMAT_MOODLE)) . PHP_EOL;
+        }
+
+        return $comments;
+
+    }
 }
+

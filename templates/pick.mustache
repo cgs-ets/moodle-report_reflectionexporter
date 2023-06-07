@@ -1,4 +1,24 @@
-<h2>{{#str}} reflection-exporter-heading, report_reflectionexporter {{/str}}</h2>
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+    @package    report
+    @subpackage reflectionexporter
+    @copyright  2022 Veronica Bermegui
+    @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+}}
 
 <div class="actions">
    <a class="action btn btn-lg" href="{{{newproc}}}">
@@ -24,25 +44,25 @@
     <tbody>
     {{#processes}}
         <tr>
-            <td>{{datecreated}}</td> 
-            <td>{{status}}</td> 
+            <td>{{datecreated}}</td>
+            <td>{{status}}</td>
             <td><a type="button" class="btn " href = "{{{actionurl}}}" title = '{{title}}'>
-                <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{existingicon}}}" /></a> 
+                <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{existingicon}}}" /></a>
             </td>
             <td>
-            
+
             <form id ="zipform" method = "post" action = "{{{downloadurl}}}">
                 <input name="datajson" type="hidden" value="{{datajson}}" />
                 <button type="submit" class = "reflection-exporter-download-index" {{^finished}} disabled title = "Download not available"{{/finished}}>
                     <img class="icon reflection-exporter-action-btn" src="{{{zipicon}}}"/>
-                </button>            
+                </button>
             </form>
-           
+
             </td>
             <td>
                 <a type="button" class="btn " title = 'Delete' >
                 <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{deleteicon}}}" data-to-delete = "{{todelete}}" />
-                </a> 
+                </a>
                 <div class = 'deleting del-processing'>
                     {{> report_reflectionexporter/loading }}
                 </div>

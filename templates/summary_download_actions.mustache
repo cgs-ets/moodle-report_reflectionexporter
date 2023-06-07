@@ -20,13 +20,16 @@
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 }}
 
-{{! The content is  generated after calling JS }}
-{{#js}}
-require(['report_reflectionexporter/view_pdf'], function(ViewPDF) {
-    new ViewPDF();
-})
-{{/js}}
-
-
-
-
+    <div class="next-action next-action-hidden" >
+        <a class="action btn btn-lg btn-summary-hidden" id = "summary" title = 'Omitted students'>
+                <img class="icon iconsize-big" alt="" aria-hidden="true" src="http://localhost/cgs/moodle/report/reflectionexporter/pix/clipboard.png">
+                <div class="action-text">Summary</div>
+            </a>
+        <form id ="zipform" method = "post" action = "{{downloadaction}}">
+             <input name="datajson" type="hidden" value="{{datajson}}">
+            <a class="action btn btn-lg" id = "download" title = 'Downloads the full batch'>
+                <img class="icon iconsize-big" alt="" aria-hidden="true" src="http://localhost/cgs/moodle/report/reflectionexporter/pix/zip.png">
+                <div class="action-text">Download </div>
+            </a>
+        </form>
+    </div>

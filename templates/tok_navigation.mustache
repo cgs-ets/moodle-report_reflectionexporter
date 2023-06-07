@@ -20,13 +20,18 @@
     @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 }}
 
-{{! The content is  generated after calling JS }}
-{{#js}}
-require(['report_reflectionexporter/view_pdf'], function(ViewPDF) {
-    new ViewPDF();
-})
-{{/js}}
+<div class="container-fluid">
+<div data-region="viewer-navigation" class="row reflection-container">
 
-
-
+<div data-region="reflectionexporter-info" class="col-md-4 col-sm" data-courseid = "{{courseid}}">
+            {{! Course name & link.}}
+<a href="{{globals.config.wwwroot}}/course/view.php?id={{courseid}}" id = "courseurl" title="{{{coursename}}}">Course: {{{coursename}}}</a><br/>
+<a href="{{globals.config.wwwroot}}/report/reflectionexporter/index.php?cid={{courseid}}" id = "reporturl" title="Reflection exporter">Reflection exporter</a>
+</div>
+        {{! Tok title }}
+<div data-region="user-info" class="col-md-4 col-sm" data-rid="{{reflecid}}" data-userid="{{userid}}">
+    <h4 id = "user-summary">{{#str}} tokheader, report_reflectionexporter {{/str}}</h4>
+</div>
+</div>
+</div>
 

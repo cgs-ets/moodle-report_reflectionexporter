@@ -63,14 +63,13 @@ trait update_pdfbase64 {
                 'pdf' => $pdf,
             )
         );
-       
+
         $pdfdata = json_decode($pdf);
-        
         reflectionexportermanager::update_pdfbase64($pdfdata);
 
         return array(
             'status' => 'ok',
-            
+
         );
     }
 
