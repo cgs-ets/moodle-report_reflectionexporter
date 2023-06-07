@@ -24,10 +24,11 @@
 define([
     "report_reflectionexporter/pdf",
     "report_reflectionexporter/pdf-lib",
+    "report_reflectionexporter/reflectionexporterHelper",
     'core/templates',
     'core/ajax',
     'core/url'
-], function (PDFJSLIB, PDFLib, Templates, Ajax, url) {
+], function (PDFJSLIB, PDFLib, ReHelper ,Templates, Ajax, url) {
     "use strict";
 
     var ViewPDF = function () {
@@ -197,7 +198,30 @@ define([
             const pdfDoc = await PDFLib.PDFDocument.load(stringPdfToBinary);
             const form = pdfDoc.getForm();
             //Text12: Supervisor comments.
-            const commentsupervisor = form.getField('Text12');
+            let commentsupervisor;
+            console.log("get_ibform_name");
+            console.log(ReHelper.get_ibform_name());
+            console.log(commentEl.value);
+
+            switch (ReHelper.get_ibform_name()) {
+                case 'EE_RPPF':
+                    commentsupervisor = form.getField(ReHelper.get_ee_form_inputs().SUPERVISOR_COMMENT);
+                    break;
+                case 'TK_PPF':
+                    commentsupervisor = form.getField(ReHelper.get_tok_form_inputs().TEACHER_COMMENTS);
+                    var today = new Date();
+                    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+                    today = today.toLocaleString("en-GB", options);
+                    const commentdate1 = form.getField(ReHelper.get_tok_form_inputs().COMPLETED_DECLARATION_DATE1);
+                    const commentdate2 = form.getField(ReHelper.get_tok_form_inputs().COMPLETED_DECLARATION_DATE2);
+                    commentdate1.setText(today);
+                    commentdate2.setText(today);
+                    break;
+
+                default:
+                    break;
+            }
+
             commentsupervisor.setText(commentEl.value);
 
             // Flatten the form's fields. This makes the pdf uneditable.

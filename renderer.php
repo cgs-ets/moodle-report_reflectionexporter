@@ -73,6 +73,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['newproc'] = $dataobject->newproc;
         $procs = reflectionexportermanager::get_process($dataobject->ibform);
         $data['processfound'] = count($procs) > 0;
+        $data['ibform'] = str_replace('_', '/', $dataobject->ibform);
 
         foreach ($procs as $proc) {
             $pr = new stdClass();
@@ -99,6 +100,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
             $pr->todelete = $proc->id;
             $data['processes'] [] = $pr;
         }
+
 
         echo $this->output->render_from_template('report_reflectionexporter/pick', $data);
     }
@@ -128,10 +130,5 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
 
         echo $this->output->render_from_template('report_reflectionexporter/viewer', $data);
     }
-
-    public function render_no_title_error() {
-        echo $this->output->render_from_template('report_reflectionexporter/tok_no_prescribed_title', '');
-    }
-
 
 }

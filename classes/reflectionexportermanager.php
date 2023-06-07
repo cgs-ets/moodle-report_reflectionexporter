@@ -365,7 +365,7 @@ class reflectionexportermanager {
             $dataobject->no_reflections_json = json_encode($noreflections);
             $dataobject->courseid = $data->courseid;
             $dataobject->timecreated = time();
-            $dataobject->formname = IB_FORM_NAME[$data->ibform];
+            $dataobject->formname = $data->ibform;
 
             $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
         }
@@ -688,8 +688,8 @@ class reflectionexportermanager {
 
             $ref = self::get_user_reflections($data->cid, $assessids, $user->id, $data->ibform);
             $std->interactions = self::map_assessment_order($ref, $selectedorder);
-            $comments = self::get_feedback_comments($assessids, $std);
-            $std->comments = $comments;
+            // $comments = self::get_feedback_comments($assessids, $std);
+            // $std->comments = $comments;
 
             if (count($std->interactions) < 3) {
                 $std->missing = self::get_missing_assignments($std->interactions, $selectedorder);
@@ -708,9 +708,10 @@ class reflectionexportermanager {
             $dataobject->reflections_json = json_encode($interactions);
             $dataobject->no_reflections_json = json_encode($nointeractions);
             $dataobject->courseid = $data->courseid;
-            $dataobject->formname = IB_FORM_NAME[$data->ibform];
-            $dataobject->status = self::FINISHED; // Tok ibforms.
+            $dataobject->formname = $data->ibform;
             $dataobject->timecreated = time();
+
+            error_log(print_r($dataobject, true));
 
             $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
         }

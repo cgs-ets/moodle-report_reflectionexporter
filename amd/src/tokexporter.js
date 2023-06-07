@@ -30,8 +30,9 @@ define([
     "core/log",
     "report_reflectionexporter/pdf-lib",
     "core/templates",
+    "report_reflectionexporter/reflectionexporterHelper",
 
-], function ($, Ajax, Log, PDFLib, Templates) {
+], function ($, Ajax, Log, PDFLib, Templates, ReHelper) {
     "use strict";
 
     function init(data) {
@@ -46,24 +47,7 @@ define([
     function Controls(data) {
 
         this.data = data;
-        this.CANDIDATE_PERSONAL_CODE = 'Text1';
-        this.SESSION = 'Text2';
-        this.PRESCRIBED_TITLE = 'Text3';
-        this.FIRST_INTERACTION_CANDIDATE_COMMENTS = 'Text4';
-        this.FIRST_INTERACTION_CANDIDATE_DATE = 'Text5';
-        this.SECOND_INTERACTION_CANDIDATE_COMMENTS = 'Text6';
-        this.SECOND_INTERACTION_CANDIDATE_DATE = 'Text7';
-        this.THIRD_INTERACTION_CANDIDATE_COMMENTS = 'Text8';
-        this.THIRD_INTERACTION_CANDIDATE_DATE = 'Text9';
-        this.TEACHER_COMMENTS = 'Text10';
-        this.COMPLETED_CANDIDATE_NAME = 'Text11';
-        this.COMPLETED_CANDIDATE_SESSION_NUMBER = 'Text12';
-        this.COMPLETED_DECLARATION_DATE1 = 'Text13';
-        this.COMPLETED_DECLARATION_TEACHER_NAME = 'Text14';
-        this.COMPLETED_DECLARATION_DATE2 = 'Text15';
-        this.COMPLETED_DECLARATION_SCHOOL_NAME = 'Text16';
-        this.COMPLETED_DECLARATION_SCHOOL_NUMBER = 'Text17';
-
+        this.tokFormInputs = ReHelper.get_tok_form_inputs();
     }
 
     /**
@@ -160,56 +144,56 @@ define([
         const fieldName = field.getName();
 
         switch (fieldName) {
-            case self.CANDIDATE_PERSONAL_CODE:
+            case self.tokFormInputs.CANDIDATE_PERSONAL_CODE:
                 form.getTextField(fieldName).setText(String(user.id));
                 break;
-            case self.SESSION:
+            case self.tokFormInputs.SESSION:
                 form.getTextField(fieldName).setText(String(user.session));
                 break;
-            case self.PRESCRIBED_TITLE:
+            case self.tokFormInputs.PRESCRIBED_TITLE:
                 form.getTextField(fieldName).setText(String(user.prescribedtitle));
                 break;
-            case self.FIRST_INTERACTION_CANDIDATE_COMMENTS:
+            case self.tokFormInputs.FIRST_INTERACTION_CANDIDATE_COMMENTS:
 
                 form.getTextField(fieldName).setText((user.interactions[0].onlinetext).replaceAll('"',''));
                 break;
-            case self.FIRST_INTERACTION_CANDIDATE_DATE:
+            case self.tokFormInputs.FIRST_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[0].month);
                 break;
-            case self.SECOND_INTERACTION_CANDIDATE_COMMENTS:
+            case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_COMMENTS:
                 form.getTextField(fieldName).setText((user.interactions[1].onlinetext).replaceAll('"',''));
                 break;
-            case self.SECOND_INTERACTION_CANDIDATE_DATE:
+            case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[1].month);
                 break;
-            case self.THIRD_INTERACTION_CANDIDATE_COMMENTS:
+            case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_COMMENTS:
                 form.getTextField(fieldName).setText((user.interactions[2].onlinetext.replaceAll('"','')));
                 break;
-            case self.THIRD_INTERACTION_CANDIDATE_DATE:
+            case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[2].month);
                 break;
-            case self.TEACHER_COMMENTS:
+            case self.tokFormInputs.TEACHER_COMMENTS:
                 form.getTextField(fieldName).setText(user.comments);
                 break;
-            case self.COMPLETED_CANDIDATE_NAME:
+            case self.tokFormInputs.COMPLETED_CANDIDATE_NAME:
                 form.getTextField(fieldName).setText(`${user.firstname} ${user.lastname}`);
                 break;
-            case self.COMPLETED_CANDIDATE_SESSION_NUMBER:
+            case self.tokFormInputs.COMPLETED_CANDIDATE_SESSION_NUMBER:
                 form.getTextField(fieldName).setText(user.session);
                 break;
-            case self.COMPLETED_DECLARATION_DATE1:
+            case self.tokFormInputs.COMPLETED_DECLARATION_DATE1:
                 form.getTextField(fieldName).setText(user.month);
                 break;
-            case self.COMPLETED_DECLARATION_TEACHER_NAME:
+            case self.tokFormInputs.COMPLETED_DECLARATION_TEACHER_NAME:
                 form.getTextField(fieldName).setText(user.teachersname);
                 break;
-            case self.COMPLETED_DECLARATION_DATE2:
+            case self.tokFormInputs.COMPLETED_DECLARATION_DATE2:
                 form.getTextField(fieldName).setText(user.month);
                 break;
-            case self.COMPLETED_DECLARATION_SCHOOL_NAME:
+            case self.tokFormInputs.COMPLETED_DECLARATION_SCHOOL_NAME:
                 form.getTextField(fieldName).setText(user.schoolname);
                 break;
-            case self.COMPLETED_DECLARATION_SCHOOL_NUMBER:
+            case self.tokFormInputs.COMPLETED_DECLARATION_SCHOOL_NUMBER:
                 form.getTextField(fieldName).setText(user.schoolnumber);
                 break;
 
@@ -237,10 +221,9 @@ define([
                     showuseridentity: true,
                     reflecid: self.data.rid,
                     firstuserid: 0,
-                    downloadaction: downloadurl,
                 }
 
-                Templates.render('report_reflectionexporter/tok_viewer', context)
+                Templates.render('report_reflectionexporter/viewer', context)
                 .done(function (html, js) {
                     $(document.querySelector('.importing-animation')).fadeOut("fast", function () {
                         Templates.replaceNodeContents($(document.querySelector('.importing-animation')), html, js);
@@ -269,15 +252,15 @@ define([
             firstuserid: 0,
         }
 
-        Templates.render('report_reflectionexporter/tok_viewer', context)
-        .done(function (html, js) {
-            $(document.querySelector('.importing-animation')).fadeOut("fast", function () {
-                Templates.replaceNodeContents($(document.querySelector('.importing-animation')), html, js);
-                $(document.querySelector('.importing-animation')).fadeIn("fast");
-            }.bind(this));
-        }).fail(function (ex) {
-            console.log(ex);
-        });
+        Templates.render('report_reflectionexporter/viewer', context)
+            .done(function (html, js) {
+                $(document.querySelector('.importing-animation')).fadeOut("fast", function () {
+                    Templates.replaceNodeContents($(document.querySelector('.importing-animation')), html, js);
+                    $(document.querySelector('.importing-animation')).fadeIn("fast");
+                }.bind(this));
+            }).fail(function (ex) {
+                console.log(ex);
+            });
     }
 
     return {
