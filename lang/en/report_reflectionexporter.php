@@ -24,7 +24,7 @@
  */
 
 $string['pluginname']                       = 'Reflection exporter';
-$string['heading']                          = 'Reflection exporter';
+$string['heading']                          = 'IB Forms exporter';
 $string['returntocourse']                   = 'Return to course';
 $string['reflectionexporter:grade']         = 'Reflection exporter: grade';
 $string['attachment_filemanager']           = 'EE/RPPF file';
@@ -49,7 +49,6 @@ $string['supervisorinitialserror']          = 'Please insert your initials';
 $string['activeusers']                      = 'Allocated students';
 $string['action-text-continue']             = 'Continue export';
 $string['action-text-new']                  = 'New export';
-$string['reflection-exporter-heading']      = 'Reflection exporter';
 $string['savingchanges']                    = 'Saving changes';
 $string['nousersselected']                  = 'No user selected';
 $string['cantdisplayerror']                 = 'Reflection exporter is only functional in courses.';

@@ -64,7 +64,6 @@ echo $OUTPUT->header();
 if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
     \core\notification::add(get_string('cantdisplayerror', 'report_reflectionexporter'), core\output\notification::NOTIFY_ERROR);
 } else {
-    $PAGE->set_title('Reflection exporter');
 
     if ($nothingtoprocess == 1) {
         // No process error.
@@ -79,7 +78,7 @@ if ($id == 0 || $id == 1) {  // $id = 1 is the main page.
     }
 
      // Title
-     echo html_writer::tag('h2', get_string('reflection-exporter-heading', 'report_reflectionexporter'));
+     echo html_writer::tag('h2', get_string('heading', 'report_reflectionexporter'));
 
      $renderer = $PAGE->get_renderer('report_reflectionexporter');
 
