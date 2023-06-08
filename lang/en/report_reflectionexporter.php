@@ -60,6 +60,17 @@ $string['ibform']                           = 'IB forms';
 $string['ibform_desc']                      = 'Name of the IB forms suported by the plugin, separated by comma. The name must be the acronym found in the form.';
 $string['ibformlabel']                      = 'Select IB form';
 $string['importingprocessmsg']              = 'Importing reflections to PDF. Please do not close the browser';
+$string['selectwork']                       = 'Select work';
+$string['datecreated']                      = 'Date Created';
+$string['status']                           = 'Status';
+$string['export']                           = 'Export';
+$string['download']                         = 'Download';
+$string['delete']                           = 'Delete';
+$string['student']                          = 'Student';
+$string['ibcode']                           = 'IB Code';
+$string['missingactivities']                = 'Missing activitie(s)';
+
+
 // TOK Form
 $string['tkattachment_filemanager']         = 'TK/PPF Form File';
 $string['tokattachment_filemanager_help']   = 'File where the interactions will be exported to.';
@@ -81,5 +92,5 @@ $string['prescribedtitle_help']             = 'The choice activity that has the 
 $string['schoolname']                       = 'School name';
 $string['schoolnumber']                     = 'School number';
 $string['tokheader']                        = 'Theory of Knowledge - Planning and progress export';
-$string['nochoice']                         = 'There are is no activity to get the prescribed title from. Return';
+$string['nochoice']                         = 'There are is no activity to get the prescribed title from, the process cannot continue. Return';
 

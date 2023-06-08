@@ -199,9 +199,6 @@ define([
             const form = pdfDoc.getForm();
             //Text12: Supervisor comments.
             let commentsupervisor;
-            console.log("get_ibform_name");
-            console.log(ReHelper.get_ibform_name());
-            console.log(commentEl.value);
 
             switch (ReHelper.get_ibform_name()) {
                 case 'EE_RPPF':

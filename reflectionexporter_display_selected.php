@@ -52,12 +52,17 @@ $PAGE->add_body_classes(['report_reflectionexporter', 'limitedwidth']);
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 $PAGE->set_heading(format_string($course->fullname, true, array('context' => $context)));
 
+$form = explode('_', $form);
+$form = $form[count($form) - 1];
+
+$heading = get_string('heading', 'report_reflectionexporter') . "- $form";
+
+$PAGE->set_heading($heading);
+
 echo $OUTPUT->header();
 
 $viewmanager = new reflectionexporterviewmanager($id, $cmid);
 
-$form = explode('_', $form);
-$form = $form[count($form) - 1];
 $form = IB_FORM_NAME[$form];
 switch ($form) {
     case 'EE_RPPF':
