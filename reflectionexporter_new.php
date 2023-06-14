@@ -77,10 +77,6 @@ if ($mform->is_cancelled()) {
         case 'TK_PPF':
             reflectionexportermanager::process_tok_form($fromform, $id, $cmid);
             break;
-
-        default:
-            # code...
-            break;
     }
 
 } else {

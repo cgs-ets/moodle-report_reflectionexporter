@@ -35,6 +35,7 @@ $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course modul
 $rid                     = required_param('rid', PARAM_INT); // Id from mdl_report_reflectionexporter.
 $new                     = optional_param('n', 0, PARAM_INT); // New process or exisiting one.
 $download                = optional_param('d', 0, PARAM_INT); // Download the zip file.
+$export                  = optional_param('export', 0, PARAM_INT); // Download an excel file.
 $datajson                = optional_param('datajson', 0, PARAM_RAW); // JSON with the information needed to display PDF.
 $finished                = optional_param('f', 0, PARAM_RAW); // Finished process.
 $ibform                  = required_param('ibform', PARAM_TEXT);
@@ -49,6 +50,10 @@ $context = context_course::instance($course->id);
 
 if ($download) {
     reflectionexportermanager::generate_zip($datajson);
+}
+
+if ($export) {
+    reflectionexportermanager::generate_spreadsheet($rid, $context, $course);
 }
 
 $PAGE->set_context($context);

@@ -38,6 +38,9 @@
         <th>{{#str}}status, report_reflectionexporter{{/str}}</th>
         <th>{{#str}}export, report_reflectionexporter{{/str}}</th>
         <th>{{#str}}download, report_reflectionexporter{{/str}}</th>
+        {{#istok}}
+            <th>{{#str}}spswc, report_reflectionexporter{{/str}}</th>
+        {{/istok}}
         <th>{{#str}}delete, report_reflectionexporter{{/str}}</th>
     </tr>
     </thead>
@@ -46,22 +49,32 @@
         <tr>
             <td>{{datecreated}}</td>
             <td>{{status}}</td>
-            <td><a type="button" class="btn " href = "{{{actionurl}}}" title = '{{title}}'>
-                <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{existingicon}}}" /></a>
+            <td>
+                <a type="button" class="btn " href = "{{{actionurl}}}" title = '{{title}}'>
+                 <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{existingicon}}}" />
+                </a>
             </td>
             <td>
-
-            <form id ="zipform" method = "post" action = "{{{downloadurl}}}">
-                <input name="datajson" type="hidden" value="{{datajson}}" />
-                <button type="submit" class = "reflection-exporter-download-index" {{^finished}} disabled title = "Download not available"{{/finished}}>
-                    <img class="icon reflection-exporter-action-btn" src="{{{zipicon}}}"/>
-                </button>
-            </form>
-
+                <form id ="zipform" method = "post" action = "{{{downloadurl}}}">
+                    <input name="datajson" type="hidden" value="{{datajson}}" />
+                    <button type="submit" class = "reflection-exporter-download-index" {{^finished}} disabled title = "Download not available"{{/finished}}>
+                        <img class="icon reflection-exporter-action-btn" src="{{{zipicon}}}"/>
+                    </button>
+                </form>
             </td>
+            {{#istok}}
+                <td>
+                    <form id ="exportform" method = "post" action = "{{{exporturl}}}">
+                        <input name="rid" type="hidden" value="{{rid}}" />
+                        <button type="submit" class = "reflection-exporter-download-index" {{^finished}} disabled title = "Download not available"{{/finished}}>
+                            <img class="icon reflection-exporter-action-btn" src="{{{spreadsheeticon}}}"/>
+                        </button>
+                    </form>
+                </td>
+            {{/istok}}
             <td>
                 <a type="button" class="btn " title = 'Delete' >
-                <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{deleteicon}}}" data-to-delete = "{{todelete}}" />
+                    <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{deleteicon}}}" data-to-delete = "{{todelete}}" />
                 </a>
                 <div class = 'deleting del-processing'>
                     {{> report_reflectionexporter/loading }}

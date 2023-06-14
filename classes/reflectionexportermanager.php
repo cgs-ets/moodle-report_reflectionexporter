@@ -26,9 +26,14 @@ namespace report_reflectionexporter;
 use context_course;
 use moodle_exception;
 use moodle_url;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use stdClass;
 use user_picture;
 use ZipArchive;
+
+use function report_reflectionexporter\wordcount\report_reflectionexporter_setup_wordcount_workbook;
+require_once($CFG->dirroot . '/report/reflectionexporter/classes/report_reflectionexporter_countword_workbook.php');
 
 class reflectionexportermanager {
 
@@ -56,7 +61,7 @@ class reflectionexportermanager {
     }
 
     // Get the reflections the student submitted.
-    public static function get_user_reflections($courseid, $assessids, $userid, $ibform) {
+    public static function get_user_reflections($courseid, $assessids, $userid, $ibform, $wc = false) {
         global $DB;
 
         $sql = "SELECT onlinetxt.*, asub.timemodified AS 'month', asub.userid
@@ -87,7 +92,10 @@ class reflectionexportermanager {
                     $r->month = date('F', $r->month);
                     break;
                 case 'TK_PPF':
-                    $r->month = date("d/m/Y", $r->month);
+                    $r->month     = date("d/m/Y", $r->month);
+                    if ($wc) {
+                        $r->wordcount = strip_tags(format_text($onlinetext, FORMAT_MOODLE));
+                    }
                     break;
             }
         }
@@ -163,6 +171,7 @@ class reflectionexportermanager {
         $dataobject->status = self::PDF_COMPLETED;
 
         $DB->update_record('report_reflec_exporter_pdf', $dataobject);
+
         if ($pdfdata->finished == '1') {
             $status = self::FINISHED;
         } else {
@@ -234,12 +243,78 @@ class reflectionexportermanager {
         readfile($file);
         unlink($file);
 
-        // Update status
-
+        // Update status.
         self::update_download_status($refexpids);
 
         die();
     }
+
+    public static function generate_spreadsheet($data, $context, $course) {
+        global $DB, $CFG;
+        // Increase the server timeout to handle the creation and sending of large zip files.
+        \core_php_time_limit::raise();
+
+        $ref = self::get_reflections_json($data);
+        $data = json_decode($ref->reflections_json); // Get the reflections_json column.
+        $tempdir = make_temp_directory('report_reflectionexporter/spreadsheet');
+
+        report_reflectionexporter_setup_wordcount_workbook($context, $data, $tempdir, $course);
+
+        // Now make a zip file of the temp dir and then delete it.
+        self::zip_spreadsheetworkbook();
+    }
+
+    /**
+     * Creates a zip file with excel files in it
+     */
+    private static function zip_spreadsheetworkbook() {
+        global $CFG;
+        $foldertozip = $CFG->tempdir.'/report_reflectionexporter/spreadsheet';
+        // Get real path for our folder.
+        $rootpath = realpath($foldertozip);
+
+        // Initialize archive object.
+        $zip = new \ZipArchive();
+        $filename = $CFG->tempdir.'/report_reflectionexporter/wordcount.zip';
+
+        $zip->open( $filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+
+        // Create recursive directory iterator.
+        /** @var SplFileInfo[] $files */
+        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($rootpath), RecursiveIteratorIterator::LEAVES_ONLY);
+        $filestodelete = [];
+
+        foreach ($files as $name => $file) {
+            // Skip directories (they would be added automatically).
+            if (!$file->isDir()) {
+                // Get real and relative path for current file.
+                $filepath = $file->getRealPath();
+                $relativepath = substr($filepath, strlen($rootpath) + 1);
+                // Add current file to archive.
+                $zip->addFile($filepath, $relativepath);
+                $filestodelete[] = $filepath;
+            }
+        }
+
+        if ($zip->numFiles > 0) {
+            // Zip archive will be created only after closing object.
+            $zip->close();
+
+            foreach ($filestodelete as $file) {
+                unlink($file);
+            }
+
+            header("Content-Type: application/zip");
+            header("Content-Disposition: attachment; filename=wordcount.zip");
+            header("Content-Length: " . filesize("$filename"));
+            readfile("$filename");
+            unlink("$filename");
+        }
+
+        die(); // If not set, a invalid zip file error is thrown.
+
+    }
+
 
     public static function update_download_status($id) {
         global $DB;
@@ -558,11 +633,11 @@ class reflectionexportermanager {
             $userdetails['customfields'] = array();
             foreach ($categories as $categoryid => $fields) {
                 foreach ($fields as $formfield) {
-                    if ($formfield->is_visible() and !$formfield->is_empty()) {
+                    if ($formfield->is_visible() && !$formfield->is_empty()) {
                         // TODO: Part of MDL-50728, this conditional coding must be moved to
                         // proper profile fields API so they are self-contained.
                         // We only use display_data in fields that require text formatting.
-                        if ($formfield->field->datatype == 'text' or $formfield->field->datatype == 'textarea') {
+                        if ($formfield->field->datatype == 'text' || $formfield->field->datatype == 'textarea') {
                             $fieldvalue = $formfield->display_data();
                         } else {
                             // Cases: datetime, checkbox and menu.
@@ -629,7 +704,7 @@ class reflectionexportermanager {
         return $results;
     }
 
-      /**
+    /**
      *  Process the Extended Essay (EE) export.
      */
     public static function process_ee_form($fromform, $id, $cmid) {
@@ -644,8 +719,8 @@ class reflectionexportermanager {
         }
     }
 
-      /**
-     * Process the Extended Theory Of Knowledge.
+    /**
+     *  Process the Extended Theory Of Knowledge.
      *  Get the title choice made by the students
      *  Get the 3 interactions from the assessment
      *  Get the feedback(s) comment given in the 3 assessments.
@@ -688,8 +763,10 @@ class reflectionexportermanager {
 
             $ref = self::get_user_reflections($data->cid, $assessids, $user->id, $data->ibform);
             $std->interactions = self::map_assessment_order($ref, $selectedorder);
-            // $comments = self::get_feedback_comments($assessids, $std);
-            // $std->comments = $comments;
+
+            // Get the text for the essay assessment. This has the word count.
+            $essayref = self::get_user_reflections($data->cid, $data->tokessay, $user->id, $data->ibform, true);
+            $std->wordcount = count($essayref) > 0 ? ($essayref[count($essayref) - 1])->wordcount : '';
 
             if (count($std->interactions) < 3) {
                 $std->missing = self::get_missing_assignments($std->interactions, $selectedorder);
@@ -710,8 +787,6 @@ class reflectionexportermanager {
             $dataobject->courseid = $data->courseid;
             $dataobject->formname = $data->ibform;
             $dataobject->timecreated = time();
-
-            error_log(print_r($dataobject, true));
 
             $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
         }

@@ -21,15 +21,30 @@
 }}
 
     <div class="next-action next-action-hidden" >
-        <a class="action btn btn-lg btn-summary-hidden" id = "summary" title = 'Omitted students'>
-                <img class="icon iconsize-big" alt="" aria-hidden="true" src="http://localhost/cgs/moodle/report/reflectionexporter/pix/clipboard.png">
-                <div class="action-text">Summary</div>
+        <a class="action btn btn-lg btn-summary-hidden" id = "summary" title = "{{#str}}ommitedstudents, report_reflectionexporter{{/str}}">
+                <img class="icon iconsize-big" alt="" aria-hidden="true" src="{{summaryicon}}">
+                <div class="action-text">{{#str}}summary, report_reflectionexporter{{/str}}</div>
             </a>
         <form id ="zipform" method = "post" action = "{{downloadaction}}">
              <input name="datajson" type="hidden" value="{{datajson}}">
-            <a class="action btn btn-lg" id = "download" title = 'Downloads the full batch'>
-                <img class="icon iconsize-big" alt="" aria-hidden="true" src="http://localhost/cgs/moodle/report/reflectionexporter/pix/zip.png">
-                <div class="action-text">Download </div>
+            <a class="action btn btn-lg" id = "download" title = "{{#str}}downloadforms, report_reflectionexporter{{/str}}"">
+                <img class="icon iconsize-big" alt="" aria-hidden="true" src="{{zipicon}}">
+                <div class="action-text">
+                    <span>Download</span><br>
+                    <span>forms</span>
+                </div>
             </a>
         </form>
+        {{#tkform}}
+            <form id ="exportspreadsheet" method = "post" action = "{{exportspreadhseetaction}}">
+                <input name="datajson" type="hidden" value="{{rid}}">
+                <a class="action btn btn-lg" id = "export" title = "{{#str}}downloadspreadsheets, report_reflectionexporter{{/str}}">
+                    <img class="icon iconsize-big" alt="" aria-hidden="true" src="{{exporticon}}">
+                    <div class="action-text">
+                        <span>Download</span><br>
+                        <span>spreadsheet</span>
+                    </div>
+                </a>
+            </form>
+        {{/tkform}}
     </div>

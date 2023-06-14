@@ -67,7 +67,7 @@ button.reflection-exporter-download-index {
 }
 
 div.omitted-table .table-responsive {
- display: inline-table;
+  display: inline-table;
 }
 
 table.table.table-bordered.table-responsive.started-work {
@@ -116,10 +116,10 @@ table.table.table-bordered.table-responsive.started-work {
 
 /* Actions buttons for tok exporter*/
 .path-report-reflectionexporter [data-region="tok-exporter-actions"] {
-    position: absolute;
-    margin-top: 15%;
-    margin-left: 40%;
-    display: flex;
+  position: absolute;
+  margin-top: 15%;
+  margin-left: 40%;
+  display: flex;
 }
 
 .path-report-reflectionexporter select.custom-select {
@@ -272,12 +272,11 @@ a.btn-summary-hidden {
   }
 
   .report_reflectionexporter .next-action {
-  margin-top: 4px;
-  width: fit-content;
-  margin: auto;
-  padding: 2rem;
-  /*display: flex;*/
-}
+    margin-top: 4px;
+    width: fit-content;
+    margin: auto;
+    padding: 2rem;
+  }
 }
 
 /* <a href="https://www.flaticon.com/free-icons/export" title="export icons">Export icons created by Uniconlabs - Flaticon</a> */
@@ -285,3 +284,5 @@ a.btn-summary-hidden {
 /* <a href="https://www.flaticon.com/free-icons/delete" title="delete icons">Delete icons created by Freepik - Flaticon</a> */
 /* <a href="https://www.flaticon.com/free-icons/delete" title="delete icons">Delete icons created by Freepik - Flaticon</a> */
 /* <a href="https://www.flaticon.com/free-icons/file" title="file icons">File icons created by Freepik - Flaticon</a> */
+/* <a href="https://www.flaticon.com/free-icons/spreadsheet" title="spreadsheet icons">Spreadsheet icons created by Freepik - Flaticon</a> */
+/* <a href="https://www.flaticon.com/free-icons/spreadsheet" title="spreadsheet icons">Spreadsheet icons created by Freepik - Flaticon</a> */

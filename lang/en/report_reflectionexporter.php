@@ -64,12 +64,15 @@ $string['selectwork']                       = 'Select work';
 $string['datecreated']                      = 'Date Created';
 $string['status']                           = 'Status';
 $string['export']                           = 'Export';
-$string['download']                         = 'Download';
+$string['download']                         = 'Download forms';
 $string['delete']                           = 'Delete';
 $string['student']                          = 'Student';
 $string['ibcode']                           = 'IB Code';
 $string['missingactivities']                = 'Missing activitie(s)';
-
+$string['summary']                          = 'Summary';
+$string['ommitedstudents']                  = 'Omitted students';
+$string['downloadforms']                    = 'Downloads all the completed forms';
+$string['downloadspreadsheets']             = 'Downloads prescribed title and word count';
 
 // TOK Form
 $string['tkattachment_filemanager']         = 'TK/PPF Form File';
@@ -77,6 +80,8 @@ $string['tokattachment_filemanager_help']   = 'File where the interactions will 
 $string['teachersname']                     = 'Teacher\'s name';
 $string['session']                          = 'Session';
 $string['session_help']                     = 'The name of the session that will fill the Session input in the TK/PPF form';
+$string['tokessay']                         = 'TOK Essay';
+$string['tokessay_help']                    = 'The assessment the student submitted the essay and the word count';
 $string['interaction1']                     = '1<sup>st</sup> interaction';
 $string['interaction1_help']                = 'Only assessments with submission type <strong>online text</strong> are displayed.';
 $string['interaction2']                     = '2<sup>nd</sup> interaction';
@@ -93,4 +98,11 @@ $string['schoolname']                       = 'School name';
 $string['schoolnumber']                     = 'School number';
 $string['tokheader']                        = 'Theory of Knowledge - Planning and progress export';
 $string['nochoice']                         = 'There are is no activity to get the prescribed title from, the process cannot continue. Return';
+$string['wordcount']                        = 'Download word count';
+$string['firstname']                        = 'First name';
+$string['lastname']                         = 'Last name';
+$string['student']                          = 'Student';
+$string['tokessay']                         = 'Tok Essay prescribed title and word count summary';
+$string['wordcount']                        = 'Word Count';
+$string['spswc']                            = 'Prescribed title and word count download';
 

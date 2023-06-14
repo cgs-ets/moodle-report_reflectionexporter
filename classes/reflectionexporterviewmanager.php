@@ -53,40 +53,79 @@ class reflectionexporterviewmanager {
         return $this->cmid;
     }
 
-    public  function display_extended_essay_view($ibform) {
-        $id =  $this->get_course_id();
+    public function display_extended_essay_view($ibform) {
+        $id   = $this->get_course_id();
         $cmid = $this->get_course_module_id();
 
-        $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 0, 'ibform' => $ibform]);
-        $newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 1, 'ibform' => $ibform]);
+        $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php',
+                                        [
+                                            'cid' => $id,
+                                            'cmid' => $cmid,
+                                            'n' => 0,
+                                            'ibform' => $ibform
+                                        ]);
+        $newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php',
+                                  [
+                                    'cid' => $id,
+                                    'cmid' => $cmid,
+                                    'n' => 1,
+                                    'ibform' => $ibform
+                                ]);
         $dataobject = new stdClass();
         $dataobject->existingproc = $existingprocurl;
         $dataobject->newproc = $newproc;
         $dataobject->cid = $id;
         $dataobject->cmid = $cmid;
         $dataobject->ibform = $ibform;
-        $dataobject->reporturl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]);
+        $dataobject->reporturl = new moodle_url('/report/reflectionexporter/index.php',
+                                                [
+                                                    'cid' => $id,
+                                                    'cmid' => $cmid
+                                                ]);
         $dataobject->courseurl = new moodle_url('/course/view.php', ['id' => $id]);
-        $dataobject->reindexpage = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]);
+        $dataobject->reindexpage = new moodle_url('/report/reflectionexporter/index.php',
+                                                 [
+                                                    'cid' => $id,
+                                                    'cmid' => $cmid
+                                                ]);
 
         $this->get_renderer()->pick_action_icon($dataobject);
     }
 
-    public  function display_theory_of_knowledge_view($ibform) {
+    public function display_theory_of_knowledge_view($ibform) {
 
-        $id =  $this->get_course_id();
+        $id   = $this->get_course_id();
         $cmid = $this->get_course_module_id();
-        $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 0]);
-        $newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php', ['cid' => $id, 'cmid' => $cmid, 'n' => 1, 'ibform' => $ibform]);
+        $existingprocurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php',
+                                        [
+                                            'cid' => $id,
+                                            'cmid' => $cmid,
+                                            'n' => 0
+                                        ]);
+        $newproc = new moodle_url('/report/reflectionexporter/reflectionexporter_new.php',
+                                 [
+                                    'cid' => $id,
+                                    'cmid' => $cmid,
+                                    'n' => 1,
+                                    'ibform' => $ibform
+                                ]);
         $dataobject = new stdClass();
         $dataobject->existingproc = $existingprocurl;
         $dataobject->newproc = $newproc;
         $dataobject->cid = $id;
         $dataobject->cmid = $cmid;
         $dataobject->ibform = $ibform;
-        $dataobject->reporturl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]);
+        $dataobject->reporturl = new moodle_url('/report/reflectionexporter/index.php',
+                                                [
+                                                    'cid' => $id,
+                                                    'cmid' => $cmid
+                                                ]);
         $dataobject->courseurl = new moodle_url('/course/view.php', ['id' => $id]);
-        $dataobject->reindexpage = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]);
+        $dataobject->reindexpage = new moodle_url('/report/reflectionexporter/index.php',
+                                                [
+                                                    'cid' => $id,
+                                                    'cmid' => $cmid
+                                                ]);
 
         $this->get_renderer()->pick_action_icon($dataobject);
     }

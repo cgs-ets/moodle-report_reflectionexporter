@@ -58,15 +58,34 @@ define([
 
                     // Render the pdf container
                     const downloadurl = new URL(window.location.href);
+                    const exporturl = new URL(window.location.href);
+                    let istkform = false;
+                    let title = 'This form has been completed';
+
                     self.pdfData = response.pdfbase64;
                     downloadurl.searchParams.append('d', 1);
                     self.completed = user[0].status == 'C' ? true : false;
+
+
+                    if (ReHelper.get_ibform_name() === 'TK_PPF') {
+                        istkform = true;
+                        exporturl.searchParams.append('export', 1);
+                    }
+                    console.log(ReHelper.get_ibform_name());
+                    console.log(exporturl);
 
                     const context = {
                         courseurl: document.getElementById("courseurl").getAttribute('href'),
                         downloadaction: downloadurl,
                         datajson: document.querySelector('.data-pdfjson').getAttribute('data-pdfs'),
-                        completed: user[0].status == 'C' ? true : false
+                        completed: user[0].status == 'C' ? true : false,
+                        tkform: istkform,
+                        exportspreadhseetaction: exporturl,
+                        summaryicon: url.imageUrl('clipboard', 'report_reflectionexporter'),
+                        zipicon: url.imageUrl('zip', 'report_reflectionexporter'),
+                        exporticon: url.imageUrl('spreadsheet', 'report_reflectionexporter'),
+                        rid: document.querySelector('[data-region="viewer-navigation-panel"]').getAttribute('data-rid'),
+                        title: title
                     }
 
                     Templates.render('report_reflectionexporter/pdf_container', context).done(function (html, js) {
@@ -335,13 +354,15 @@ define([
 
         // Only display if there are no processes.
         let notprocess = document.querySelector('.importing-animation').getAttribute('data-notprocess');
-         notprocess = parseInt(notprocess, 10);
-        console.log("NOT PROCESS");
-        console.log(notprocess);
+        notprocess = parseInt(notprocess, 10);
 
         if (notprocess > 0) {
             document.getElementById('summary').classList.remove('btn-summary-hidden');
             document.getElementById('summary').addEventListener('click', self._loadsummary);
+        }
+
+        if (ReHelper.get_ibform_name() === 'TK_PPF') {
+            document.getElementById('export').addEventListener('click', self._spreadsheetdowndload);
         }
     }
 
@@ -353,7 +374,7 @@ define([
                 recordid: document.querySelector('[data-region="viewer-navigation-panel"]').getAttribute('data-rid'),
             },
             done: function (response) {
-                console.log(response);
+
                 let context = {
                     students: JSON.parse(response.context)
                 };
@@ -382,6 +403,10 @@ define([
                 console.log(reason);
             },
         }, ]);
+    }
+
+    ViewPDF.prototype._spreadsheetdowndload = function () {
+        document.getElementById('exportspreadsheet').submit();
     }
 
     return ViewPDF;

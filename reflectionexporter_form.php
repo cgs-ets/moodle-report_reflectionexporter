@@ -79,7 +79,7 @@ class reflectionexporter_form extends moodleform {
 
         // Group selection.
         $groups = reflectionexportermanager::get_groups_with_teachers($this->_customdata['id']);
-        $mform->addElement('text', 'groupscount', 'Count',['class' => 'reflection-exporter-group-count']);
+        $mform->addElement('text', 'groupscount', 'Count', ['class' => 'reflection-exporter-group-count']);
         $mform->setType('groupscount', PARAM_RAW);
         $mform->setDefault('groupscount', count($groups));
 
@@ -183,8 +183,13 @@ class reflectionexporter_form extends moodleform {
 
         // 1st reflection
         $assessarray[] = '';
+        $assessarray2[] = '';
+        $assessarray3[] = '';
+
         foreach ($results as $result) {
             $assessarray[$result->id] = $result->assignmentname;
+            $assessarray2[$result->id] = $result->assignmentname;
+            $assessarray3[$result->id] = $result->assignmentname;
         }
 
         $mform->addElement('select', 'assessments1', get_string('assessments', 'report_reflectionexporter'), $assessarray, ['class' => 'assessment-reflection-exporter']);
@@ -192,22 +197,14 @@ class reflectionexporter_form extends moodleform {
         $mform->addRule('assessments1', null, 'required');
         $mform->addHelpButton('assessments1', 'assessments', 'report_reflectionexporter');
 
-        // 2nd reflection
-
-        $assessarray2[] = '';
-        foreach ($results as $result) {
-            $assessarray2[$result->id] = $result->assignmentname;
-        }
+        // 2nd reflection.
 
         $mform->addElement('select', 'assessments2', get_string('assessments2', 'report_reflectionexporter'), $assessarray2);
         $mform->getElement('assessments2')->setMultiple(false);
         $mform->addRule('assessments2', null, 'required');
         $mform->addHelpButton('assessments2', 'assessments2', 'report_reflectionexporter');
 
-        $assessarray3[] = '';
-        foreach ($results as $result) {
-            $assessarray3[$result->id] = $result->assignmentname;
-        }
+        // 3rd reflection.
 
         $mform->addElement('select', 'assessments3', get_string('assessments3', 'report_reflectionexporter'), $assessarray3);
         $mform->getElement('assessments3')->setMultiple(false);

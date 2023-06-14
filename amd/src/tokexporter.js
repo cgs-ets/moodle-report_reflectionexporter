@@ -250,7 +250,10 @@ define([
             showuseridentity: true,
             reflecid: self.data.rid,
             firstuserid: 0,
+            // tkform: self.data.ibform === 'TK_PPF',
         }
+
+        console.log(context);
 
         Templates.render('report_reflectionexporter/viewer', context)
             .done(function (html, js) {

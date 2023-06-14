@@ -49,9 +49,6 @@ class reflectionexporter_tok_form extends moodleform {
         $mform->addElement('hidden', 'choices', json_encode($this->_customdata['choices']));
         $mform->settype('choices', PARAM_RAW); // To be able to pre-fill the form.
 
-        // TODO
-
-
         $assessarray = array();
 
         $results = $this->_customdata['aids']; // Assignments.
@@ -109,37 +106,40 @@ class reflectionexporter_tok_form extends moodleform {
             $mform->addRule('titlechoiceid', null, 'required');
             $mform->addHelpButton('titlechoiceid', 'prescribedtitle', 'report_reflectionexporter');
 
-            // Assessments
-            // One for each iteraction because they could be in different order and I need a way to know which one is 1st, 2nd and 3rd.
+            // Assessments.
 
-            // 1st iteraction.
+            $assessessayarray[] = '';
             $assessarray[] = '';
+            $assessarray2[] = '';
+            $assessarray3[] = '';
 
             foreach ($results as $result) {
+                $assessessayarray[$result->id] = $result->assignmentname;
                 $assessarray[$result->id] = $result->assignmentname;
+                $assessarray2[$result->id] = $result->assignmentname;
+                $assessarray3[$result->id] = $result->assignmentname;
             }
 
+            //  Assessment that has the essay and the word count.
+            $mform->addElement('select', 'tokessay', get_string('tokessay', 'report_reflectionexporter'), $assessessayarray, ['class' => 'assessment-reflection-exporter']);
+            $mform->getElement('tokessay')->setMultiple(false);
+            $mform->addRule('tokessay', null, 'required');
+            $mform->addHelpButton('tokessay', 'tokessay', 'report_reflectionexporter');
+
+             // One for each iteraction because they could be in different order and I need a way to know which one is 1st, 2nd and 3rd.
+            // 1st iteraction.
             $mform->addElement('select', 'interaction1', get_string('interaction1', 'report_reflectionexporter'), $assessarray, ['class' => 'assessment-reflection-exporter']);
             $mform->getElement('interaction1')->setMultiple(false);
             $mform->addRule('interaction1', null, 'required');
             $mform->addHelpButton('interaction1', 'interaction1', 'report_reflectionexporter');
 
             // 2nd iteraction.
-            $assessarray2[] = '';
-            foreach ($results as $result) {
-                $assessarray2[$result->id] = $result->assignmentname;
-            }
 
             $mform->addElement('select', 'interaction2', get_string('interaction2', 'report_reflectionexporter'), $assessarray2);
             $mform->getElement('interaction2')->setMultiple(false);
             $mform->addRule('interaction2', null, 'required');
             $mform->addHelpButton('interaction2', 'interaction2', 'report_reflectionexporter');
 
-            // 2nd iteraction.
-            $assessarray3[] = '';
-            foreach ($results as $result) {
-                $assessarray3[$result->id] = $result->assignmentname;
-            }
             // 3rd iteraction.
             $mform->addElement('select', 'interaction3', get_string('interaction3', 'report_reflectionexporter'), $assessarray3);
             $mform->getElement('interaction3')->setMultiple(false);

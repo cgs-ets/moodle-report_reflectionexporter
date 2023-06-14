@@ -37,6 +37,7 @@ $wrongformat             = optional_param('wf', 0, PARAM_INT);   // The PDF is n
 $rid                     = optional_param('rid', 0, PARAM_INT);
 $download                = optional_param('d', 0, PARAM_INT); // Download the zip file.
 $datajson                = optional_param('datajson', 0, PARAM_RAW); // JSON with the information needed to display PDF.
+$export                  = optional_param('export', 0, PARAM_INT); // Download an excel file.
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     throw new moodle_exception('invalidcourse');
@@ -57,6 +58,10 @@ $PAGE->set_heading(format_string($course->fullname, true, array('context' => $co
 
 if ($download) {
     reflectionexportermanager::generate_zip($datajson);
+}
+
+if ($export) {
+    reflectionexportermanager::generate_spreadsheet($rid, $context, $course);
 }
 
 echo $OUTPUT->header();
