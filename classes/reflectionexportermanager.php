@@ -345,6 +345,7 @@ class reflectionexportermanager {
         $params = ['courseid' => $COURSE->id, 'formname' => $ibform];
 
         $results = array_values($DB->get_records_sql($sql, $params));
+
         return $results;
     }
 
@@ -742,7 +743,7 @@ class reflectionexportermanager {
         $interactions   = [];
         $nointeractions = [];
         $selectedorder  = [$data->interaction1, $data->interaction2, $data->interaction3];
-        $users          = self::get_active_users($courseid);
+        $users          =  groups_get_members($data->groupsallocated);//self::get_active_users($courseid);
         $userids        = implode(',', array_keys($users));
         $titles         = self::get_tok_prescribed_title($courseid, $userids, $data->titlechoiceid);
 
@@ -786,6 +787,7 @@ class reflectionexportermanager {
             $dataobject->no_reflections_json = json_encode($nointeractions);
             $dataobject->courseid = $data->courseid;
             $dataobject->formname = $data->ibform;
+            $dataobject->userid = $data->userid;
             $dataobject->timecreated = time();
 
             $rid = $DB->insert_record('report_reflectionexporter', $dataobject);

@@ -56,11 +56,19 @@ $aids = reflectionexportermanager::get_submitted_assessments($id);
 
 switch ($ibform) {
     case 'EE_RPPF':
-        $mform = new reflectionexporter_form(null, ['id' => $id, 'cmid' => $cmid, 'aids' => $aids, 'ibform' => $ibform]);
+        $mform = new reflectionexporter_form(null, ['id' => $id,
+                                                    'cmid' => $cmid,
+                                                    'aids' => $aids,
+                                                    'ibform' => $ibform]);
         break;
     case 'TK_PPF':
         $choices = reflectionexportermanager::get_tok_prescribed_title_choice_activity($id);
-        $mform = new reflectionexporter_tok_form(null, ['id' => $id, 'cmid' => $cmid, 'aids' => $aids, 'choices' => $choices, 'ibform' => $ibform]);
+        $mform = new reflectionexporter_tok_form(null, ['id' => $id,
+                                                        'cmid' => $cmid,
+                                                        'aids' => $aids,
+                                                        'choices' => $choices,
+                                                        'ibform' => $ibform,
+                                                        'userid' => $USER->id]);
         break;
 }
 

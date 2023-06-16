@@ -35,6 +35,9 @@
     <thead>
     <tr>
         <th>{{#str}}datecreated, report_reflectionexporter{{/str}}</th>
+        {{#istok}}
+            <th>{{#str}}whostartedproc, report_reflectionexporter{{/str}}</th>
+        {{/istok}}
         <th>{{#str}}status, report_reflectionexporter{{/str}}</th>
         <th>{{#str}}export, report_reflectionexporter{{/str}}</th>
         <th>{{#str}}download, report_reflectionexporter{{/str}}</th>
@@ -48,14 +51,17 @@
     {{#processes}}
         <tr>
             <td>{{datecreated}}</td>
+            {{#istok}}
+                <td>{{teacher}}</td>
+            {{/istok}}
             <td>{{status}}</td>
             <td>
-                <a type="button" class="btn " href = "{{{actionurl}}}" title = '{{title}}'>
+                 <a type="button" class="btn " href = "{{{actionurl}}}" title = '{{title}}'>
                  <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{existingicon}}}" />
                 </a>
             </td>
             <td>
-                <form id ="zipform" method = "post" action = "{{{downloadurl}}}">
+                <form id ="zipform" method = "post" action = "{{{downloadurl}}}" class = 'reflection-exporter-forms-selected'>
                     <input name="datajson" type="hidden" value="{{datajson}}" />
                     <button type="submit" class = "reflection-exporter-download-index" {{^finished}} disabled title = "Download not available"{{/finished}}>
                         <img class="icon reflection-exporter-action-btn" src="{{{zipicon}}}"/>
@@ -64,7 +70,7 @@
             </td>
             {{#istok}}
                 <td>
-                    <form id ="exportform" method = "post" action = "{{{exporturl}}}">
+                    <form id ="exportform" method = "post" action = "{{{exporturl}}}"  class = 'reflection-exporter-forms-selected' >
                         <input name="rid" type="hidden" value="{{rid}}" />
                         <button type="submit" class = "reflection-exporter-download-index" {{^finished}} disabled title = "Download not available"{{/finished}}>
                             <img class="icon reflection-exporter-action-btn" src="{{{spreadsheeticon}}}"/>
@@ -72,6 +78,7 @@
                     </form>
                 </td>
             {{/istok}}
+
             <td>
                 <a type="button" class="btn " title = 'Delete' >
                     <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{deleteicon}}}" data-to-delete = "{{todelete}}" />

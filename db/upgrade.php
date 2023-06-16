@@ -58,4 +58,20 @@ function xmldb_report_reflectionexporter_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2023060601, 'report', 'reflectionexporter');
     }
 
+    if ($oldversion < 2023061601) {
+
+        // Define field userid to be added to report_reflectionexporter.
+        $table = new xmldb_table('report_reflectionexporter');
+        $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, null, null, '0', 'formname');
+
+        // Conditionally launch add field userid.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Reflectionexporter savepoint reached.
+        upgrade_plugin_savepoint(true, 2023061601, 'report', 'reflectionexporter');
+    }
+
+
 }

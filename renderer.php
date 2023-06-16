@@ -70,6 +70,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['existingicon'] = new moodle_url('/report/reflectionexporter/pix/continueproc.png');
         $data['deleteicon'] = new moodle_url('/report/reflectionexporter/pix/delete.png');
         $data['zipicon'] = new moodle_url('/report/reflectionexporter/pix/zip_2.png');
+        // $data['clipboardicon'] = new moodle_url('/report/reflectionexporter/pix/clipboard_2.png');
         $data['spreadsheeticon'] = new moodle_url('/report/reflectionexporter/pix/spreadsheet_2.png');
         $data['newproc'] = $dataobject->newproc;
         $procs = reflectionexportermanager::get_process($dataobject->ibform);
@@ -95,12 +96,20 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
                 $pr->title = 'Continue';
             }
 
+            if ($proc->userid != 0) {
+                $teacher = core_user::get_user($proc->userid, 'firstname, lastname');
+                $teacher = "$teacher->firstname $teacher->lastname";
+                $pr->teacher = $teacher;
+            }
+
             $params = array('cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'rid' => $proc->id, 'n' => 0, 'f' => $f, 'ibform' => $dataobject->ibform);
             $pr->actionurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params);
             $pr->deleteurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid]);
             $pr->downloadurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'd' => 1]);
             $pr->exporturl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'export' => 1]);
             $pr->todelete = $proc->id;
+
+
             $pr->rid = $proc->id;
             $data['processes'] [] = $pr;
         }

@@ -105,4 +105,7 @@ $string['student']                          = 'Student';
 $string['tokessay']                         = 'Tok Essay prescribed title and word count summary';
 $string['wordcount']                        = 'Word Count';
 $string['spswc']                            = 'Prescribed title and word count download';
+$string['whostartedproc']                   = 'Teacher';
+$string['groupsallocated']                  = 'Allocated group';
+$string['groupsallocated_help']             = 'Select your allocated group';
 

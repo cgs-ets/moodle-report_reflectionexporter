@@ -23,6 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use report_reflectionexporter\reflectionexportermanager;
+
 defined('MOODLE_INTERNAL') || die;
 
 require_once("$CFG->libdir/formslib.php");
@@ -48,6 +50,9 @@ class reflectionexporter_tok_form extends moodleform {
 
         $mform->addElement('hidden', 'choices', json_encode($this->_customdata['choices']));
         $mform->settype('choices', PARAM_RAW); // To be able to pre-fill the form.
+
+        $mform->addElement('hidden', 'userid', $this->_customdata['userid']);
+        $mform->settype('userid', PARAM_RAW); // To be able to pre-fill the form.
 
         $assessarray = array();
 
@@ -93,12 +98,35 @@ class reflectionexporter_tok_form extends moodleform {
             $mform->addRule('session', null, 'required');
             $mform->settype('session', PARAM_TEXT);
 
+
             // Teachers name
             $attributes = array('size' => '16');
             $mform->addElement('text', 'teachersname', get_string('teachersname', 'report_reflectionexporter'), $attributes);
             $mform->settype('teachersname', PARAM_TEXT);
             $mform->addRule('teachersname', null, 'required');
             $mform->setDefault('teachersname', "$USER->firstname $USER->lastname");
+
+
+            // Group selection.
+            $groups = reflectionexportermanager::get_groups_with_teachers($this->_customdata['id']);
+            $grouparray = array();
+            $grouparray[] = '';
+
+            foreach ($groups as $groupid => $group) {
+                $id = $groupid;
+                $grouparray[$id] = $group->name;
+                $data = new stdClass();
+                $data->groupname = $group->name;
+                $data->groupid = $groupid;
+                $data->courseid = $this->_customdata['id'];
+                $data->teachers = $group->teachers;
+                $data->students = $group->students;
+            }
+
+            $mform->addElement('select', 'groupsallocated', get_string('groupsallocated', 'report_reflectionexporter'), $grouparray, ['class' => 'assessment-reflection-exporter']);
+            $mform->getElement('groupsallocated')->setMultiple(false);
+            $mform->addRule('groupsallocated', null, 'required');
+            $mform->addHelpButton('groupsallocated', 'groupsallocated', 'report_reflectionexporter');
 
             // Prescribed title. We will use the choice activity to get the title
             $mform->addElement('select', 'titlechoiceid', get_string('prescribedtitle', 'report_reflectionexporter'), $choicearray, ['class' => 'assessment-reflection-exporter']);
