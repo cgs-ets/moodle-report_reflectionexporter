@@ -85,7 +85,7 @@ class reflectionexportermanager {
                                     'assignsubmission_onlinetext',
                                     'submissions_onlinetext',
                                     $r->id);
-            $r->onlinetext = json_encode(strip_tags(format_text($onlinetext, FORMAT_MOODLE)), JSON_HEX_QUOT | JSON_HEX_TAG);
+            $r->onlinetext = json_encode(strip_tags(format_text(str_replace('&nbsp;', ' ', $onlinetext), FORMAT_MOODLE)), JSON_HEX_QUOT | JSON_HEX_TAG);
             // Depending on the form the date has different format.
             switch ($ibform) {
                 case 'EE_RPPF':
