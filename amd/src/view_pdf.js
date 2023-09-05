@@ -40,11 +40,10 @@ define([
 
         Templates.render('report_reflectionexporter/loading', {}).done(function (html, js) {
             // Update the page.
-            $('[data-region="pdf-comment-container"]').fadeOut("fast", function () {
-                Templates.replaceNodeContents($('[data-region="pdf-comment-container"]'), html, js);
-                $('[data-region="pdf-comment-container"]').fadeIn("fast");
-
-            }.bind(this));
+            //$('[data-region="pdf-comment-container"]').fadeOut("fast", function () {
+                //Templates.replaceNodeContents($('[data-region="pdf-comment-container"]'), html, js);
+                //$('[data-region="pdf-comment-container"]').fadeIn("fast");
+            //}.bind(this));
 
             const user = self._getUser();
 
@@ -71,8 +70,8 @@ define([
                         istkform = true;
                         exporturl.searchParams.append('export', 1);
                     }
-                    console.log(ReHelper.get_ibform_name());
-                    console.log(exporturl);
+                    //console.log(ReHelper.get_ibform_name());
+                    //console.log(exporturl);
 
                     const context = {
                         courseurl: document.getElementById("courseurl").getAttribute('href'),
@@ -103,7 +102,6 @@ define([
                         var thePDF = null;
 
                         loadingTask.promise.then(function (pdf) {
-
                             //Set PDFJS global object (so we can easily access in our page functions
                             thePDF = pdf;
 
@@ -116,6 +114,7 @@ define([
                             //Start with first page
                             pdf.getPage(1).then(handlePages).catch(error => console.log(error));
                         }, function (reason) {
+                            console.log("loadingTask promise fail");
                             console.error(reason);
                         });
 
@@ -124,8 +123,8 @@ define([
                             var viewport = page.getViewport({
                                 scale: 1.5
                             });
-                            //We'll create a canvas for each page to draw it on
 
+                            //We'll create a canvas for each page to draw it on
                             var canvas = document.createElement("canvas");
                             canvas.classList.add('pdf-page');
                             canvas.height = viewport.height;
@@ -165,6 +164,8 @@ define([
                                 self._enableDownloadAndSummary();
                             }
                         }
+                    }).fail( function (error) {
+                      console.error(error);
                     });
 
 
@@ -174,6 +175,8 @@ define([
                     console.log(reason);
                 },
             }, ]);
+        }).fail( function (error) {
+          console.error(error);
         });
     }
 
@@ -194,7 +197,7 @@ define([
     ViewPDF.prototype._saveshownext = function (e) {
 
         e.preventDefault();
-        console.log(e);
+        //console.log(e);
         this._save('shownext'); // TODO: Get the name of the button from the e object
 
     }
@@ -279,7 +282,7 @@ define([
                 pdf: arg,
             },
             done: function (response) {
-                console.log(response);
+                //console.log(response);
 
                 // if it comes from save and exit. redirect to the course.
                 if (exit == '1') {
@@ -378,7 +381,7 @@ define([
                 let context = {
                     students: JSON.parse(response.context)
                 };
-                console.log(context);
+                //console.log(context);
 
                 Templates.render('report_reflectionexporter/students_table', context).done(function (html, js) {
                     Templates.replaceNodeContents(document.querySelector('div.omitted-table'), html, js);
