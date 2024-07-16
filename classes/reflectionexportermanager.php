@@ -67,8 +67,7 @@ class reflectionexportermanager {
         $params = ['status' => 'submitted', 'userid' => $userid];
         $results = $DB->get_records_sql($sql, $params);
         $results = array_values($results);
-        
-        error_log(print_r($results, true));
+
         return $results;
     }
 
@@ -304,7 +303,7 @@ class reflectionexportermanager {
 
             $us = new stdClass();
             $us->id = $user->profile['IBCode']; // Personal code.
-            $us->dp = $user->profile['Year'] == '11' ? 1 : '2';
+            $us->dp = $user->profile['Year'] == '11' ? '1' : '2';
             $us->firstname = $user->firstname;
             $us->lastname = $user->lastname;
             $us->uid = $user->id;
