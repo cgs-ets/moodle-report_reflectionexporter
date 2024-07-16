@@ -20,7 +20,7 @@
  * @copyright  2015 Damyon Wiese <damyon@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['core/ajax', 'jquery', 'core/templates'], function(ajax, $, templates) {
+define(['core/ajax', 'jquery', 'core/templates'], function (ajax, $, templates) {
 
 
     return /** @alias module:report_reflectionexporter/participants_selector */ {
@@ -34,7 +34,7 @@ define(['core/ajax', 'jquery', 'core/templates'], function(ajax, $, templates) {
          * @param {Array} data
          * @return {Array}
          */
-        processResults: function(selector, data) {
+        processResults: function (selector, data) {
             return data;
         },
 
@@ -47,7 +47,7 @@ define(['core/ajax', 'jquery', 'core/templates'], function(ajax, $, templates) {
          * @param {Function} success Success handler
          * @param {Function} failure Failure handler
          */
-        transport: function(selector, query, success, failure) {
+        transport: function (selector, query, success, failure) {
             var select = this._region.find('[data-action=change-user]');
             var reflecid = select.attr('data-rid');
 
@@ -59,32 +59,32 @@ define(['core/ajax', 'jquery', 'core/templates'], function(ajax, $, templates) {
                 args: {
                     rid: reflecid,
                 }
-            }])[0].then(function(results) {
+            }])[0].then(function (results) {
                 var promises = [];
                 var identityfields = $('[data-showuseridentity]').data('showuseridentity').split(',');
 
                 // We got the results, now we loop over them and render each one from a template.
-                $.each(results, function(index, user) {
+                $.each(results, function (index, user) {
                     var ctx = user,
                         identity = [],
                         show = true;
 
                     if (show) {
-                        $.each(identityfields, function(i, k) {
+                        $.each(identityfields, function (i, k) {
                             if (typeof user[k] !== 'undefined' && user[k] !== '') {
                                 ctx.hasidentity = true;
                                 identity.push(user[k]);
                             }
                         });
                         ctx.identity = identity.join(', ');
-                        promises.push(templates.render('report_reflectionexporter/list_participant_user_summary', ctx).then(function(html) {
-                            return {value: user.id, label: html};
+                        promises.push(templates.render('report_reflectionexporter/list_participant_user_summary', ctx).then(function (html) {
+                            return { value: user.id, label: html };
                         }));
                     }
                 });
                 // Do the dance for $.when()
                 return $.when.apply($, promises);
-            }).then(function() {
+            }).then(function () {
                 var users = [];
 
                 // Determine if we've been passed any arguments..

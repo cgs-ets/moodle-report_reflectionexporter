@@ -66,7 +66,7 @@ define([
     };
 
     Controls.prototype.getreflectionspdf = function () {
-   
+
         this.displayTemplate();
     }
 
@@ -88,7 +88,7 @@ define([
             fail: function (reason) {
                 Log.error(reason);
             },
-        }, ]);
+        },]);
     };
 
     // Returns an array with the users PDF enconded in base64
@@ -150,16 +150,17 @@ define([
     Controls.prototype.setFormFields = async function (user, form, field) {
         var self = this;
         const fieldName = field.getName();
+        console.log(user);
         switch (fieldName) {
             case self.CANDIDATE_PERSONAL_CODE: //Candaite personal code "Text1"
                 Y.log(user);
                 form.getTextField(fieldName).setText(String(user.id));
                 break;
             case self.FIRST_REFLECTION_SESSION: // First reflection session (1st page) "Text3"
-                form.getTextField(fieldName).setText(JSON.parse(user.reflections[0].onlinetext));
+                form.getTextField(fieldName).setText(user.reflections[0].plaintext);
                 break;
             case "Dropdown1": // Month
-                form.getDropdown(fieldName).select(user.reflections[0].month);
+                form.getDropdown(fieldName).select((new Date(user.reflections[0].month * 1000)).toLocaleString('default', { month: 'long' }));
                 break;
             case "Dropdown2": // DP
                 form.getDropdown(fieldName).select(String(user.dp)); // just to make sure that we are sending a string
@@ -168,10 +169,10 @@ define([
                 form.getTextField(fieldName).setText(String(user.si));
                 break;
             case self.INTERIM_REFLECTION: // Interim reflection (2nd page) "Text6"
-                form.getTextField(fieldName).setText(JSON.parse(user.reflections[1].onlinetext));
+                form.getTextField(fieldName).setText(user.reflections[1].plaintext);
                 break;
             case "Dropdown3": // Month
-                form.getDropdown(fieldName).select(user.reflections[1].month);
+                form.getDropdown(fieldName).select((new Date(user.reflections[1].month * 1000)).toLocaleString('default', { month: 'long' }));
                 break;
             case "Dropdown4": // DP
                 form.getDropdown(fieldName).select(String(user.dp));
@@ -180,10 +181,10 @@ define([
                 form.getTextField(fieldName).setText(String(user.si));
                 break;
             case self.FINAL_REFLECTION: // Final reflection (3rd page) "Text9"
-                form.getTextField(fieldName).setText(JSON.parse(user.reflections[2].onlinetext));
+                form.getTextField(fieldName).setText(user.reflections[2].plaintext);
                 break;
             case "Dropdown5": // Month
-                form.getDropdown(fieldName).select(user.reflections[2].month);
+                form.getDropdown(fieldName).select((new Date(user.reflections[2].month * 1000)).toLocaleString('default', { month: 'long' }));
                 break;
             case "Dropdown6": //DP //dp
                 form.getDropdown(fieldName).select(String(user.dp));
@@ -229,7 +230,7 @@ define([
             fail: function (reason) {
                 Log.error(reason);
             },
-        }, ]);
+        },]);
 
     }
 
