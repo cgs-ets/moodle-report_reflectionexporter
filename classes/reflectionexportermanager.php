@@ -35,14 +35,14 @@ class reflectionexportermanager {
     const FINISHED = 'F';
     const PDF_COMPLETED = 'C'; // Completed. Cant edit anymore.
 
-    // Get the course's assessments that have submissions and the submission type is onlinetext.
+    // Get the course's assessments that have submissions and the submission type is plaintext.
     public static function get_submitted_assessments($courseid) {
         global $DB;
 
         $sql = "SELECT distinct assign.id, assign.name AS 'assignmentname' FROM {assign} as assign
                 JOIN {assign_submission} as asub
                 ON assign.id = asub.assignment
-                JOIN {assignsubmission_onlinetext} as onlinetxt ON assign.id = onlinetxt.assignment
+                JOIN {assignsubmission_plaintext} as onlinetxt ON assign.id = onlinetxt.assignment
                 WHERE assign.course = ? AND asub.status = ?";
 
         $params = ['course' => $courseid, 'status' => 'submitted'];
@@ -56,28 +56,19 @@ class reflectionexportermanager {
     public static function get_user_reflections($courseid, $assessids, $userid) {
         global $DB;
 
-        $sql = "SELECT onlinetxt.*, asub.timemodified AS 'month', asub.userid
-                FROM {assignsubmission_onlinetext} AS onlinetxt
+        $sql = "SELECT plaintext.*, asub.timemodified AS 'month', asub.userid
+                FROM {assignsubmission_plaintext} AS plaintext
                 JOIN {assign_submission} AS asub
-                ON onlinetxt.submission = asub.id
+                ON plaintext.submission = asub.id
                 WHERE asub.status = ?
                 AND asub.assignment IN ($assessids)
                 AND asub.userid = ?;";
 
         $params = ['status' => 'submitted', 'userid' => $userid];
         $results = $DB->get_records_sql($sql, $params);
-        $context = $context = context_course::instance($courseid);
-        // Format has to me FORMAT_MOODLE otherwise the text might be too long and wont be display propery.
-        // If the student added images, process the URL to avoid warning.
-        // The image wont be seen in the PDF.
-        foreach ($results as $r) {
-            $onlinetext = file_rewrite_pluginfile_urls($r->onlinetext, 'pluginfile.php', $context->id, 'assignsubmission_onlinetext', 'submissions_onlinetext', $r->id);
-            $r->onlinetext = json_encode(strip_tags(format_text($onlinetext, FORMAT_MOODLE)), JSON_HEX_QUOT | JSON_HEX_TAG);
-            $r->month = date('F', $r->month);
-        }
-
         $results = array_values($results);
-
+        
+        error_log(print_r($results, true));
         return $results;
     }
 
@@ -563,7 +554,7 @@ class reflectionexportermanager {
         }
         if (in_array('profileimageurlsmall', $userfields)) {
             if (!isset($userpicture)) {
-                $userpicture = new user_picture($user);
+                $userpicture = new \user_picture($user);
             }
             $userpicture->size = 0; // Size f2.
             $userdetails['profileimageurlsmall'] = $userpicture->get_url($PAGE)->out(false);

@@ -34,7 +34,7 @@ $id                      = optional_param('cid', 0, PARAM_INT); // Course ID.
 $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course module ID.
 
 if (!$course = $DB->get_record('course', array('id'=>$id))) {
-    print_error('invalidcourse');
+    throw new \moodle_exception('invalidcourse');
 }
 
 require_login($course);
