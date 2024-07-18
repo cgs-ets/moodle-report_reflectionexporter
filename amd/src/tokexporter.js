@@ -155,19 +155,19 @@ define([
                 break;
             case self.tokFormInputs.FIRST_INTERACTION_CANDIDATE_COMMENTS:
 
-                form.getTextField(fieldName).setText((user.interactions[0].onlinetext).replaceAll('"',''));
+                form.getTextField(fieldName).setText((user.interactions[0].plaintext).replaceAll('"', ''));
                 break;
             case self.tokFormInputs.FIRST_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[0].month);
                 break;
             case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_COMMENTS:
-                form.getTextField(fieldName).setText((user.interactions[1].onlinetext).replaceAll('"',''));
+                form.getTextField(fieldName).setText((user.interactions[1].plaintext).replaceAll('"', ''));
                 break;
             case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[1].month);
                 break;
             case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_COMMENTS:
-                form.getTextField(fieldName).setText((user.interactions[2].onlinetext.replaceAll('"','')));
+                form.getTextField(fieldName).setText((user.interactions[2].plaintext.replaceAll('"', '')));
                 break;
             case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[2].month);
@@ -224,14 +224,14 @@ define([
                 }
 
                 Templates.render('report_reflectionexporter/viewer', context)
-                .done(function (html, js) {
-                    $(document.querySelector('.importing-animation')).fadeOut("fast", function () {
-                        Templates.replaceNodeContents($(document.querySelector('.importing-animation')), html, js);
-                        $(document.querySelector('.importing-animation')).fadeIn("fast");
-                    }.bind(this));
-                }).fail(function (ex) {
-                    console.log(ex);
-                });
+                    .done(function (html, js) {
+                        $(document.querySelector('.importing-animation')).fadeOut("fast", function () {
+                            Templates.replaceNodeContents($(document.querySelector('.importing-animation')), html, js);
+                            $(document.querySelector('.importing-animation')).fadeIn("fast");
+                        }.bind(this));
+                    }).fail(function (ex) {
+                        console.log(ex);
+                    });
 
             },
             fail: function (reason) {

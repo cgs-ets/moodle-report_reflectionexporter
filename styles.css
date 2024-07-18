@@ -5,6 +5,11 @@
   height: auto;
 }
 
+#page-report-reflectionexporter-reflectionexporter_display_selected>div#page,
+#page-report-reflectionexporter-index>div#page {
+  height: 100vh;
+}
+
 /* Form. */
 .form-group.row.fitem.teacher-initial-field-hide {
   display: none;
@@ -21,6 +26,7 @@ div#fitem_id_groupscount {
   display: block;
   text-align: center;
   margin-bottom: 1em;
+
 }
 
 .report_reflectionexporter .actions .action {
@@ -126,6 +132,7 @@ table.table.table-bordered.table-responsive.started-work {
   width: 15rem;
   display: inline-block;
 }
+
 .row.reflection-container {
   margin-bottom: 2%;
 }
@@ -267,7 +274,7 @@ a.btn-summary-hidden {
 }
 
 .reflection-exporter-forms-selected {
-    margin-top: 0.3rem;
+  margin-top: 0.3rem;
 }
 
 @media (max-width: 900px) {

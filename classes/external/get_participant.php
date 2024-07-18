@@ -27,9 +27,9 @@ namespace report_reflectionexporter\external;
 
 defined('MOODLE_INTERNAL') || die();
 
-use external_function_parameters;
-use external_value;
-use external_single_structure;
+use core_external\external_function_parameters as Core_externalExternal_function_parameters;
+use core_external\external_value;
+use core_external\external_single_structure;
 use core_user_external;
 use report_reflectionexporter\reflectionexportermanager;
 
@@ -47,7 +47,7 @@ trait get_participant {
      *
      */
     public static function get_participant_parameters() {
-        return new external_function_parameters(
+        return new Core_externalExternal_function_parameters(
             array(
                 'userid' => new external_value(PARAM_RAW, 'user ID'),
                 'refid' => new external_value(PARAM_RAW, 'row id from mdl_report_reflectionexporter'),
