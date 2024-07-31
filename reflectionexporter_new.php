@@ -36,7 +36,7 @@ $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course modul
 $ibform                  = required_param('ibform', PARAM_RAW); // Course module ID.
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
-    throw new \moodle_exception('invalidcourse');
+    print_error('invalidcourse');
 }
 
 require_login($course);

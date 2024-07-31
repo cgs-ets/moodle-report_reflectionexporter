@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/externallib.php');
 
-use core_external\external_api;
+use external_api;
 
 class api extends external_api {
     use get_reflections;

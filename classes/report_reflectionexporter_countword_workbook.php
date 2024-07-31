@@ -55,6 +55,7 @@ function report_reflectionexporter_setup_wordcount_workbook($context, $studentsd
 
     require_capability('mod/assign:grade', $context);
 
+
     $filename       = $course->shortname . ' -TheoryOfKnowledgeWordCount'  . '.xls';
     $workbook       = new SpreadsheetWorkbook("-");
 
@@ -126,7 +127,7 @@ function report_reflectionexporter_set_students_rows (MoodleExcelWorksheet $shee
         $sheet->write_string($row, $col++, $studentdata->firstname, $format);
         $sheet->write_string($row, $col++, $studentdata->lastname, $format);
         $sheet->write_string($row, $col++, $studentdata->prescribedtitle, $format);
-        $wordcount = strlen($studentdata->wordcount) > 0 ? strval($studentdata->wordcount) : 'Not provided';
+        $wordcount = count_words($studentdata->wordcount);
         $sheet->write_string($row, $col++, $wordcount, $format);
     }
 

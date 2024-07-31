@@ -245,6 +245,11 @@ class reflectionexporter_form extends moodleform {
             }
         }
 
+        // If there is only one group, make sure it was selected
+        if (isset($data['onbehalf']) && count($data['coursegroups']) == 0 ) {
+            $errors['coursegroups'] =  get_string('coursegroupserror', 'report_reflectionexporter');
+        }
+
         return $errors;
     }
 }

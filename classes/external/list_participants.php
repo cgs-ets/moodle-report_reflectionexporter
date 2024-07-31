@@ -26,10 +26,10 @@ namespace report_reflectionexporter\external;
 
 defined('MOODLE_INTERNAL') || die();
 
-use core_external\external_function_parameters;
-use core_external\external_value;
+use external_function_parameters;
+use external_value;
 use core_user_external;
-use core_external\external_multiple_structure;
+use external_multiple_structure;
 use report_reflectionexporter\reflectionexportermanager;
 
 require_once($CFG->libdir . '/externallib.php');

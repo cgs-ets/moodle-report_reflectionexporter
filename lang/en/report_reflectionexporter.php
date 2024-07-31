@@ -42,10 +42,12 @@ $string['useridterror']                     = 'Please select One or more student
 $string['onbehalf']                         = 'Are you filling the supervisor comments on behalf of another colleague(s)?';
 $string['onbehalf_help']                    = 'If this option is disabled, is because there are no groups available or the group(s) does not meet the requirements. A group has to have a teacher and the students this teacher has allocated.';
 $string['coursegroups']                     = 'Select group(s)';
+$string['coursegroupserror']                = 'Please select a group';
 $string['nogroups']                         = 'No groups available';
 $string['coursegroups_help']                = 'Group the colleague you are completing this work for belongs to. <br> See the initials that will be printed in the PDF';
 $string['supervisorinitials']               = 'Supervisor initials';
 $string['supervisorinitialserror']          = 'Please insert your initials';
+
 $string['activeusers']                      = 'Allocated students';
 $string['action-text-continue']             = 'Continue export';
 $string['action-text-new']                  = 'New export';
