@@ -85,7 +85,8 @@ class reflectionexportermanager {
                                     'assignsubmission_onlinetext',
                                     'submissions_onlinetext',
                                     $r->id);
-            $r->onlinetext = json_encode(strip_tags(format_text(str_replace('&nbsp;', ' ', $onlinetext), FORMAT_MOODLE)), JSON_HEX_QUOT | JSON_HEX_TAG);
+
+            $r->onlinetext = json_encode(strip_tags(format_text($onlinetext, FORMAT_MOODLE)), JSON_HEX_QUOT | JSON_HEX_TAG);
             // Depending on the form the date has different format.
             switch ($ibform) {
                 case 'EE_RPPF':
@@ -758,7 +759,7 @@ class reflectionexportermanager {
             $std->lastname        = $user->lastname;
             $std->session         = $data->session;
             $std->teachersname    = $data->teachersname;
-            $std->prescribedtitle = isset($titles[$user->id]) ? ($titles[$user->id])->prescribedtitle : '';
+            $std->prescribedtitle = isset($titles[$user->id]) ? strip_tags(format_text(($titles[$user->id])->prescribedtitle, FORMAT_MOODLE)) : '';
             $std->schoolname      = $CFG->report_reflectionexporter_school_name;
             $std->schoolnumber    = $CFG->report_reflectionexporter_school_number;
 
