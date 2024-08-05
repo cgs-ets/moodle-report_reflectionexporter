@@ -142,7 +142,6 @@ define([
     Controls.prototype.setFormFields = async function (user, form, field) {
         var self = this;
         const fieldName = field.getName();
-
         switch (fieldName) {
             case self.tokFormInputs.CANDIDATE_PERSONAL_CODE:
                 form.getTextField(fieldName).setText(String(user.id));
@@ -154,19 +153,25 @@ define([
                 form.getTextField(fieldName).setText(String(user.prescribedtitle));
                 break;
             case self.tokFormInputs.FIRST_INTERACTION_CANDIDATE_COMMENTS:
-                form.getTextField(fieldName).setText(JSON.parse(user.interactions[0].onlinetext));
+                console.log((user.interactions[0].onlinetext));
+                user.interactions[0].onlinetext = JSON.parse(user.interactions[0].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
+                form.getTextField(fieldName).setText(user.interactions[0].onlinetext);
                 break;
             case self.tokFormInputs.FIRST_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[0].month);
                 break;
             case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_COMMENTS:
-                form.getTextField(fieldName).setText(JSON.parse(user.interactions[1].onlinetext));
+                user.interactions[1].onlinetext = JSON.parse(user.interactions[1].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
+                console.log((user.interactions[1].onlinetext));
+                form.getTextField(fieldName).setText(user.interactions[1].onlinetext);
                 break;
             case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[1].month);
                 break;
             case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_COMMENTS:
-                form.getTextField(fieldName).setText(JSON.parse(user.interactions[2].onlinetext));
+                user.interactions[2].onlinetext = JSON.parse(user.interactions[2].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
+                console.log((user.interactions[2].onlinetext));
+                form.getTextField(fieldName).setText(user.interactions[2].onlinetext);
                 break;
             case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[2].month);
@@ -195,7 +200,6 @@ define([
             case self.tokFormInputs.COMPLETED_DECLARATION_SCHOOL_NUMBER:
                 form.getTextField(fieldName).setText(user.schoolnumber);
                 break;
-
         }
     };
 

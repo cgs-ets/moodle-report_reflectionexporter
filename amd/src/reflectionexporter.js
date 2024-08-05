@@ -159,7 +159,8 @@ define([
                 form.getTextField(fieldName).setText(String(user.id));
                 break;
             case self.FIRST_REFLECTION_SESSION: // First reflection session (1st page) "Text3"
-                form.getTextField(fieldName).setText(JSON.parse(user.reflections[0].onlinetext));
+                user.reflections[0].onlinetext = JSON.parse(user.reflections[0].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
+                form.getTextField(fieldName).setText(user.reflections[0].onlinetext);
                 break;
             case "Dropdown1": // Month
                 form.getDropdown(fieldName).select(user.reflections[0].month);
@@ -171,9 +172,8 @@ define([
                 form.getTextField(fieldName).setText(String(user.si));
                 break;
             case self.INTERIM_REFLECTION: // Interim reflection (2nd page) "Text6"
-                form.getTextField(fieldName).setText(JSON.parse(user.reflections[1].onlinetext));
-                console.log(JSON.parse(user.reflections[1].onlinetext))
-
+                user.reflections[1].onlinetext = JSON.parse(user.reflections[1].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
+                form.getTextField(fieldName).setText(user.reflections[1].onlinetext);
                 break;
             case "Dropdown3": // Month
                 form.getDropdown(fieldName).select(user.reflections[1].month);
@@ -185,7 +185,8 @@ define([
                 form.getTextField(fieldName).setText(String(user.si));
                 break;
             case self.FINAL_REFLECTION: // Final reflection (3rd page) "Text9"
-                form.getTextField(fieldName).setText(JSON.parse(user.reflections[2].onlinetext));
+                user.reflections[2].onlinetext = JSON.parse(user.reflections[2].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
+                form.getTextField(fieldName).setText(user.reflections[2].onlinetext);
                 break;
             case "Dropdown5": // Month
                 form.getDropdown(fieldName).select(user.reflections[2].month);
