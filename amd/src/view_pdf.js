@@ -28,7 +28,7 @@ define([
     'core/templates',
     'core/ajax',
     'core/url'
-], function (PDFJSLIB, PDFLib, ReHelper ,Templates, Ajax, url) {
+], function (PDFJSLIB, PDFLib, ReHelper, Templates, Ajax, url) {
     "use strict";
 
     var ViewPDF = function () {
@@ -41,8 +41,8 @@ define([
         Templates.render('report_reflectionexporter/loading', {}).done(function (html, js) {
             // Update the page.
             //$('[data-region="pdf-comment-container"]').fadeOut("fast", function () {
-                //Templates.replaceNodeContents($('[data-region="pdf-comment-container"]'), html, js);
-                //$('[data-region="pdf-comment-container"]').fadeIn("fast");
+            //Templates.replaceNodeContents($('[data-region="pdf-comment-container"]'), html, js);
+            //$('[data-region="pdf-comment-container"]').fadeIn("fast");
             //}.bind(this));
 
             const user = self._getUser();
@@ -70,8 +70,6 @@ define([
                         istkform = true;
                         exporturl.searchParams.append('export', 1);
                     }
-                    //console.log(ReHelper.get_ibform_name());
-                    //console.log(exporturl);
 
                     const context = {
                         courseurl: document.getElementById("courseurl").getAttribute('href'),
@@ -84,7 +82,8 @@ define([
                         zipicon: url.imageUrl('zip', 'report_reflectionexporter'),
                         exporticon: url.imageUrl('spreadsheet', 'report_reflectionexporter'),
                         rid: document.querySelector('[data-region="viewer-navigation-panel"]').getAttribute('data-rid'),
-                        title: title
+                        title: title,
+                        maxcommentlength: istkform ? 200 : 542
                     }
 
                     Templates.render('report_reflectionexporter/pdf_container', context).done(function (html, js) {
@@ -151,6 +150,7 @@ define([
                         // Display the form or status
                         if (!self.completed) {
                             document.querySelector('form.reflection-comment-form').removeAttribute('hidden');
+                            document.querySelector('form.reflection-comment-form').addEventListener('keydown', self._checkwordLength.bind(self))
                             document.querySelector('button.save-show-next-btn').addEventListener('click', self._saveshownext.bind(self));
                             document.querySelector('button.save-exit-btn').addEventListener('click', self._savesandexit.bind(self));
                         } else {
@@ -164,8 +164,8 @@ define([
                                 self._enableDownloadAndSummary();
                             }
                         }
-                    }).fail( function (error) {
-                      console.error(error);
+                    }).fail(function (error) {
+                        console.error(error);
                     });
 
 
@@ -174,9 +174,9 @@ define([
                 fail: function (reason) {
                     console.log(reason);
                 },
-            }, ]);
-        }).fail( function (error) {
-          console.error(error);
+            },]);
+        }).fail(function (error) {
+            console.error(error);
         });
     }
 
@@ -197,9 +197,21 @@ define([
     ViewPDF.prototype._saveshownext = function (e) {
 
         e.preventDefault();
-        //console.log(e);
-        this._save('shownext'); // TODO: Get the name of the button from the e object
+        this._save('shownext');
+    }
 
+    ViewPDF.prototype._checkwordLength = function (e) {
+
+        const wordLen = ReHelper.get_ibform_name() === 'TK_PPF' ? 200 : 542
+        var len = e.target.value.split(/[\s]+/);
+        document.querySelector('.reflectionexporter-comment-len-warning').setAttribute('hidden', 1);
+        if (len.length > wordLen) {
+            document.querySelector('.reflectionexporter-comment-len-warning').removeAttribute('hidden')
+            e.target.oldValue = e.target.value != e.target.oldValue ? e.target.value : e.target.oldValue;
+            e.target.value = e.target.oldValue;
+            return false;
+        }
+        return true;
     }
 
     // Save the data in BD
@@ -207,6 +219,8 @@ define([
 
         //Get the teacher comment from the textarea
         const commentEl = document.getElementById('comment');
+
+
         // Check it has content.
         if (commentEl.value.length === 0) {
             commentEl.classList.add('comment_error');
@@ -322,7 +336,7 @@ define([
             fail: function (reason) {
                 console.log(reason);
             },
-        }, ]);
+        },]);
     }
 
     ViewPDF.prototype._zipdownload = function (e) {
@@ -405,7 +419,7 @@ define([
             fail: function (reason) {
                 console.log(reason);
             },
-        }, ]);
+        },]);
     }
 
     ViewPDF.prototype._spreadsheetdowndload = function () {

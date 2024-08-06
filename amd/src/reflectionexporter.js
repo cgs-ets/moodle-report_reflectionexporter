@@ -89,6 +89,7 @@ define([
             },
             fail: function (reason) {
                 Log.error(reason);
+                ReHelper.get_error_template(self.data);
             },
         },]);
     };
@@ -146,6 +147,9 @@ define([
      *  DP: Dropdown6
      *  supervisor id: Text11
      *
+     *  WORD LIMITS:
+     *  Candidate commetns:  364
+     *  Teachers comments: 542
      * @param {*} user
      * @param {*} form
      * @param {*} field
@@ -235,6 +239,7 @@ define([
             },
             fail: function (reason) {
                 Log.error(reason);
+                ReHelper.get_error_template(self.data);
             },
         },]);
 

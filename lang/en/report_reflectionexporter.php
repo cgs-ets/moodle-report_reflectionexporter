@@ -111,3 +111,4 @@ $string['whostartedproc']                   = 'Teacher';
 $string['groupsallocated']                  = 'Allocated group';
 $string['groupsallocated_help']             = 'Select your allocated group';
 
+$string['commentwarning']                   = 'Your comment cannot be longer than {$a} words';

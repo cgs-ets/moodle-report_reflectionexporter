@@ -24,7 +24,7 @@
  */
 
 
-define([], function () {
+define(["core/templates"], function (Templates) {
     "use strict";
 
     return {
@@ -70,6 +70,19 @@ define([], function () {
         get_ibform_name: function () {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('ibform');
+        },
+
+        get_error_template: function (data) {
+            const context = {
+                courseid: data.cid,
+                coursename: data.coursename
+            };
+
+            Templates.renderForPromise('report_reflectionexporter/error_message', context)
+                .then(({ html, js }) => {
+                    Templates.replaceNodeContents($(document.querySelector('.importing-animation')), html, js);
+                })
+                .catch((error) => displayException(error));
         }
 
 

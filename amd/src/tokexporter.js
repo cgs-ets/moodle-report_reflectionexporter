@@ -86,6 +86,8 @@ define([
             },
             fail: function (reason) {
                 Log.error(reason);
+                ReHelper.get_error_template(self.data);
+
             },
         },]);
     };
@@ -135,6 +137,9 @@ define([
 
     /**
    * Fields to complete in the form.
+   * WORKD LIMITS: 
+   *    Interactions: 96
+   *    Teachers comment: 200 words
    * @param {*} user
    * @param {*} form
    * @param {*} field
@@ -153,7 +158,6 @@ define([
                 form.getTextField(fieldName).setText(String(user.prescribedtitle));
                 break;
             case self.tokFormInputs.FIRST_INTERACTION_CANDIDATE_COMMENTS:
-                console.log((user.interactions[0].onlinetext));
                 user.interactions[0].onlinetext = JSON.parse(user.interactions[0].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.interactions[0].onlinetext);
                 break;
@@ -162,7 +166,6 @@ define([
                 break;
             case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_COMMENTS:
                 user.interactions[1].onlinetext = JSON.parse(user.interactions[1].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
-                console.log((user.interactions[1].onlinetext));
                 form.getTextField(fieldName).setText(user.interactions[1].onlinetext);
                 break;
             case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_DATE:
@@ -170,7 +173,6 @@ define([
                 break;
             case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_COMMENTS:
                 user.interactions[2].onlinetext = JSON.parse(user.interactions[2].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
-                console.log((user.interactions[2].onlinetext));
                 form.getTextField(fieldName).setText(user.interactions[2].onlinetext);
                 break;
             case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_DATE:
@@ -239,6 +241,7 @@ define([
             },
             fail: function (reason) {
                 Log.error(reason);
+                ReHelper.get_error_template(self.data);
             },
         },]);
 
@@ -256,8 +259,6 @@ define([
             // tkform: self.data.ibform === 'TK_PPF',
         }
 
-        console.log(context);
-
         Templates.render('report_reflectionexporter/viewer', context)
             .done(function (html, js) {
                 $(document.querySelector('.importing-animation')).fadeOut("fast", function () {
@@ -272,8 +273,5 @@ define([
     return {
         init: init,
     };
-
-
-
 
 })
