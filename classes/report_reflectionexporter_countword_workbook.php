@@ -127,7 +127,7 @@ function report_reflectionexporter_set_students_rows (MoodleExcelWorksheet $shee
         $sheet->write_string($row, $col++, $studentdata->firstname, $format);
         $sheet->write_string($row, $col++, $studentdata->lastname, $format);
         $sheet->write_string($row, $col++, $studentdata->prescribedtitle, $format);
-        $wordcount = count_words($studentdata->wordcount);
+        $wordcount = $studentdata->wordcount; //count_words($studentdata->wordcount);
         $sheet->write_string($row, $col++, $wordcount, $format);
     }
 
