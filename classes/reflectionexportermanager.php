@@ -33,7 +33,10 @@ use user_picture;
 use ZipArchive;
 
 use function report_reflectionexporter\wordcount\report_reflectionexporter_setup_wordcount_workbook;
+use function report_reflectionexporter\summary\report_reflectionexporter_summary_workbook;
+
 require_once($CFG->dirroot . '/report/reflectionexporter/classes/report_reflectionexporter_countword_workbook.php');
+require_once($CFG->dirroot . '/report/reflectionexporter/classes/report_reflectionexporter_summary_workbook.php');
 
 class reflectionexportermanager {
 
@@ -124,7 +127,7 @@ class reflectionexportermanager {
         $params = ['id' => $rid];
 
         $result = $DB->get_record_sql($sql, $params);
-
+      
         return $result->no_reflections_json;
     }
 
@@ -250,25 +253,40 @@ class reflectionexportermanager {
         die();
     }
 
-    public static function generate_spreadsheet($data, $context, $course) {
-        global $DB, $CFG;
+    public static function generate_spreadsheet($data, $context, $course, $filename) {
         // Increase the server timeout to handle the creation and sending of large zip files.
         \core_php_time_limit::raise();
 
         $ref = self::get_reflections_json($data);
         $data = json_decode($ref->reflections_json); // Get the reflections_json column.
         $tempdir = make_temp_directory('report_reflectionexporter/spreadsheet');
-
         report_reflectionexporter_setup_wordcount_workbook($context, $data, $tempdir, $course);
 
         // Now make a zip file of the temp dir and then delete it.
-        self::zip_spreadsheetworkbook();
+        self::zip_spreadsheetworkbook( $filename);
+    }
+
+    public static function generate_summary_spreadsheet($data, $context, $course,  $filename) {
+        // Increase the server timeout to handle the creation and sending of large zip files.
+        \core_php_time_limit::raise();
+
+        error_log(print_r($data, true));
+
+        $ref = self::get_no_reflections_json($data);
+        $studentdata = json_decode($ref); // Get the no_reflections_json column.
+      
+        $tempdir = make_temp_directory('report_reflectionexporter/spreadsheet');
+
+        report_reflectionexporter_summary_workbook($context, $studentdata, $tempdir, $course);
+
+        // Now make a zip file of the temp dir and then delete it.
+        self::zip_spreadsheetworkbook($filename);
     }
 
     /**
      * Creates a zip file with excel files in it
      */
-    private static function zip_spreadsheetworkbook() {
+    private static function zip_spreadsheetworkbook($filenamegiven) {
         global $CFG;
         $foldertozip = $CFG->tempdir.'/report_reflectionexporter/spreadsheet';
         // Get real path for our folder.
@@ -276,7 +294,7 @@ class reflectionexportermanager {
 
         // Initialize archive object.
         $zip = new \ZipArchive();
-        $filename = $CFG->tempdir.'/report_reflectionexporter/wordcount.zip';
+        $filename = $CFG->tempdir.'/report_reflectionexporter/' . $filenamegiven . '.zip';
 
         $zip->open( $filename, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
@@ -306,7 +324,7 @@ class reflectionexportermanager {
             }
 
             header("Content-Type: application/zip");
-            header("Content-Disposition: attachment; filename=wordcount.zip");
+            header("Content-Disposition: attachment; filename=".$filenamegiven.".zip");
             header("Content-Length: " . filesize("$filename"));
             readfile("$filename");
             unlink("$filename");
@@ -751,6 +769,7 @@ class reflectionexportermanager {
         foreach ($users as $user) {
             $assessids = implode(',', $selectedorder);
             profile_load_custom_fields($user);
+            error_log(print_r($user, true));
 
             $std                  = new stdClass();
             $std->id              = $user->profile['IBCode']; // Personal code.
@@ -762,6 +781,7 @@ class reflectionexportermanager {
             $std->prescribedtitle = isset($titles[$user->id]) ? strip_tags(format_text(($titles[$user->id])->prescribedtitle, FORMAT_MOODLE)) : '';
             $std->schoolname      = $CFG->report_reflectionexporter_school_name;
             $std->schoolnumber    = $CFG->report_reflectionexporter_school_number;
+            $std->studiescode     = $user->profile['IBStudiesCode']; // Studies code.
 
             $ref = self::get_user_reflections($data->cid, $assessids, $user->id, $data->ibform);
             $std->interactions = self::map_assessment_order($ref, $selectedorder);

@@ -185,7 +185,7 @@ define([
                 form.getTextField(fieldName).setText(`${user.firstname} ${user.lastname}`);
                 break;
             case self.tokFormInputs.COMPLETED_CANDIDATE_SESSION_NUMBER:
-                form.getTextField(fieldName).setText(user.session);
+                form.getTextField(fieldName).setText(user.studiescode);
                 break;
             case self.tokFormInputs.COMPLETED_DECLARATION_DATE1:
                 form.getTextField(fieldName).setText(user.month);

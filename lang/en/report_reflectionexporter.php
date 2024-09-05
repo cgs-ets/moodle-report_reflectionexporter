@@ -75,6 +75,9 @@ $string['summary']                          = 'Summary';
 $string['ommitedstudents']                  = 'Omitted students';
 $string['downloadforms']                    = 'Downloads all the completed forms';
 $string['downloadspreadsheets']             = 'Downloads prescribed title and word count';
+$string['downloadsummary']                  = 'Download Missing Activities Summary';
+$string['extendedessayheader']              = 'Extended essay missing activities';
+$string['summaryzipname']                   = 'SummaryOfMissingActivities';
 
 // TOK Form
 $string['tkattachment_filemanager']         = 'TK/PPF Form File';
@@ -110,5 +113,5 @@ $string['spswc']                            = 'Prescribed title and word count d
 $string['whostartedproc']                   = 'Teacher';
 $string['groupsallocated']                  = 'Allocated group';
 $string['groupsallocated_help']             = 'Select your allocated group';
-
+$string['wodcountzipname']                  = 'wordCount';
 $string['commentwarning']                   = 'Your comment cannot be longer than {$a} words';

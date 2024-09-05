@@ -38,6 +38,7 @@ $rid                     = optional_param('rid', 0, PARAM_INT);
 $download                = optional_param('d', 0, PARAM_INT); // Download the zip file.
 $datajson                = optional_param('datajson', 0, PARAM_RAW); // JSON with the information needed to display PDF.
 $export                  = optional_param('export', 0, PARAM_INT); // Download an excel file.
+$exportsummary                  = optional_param('exportsummary', 0, PARAM_INT); // Download an excel file.
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     throw new moodle_exception('invalidcourse');
@@ -61,7 +62,11 @@ if ($download) {
 }
 
 if ($export) {
-    reflectionexportermanager::generate_spreadsheet($rid, $context, $course);
+    reflectionexportermanager::generate_spreadsheet($rid, $context, $course, get_string('wodcountzipname', 'report_reflectionexporter'));
+}
+
+if ($exportsummary) {
+    reflectionexportermanager::generate_summary_spreadsheet($rid, $context, $course,  get_string('summaryzipname', 'report_reflectionexporter'));
 }
 
 echo $OUTPUT->header();

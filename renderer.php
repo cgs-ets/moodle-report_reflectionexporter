@@ -70,7 +70,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['existingicon'] = new moodle_url('/report/reflectionexporter/pix/continueproc.png');
         $data['deleteicon'] = new moodle_url('/report/reflectionexporter/pix/delete.png');
         $data['zipicon'] = new moodle_url('/report/reflectionexporter/pix/zip_2.png');
-        // $data['clipboardicon'] = new moodle_url('/report/reflectionexporter/pix/clipboard_2.png');
+        $data['clipboardicon'] = new moodle_url('/report/reflectionexporter/pix/clipboard_2.png');
         $data['spreadsheeticon'] = new moodle_url('/report/reflectionexporter/pix/spreadsheet_2.png');
         $data['newproc'] = $dataobject->newproc;
         $procs = reflectionexportermanager::get_process($dataobject->ibform);
@@ -78,7 +78,8 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['istok'] = $dataobject->ibform == 'TK_PPF';
         $data['ibform'] = str_replace('_', '/', $dataobject->ibform);
 
-        foreach ($procs as $proc) {
+
+        foreach ($procs as $proc) { 
             $pr = new stdClass();
             $pr->datecreated = userdate($proc->timecreated, get_string('strftimedatefullshort', 'core_langconfig'));
 
@@ -102,12 +103,16 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
                 $pr->teacher = $teacher;
             }
 
+            $missing = count(json_decode($proc->no_reflections_json)) > 0 ;
+
             $params = array('cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'rid' => $proc->id, 'n' => 0, 'f' => $f, 'ibform' => $dataobject->ibform);
             $pr->actionurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params);
             $pr->deleteurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid]);
             $pr->downloadurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'd' => 1]);
             $pr->exporturl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'export' => 1]);
+            $pr->exportsummary = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'exportsummary' => 1]);
             $pr->todelete = $proc->id;
+            $pr->missing = $missing;
 
 
             $pr->rid = $proc->id;

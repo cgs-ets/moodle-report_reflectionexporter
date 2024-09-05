@@ -33,19 +33,20 @@
     <br>
     <table class="table table-bordered table-responsive started-work">
     <thead>
-    <tr>
-        <th>{{#str}}datecreated, report_reflectionexporter{{/str}}</th>
-        {{#istok}}
-            <th>{{#str}}whostartedproc, report_reflectionexporter{{/str}}</th>
-        {{/istok}}
-        <th>{{#str}}status, report_reflectionexporter{{/str}}</th>
-        <th>{{#str}}export, report_reflectionexporter{{/str}}</th>
-        <th>{{#str}}download, report_reflectionexporter{{/str}}</th>
-        {{#istok}}
-            <th>{{#str}}spswc, report_reflectionexporter{{/str}}</th>
-        {{/istok}}
-        <th>{{#str}}delete, report_reflectionexporter{{/str}}</th>
-    </tr>
+        <tr>
+            <th>{{#str}}datecreated, report_reflectionexporter{{/str}}</th>
+            {{#istok}}
+                <th>{{#str}}whostartedproc, report_reflectionexporter{{/str}}</th>
+            {{/istok}}
+            <th>{{#str}}status, report_reflectionexporter{{/str}}</th>
+            <th>{{#str}}export, report_reflectionexporter{{/str}}</th>
+            <th>{{#str}}downloadsummary, report_reflectionexporter{{/str}}</th>
+            <th>{{#str}}download, report_reflectionexporter{{/str}}</th>
+            {{#istok}}
+                <th>{{#str}}spswc, report_reflectionexporter{{/str}}</th>
+            {{/istok}}
+            <th>{{#str}}delete, report_reflectionexporter{{/str}}</th>
+        </tr>
     </thead>
     <tbody>
     {{#processes}}
@@ -60,6 +61,13 @@
                  <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{existingicon}}}" />
                 </a>
             </td>
+              <td>
+                <form id ="exportform" method = "post" action = "{{{exportsummary}}}"  class = 'reflection-exporter-forms-selected' >
+                        <input name="rid" type="hidden" value="{{rid}}" />
+                        <button type="submit" class = "reflection-exporter-download-index" {{^missing}} disabled title = "Download not available. All students completed their activities"{{/missing}}>
+                            <img class="icon reflection-exporter-action-btn" src="{{{spreadsheeticon}}}"/>
+                        </button>
+                </form>
             <td>
                 <form id ="zipform" method = "post" action = "{{{downloadurl}}}" class = 'reflection-exporter-forms-selected'>
                     <input name="datajson" type="hidden" value="{{datajson}}" />
@@ -68,6 +76,7 @@
                     </button>
                 </form>
             </td>
+          
             {{#istok}}
                 <td>
                     <form id ="exportform" method = "post" action = "{{{exporturl}}}"  class = 'reflection-exporter-forms-selected' >
@@ -95,7 +104,7 @@
 {{/processfound}}
 
 {{#js}}
-require(['report_reflectionexporter/delete'], function(Delete) {
-  new Delete()
-});
+    require(['report_reflectionexporter/delete'], function(Delete) {
+      new Delete()
+    });
 {{/js}}
