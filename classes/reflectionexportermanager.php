@@ -546,7 +546,7 @@ class reflectionexportermanager {
             $group->students = $students;
             $group->teachers = $teachers;
             unset($group->members); // We dont need them anymore.
-            if (count($teachers) > 0) {
+            if (count($teachers) > 0 & count($students) > 0) {
                 $groupsaux[$group->id] = $group;
             }
         }
