@@ -30,8 +30,9 @@ define([
     "core/log",
     "report_reflectionexporter/pdf-lib",
     "core/templates",
+    "report_reflectionexporter/reflectionexporterHelper",
 
-], function ($, Ajax, Log, PDFLib, Templates) {
+], function ($, Ajax, Log, PDFLib, Templates, ReHelper) {
     "use strict";
 
     function init(data) {
@@ -81,6 +82,7 @@ define([
                 rid: this.data.rid,
             },
             done: async function (response) {
+
                 const users = JSON.parse(response.reflecjson);
                 const pdfs = await self.processReflections(users);
 
