@@ -24,11 +24,12 @@
 define([
     "report_reflectionexporter/pdf",
     "report_reflectionexporter/pdf-lib",
+    "report_reflectionexporter/fontkit.umd",
     "report_reflectionexporter/reflectionexporterHelper",
     'core/templates',
     'core/ajax',
     'core/url'
-], function (PDFJSLIB, PDFLib, ReHelper, Templates, Ajax, url) {
+], function (PDFJSLIB, PDFLib, Fontkit, ReHelper, Templates, Ajax, url) {
     "use strict";
 
     var ViewPDF = function () {
@@ -232,6 +233,11 @@ define([
             const stringPdfToBinary = Uint8Array.from(atob(pdfData), (c) => c.charCodeAt(0));
 
             const pdfDoc = await PDFLib.PDFDocument.load(stringPdfToBinary);
+            pdfDoc.registerFontkit(Fontkit);
+            const fontBytes = await fetch('./font/arial.ttf').then(res => res.arrayBuffer());
+            // Embed the font in the PDF document
+            const customFont = await pdfDoc.embedFont(fontBytes);
+
             const form = pdfDoc.getForm();
             //Text12: Supervisor comments.
             let commentsupervisor;
@@ -254,8 +260,11 @@ define([
                 default:
                     break;
             }
+            const fontSize = 9;
 
             commentsupervisor.setText(commentEl.value);
+            commentsupervisor.setFontSize(fontSize);
+            commentsupervisor.updateAppearances(customFont);
 
             // Flatten the form's fields. This makes the pdf uneditable.
             form.flatten();

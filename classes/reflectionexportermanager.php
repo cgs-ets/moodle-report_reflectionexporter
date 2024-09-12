@@ -424,11 +424,11 @@ class reflectionexportermanager {
         $reflections = [];
         $noreflections = [];
         $selectedorder = [$data->assessments1, $data->assessments2, $data->assessments3];
-
+      
         foreach ($users as $user) {
             $assessids = implode(',', $selectedorder);
             profile_load_custom_fields($user);
-
+         
             $us = new stdClass();
             $us->id = $user->profile['IBCode']; // Personal code.
             $us->dp = $user->profile['Year'] == '11' ? 1 : '2';
@@ -454,7 +454,7 @@ class reflectionexportermanager {
             $rid = 0;
         } else {
             // Save the reflection data in the DB.
-
+            error_log(print_r(count($reflections), true));
             $dataobject = new stdClass();
             $dataobject->reflections_json = json_encode($reflections);
             $dataobject->no_reflections_json = json_encode($noreflections);
@@ -769,7 +769,7 @@ class reflectionexportermanager {
         foreach ($users as $user) {
             $assessids = implode(',', $selectedorder);
             profile_load_custom_fields($user);
-            error_log(print_r($user, true));
+           
 
             $std                  = new stdClass();
             $std->id              = $user->profile['IBCode']; // Personal code.

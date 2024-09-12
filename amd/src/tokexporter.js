@@ -29,10 +29,11 @@ define([
     "core/ajax",
     "core/log",
     "report_reflectionexporter/pdf-lib",
+    "report_reflectionexporter/fontkit.umd",
     "core/templates",
     "report_reflectionexporter/reflectionexporterHelper",
 
-], function ($, Ajax, Log, PDFLib, Templates, ReHelper) {
+], function ($, Ajax, Log, PDFLib, Fontkit, Templates, ReHelper) {
     "use strict";
 
     function init(data) {
@@ -126,8 +127,14 @@ define([
         const form = pdfDoc.getForm();
         const fields = form.getFields();
 
+        pdfDoc.registerFontkit(Fontkit);
+        const fontBytes = await fetch('./font/arial.ttf').then(res => res.arrayBuffer());
+
+        // Embed the font in the PDF document
+        const customFont = await pdfDoc.embedFont(fontBytes);
+
         fields.forEach((field) => {
-            this.setFormFields(user, form, field);
+            this.setFormFields(user, form, field, customFont);
         });
 
         // Return the base64 PDF
@@ -144,63 +151,99 @@ define([
    * @param {*} form
    * @param {*} field
    */
-    Controls.prototype.setFormFields = async function (user, form, field) {
+    Controls.prototype.setFormFields = async function (user, form, field, customFont) {
         var self = this;
         const fieldName = field.getName();
+        const fontSize = 9;
+
         switch (fieldName) {
             case self.tokFormInputs.CANDIDATE_PERSONAL_CODE:
                 form.getTextField(fieldName).setText(String(user.id));
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.SESSION:
                 form.getTextField(fieldName).setText(String(user.session));
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.PRESCRIBED_TITLE:
                 form.getTextField(fieldName).setText(String(user.prescribedtitle));
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.FIRST_INTERACTION_CANDIDATE_COMMENTS:
                 user.interactions[0].onlinetext = JSON.parse(user.interactions[0].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.interactions[0].onlinetext);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.FIRST_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[0].month);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_COMMENTS:
                 user.interactions[1].onlinetext = JSON.parse(user.interactions[1].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.interactions[1].onlinetext);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.SECOND_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[1].month);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_COMMENTS:
                 user.interactions[2].onlinetext = JSON.parse(user.interactions[2].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.interactions[2].onlinetext);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.THIRD_INTERACTION_CANDIDATE_DATE:
                 form.getTextField(fieldName).setText(user.interactions[2].month);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.TEACHER_COMMENTS:
                 form.getTextField(fieldName).setText(user.comments);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.COMPLETED_CANDIDATE_NAME:
                 form.getTextField(fieldName).setText(`${user.firstname} ${user.lastname}`);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.COMPLETED_CANDIDATE_SESSION_NUMBER:
                 form.getTextField(fieldName).setText(user.studiescode);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.COMPLETED_DECLARATION_DATE1:
                 form.getTextField(fieldName).setText(user.month);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.COMPLETED_DECLARATION_TEACHER_NAME:
                 form.getTextField(fieldName).setText(user.teachersname);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.COMPLETED_DECLARATION_DATE2:
                 form.getTextField(fieldName).setText(user.month);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.COMPLETED_DECLARATION_SCHOOL_NAME:
                 form.getTextField(fieldName).setText(user.schoolname);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.COMPLETED_DECLARATION_SCHOOL_NUMBER:
                 form.getTextField(fieldName).setText(user.schoolnumber);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
         }
     };
@@ -208,19 +251,23 @@ define([
     // Call WS to save pdf data in DB (table mdl_report_reflec_exporter_pdf).
     Controls.prototype.savePDFInDB = function (pdfs) {
         var self = this;
+        const batchSize = 10;
+        const batches = [];
+        let allResponses = [];
 
-        const pdfjson = JSON.stringify(pdfs);
+        for (let i = 0; i < pdfs.length; i += batchSize) {
+            batches.push(pdfs.slice(i, i + batchSize));
+        }
 
-        Ajax.call([{
-            methodname: "report_reflectionexporter_save_pdfbase64",
-            args: {
-                pdfs: pdfjson,
-            },
-            done: function (response) {
+        // Do this in batches because when the numbers gets too big it crashes.
+        function processBatch(batchIndex) {
+            if (batchIndex >= batches.length) {
+                // All batches processed, now render the template
                 const downloadurl = new URL(window.location.href);
                 downloadurl.searchParams.append('d', 1);
+
                 const context = {
-                    pdfjson: response.savedrecords,
+                    pdfjson: JSON.stringify(allResponses),
                     courseid: self.data.cid,
                     coursename: self.data.coursename,
                     showuseridentity: true,
@@ -238,13 +285,28 @@ define([
                         console.log(ex);
                     });
 
-            },
-            fail: function (reason) {
-                Log.error(reason);
-                ReHelper.get_error_template(self.data);
-            },
-        },]);
+                return;
+            }
 
+            const pdfjson = JSON.stringify(batches[batchIndex]);
+
+            Ajax.call([{
+                methodname: "report_reflectionexporter_save_pdfbase64",
+                args: {
+                    pdfs: pdfjson,
+                },
+                done: function (response) {
+                    allResponses = allResponses.concat(JSON.parse(response.savedrecords)) // Concatenate responses
+                    processBatch(batchIndex + 1); // Process next batch
+                },
+                fail: function (reason) {
+                    Log.error(reason);
+                    ReHelper.get_error_template(self.data);
+                },
+            }]);
+        }
+
+        processBatch(0); // Start processing batches
     }
 
     Controls.prototype.displayTemplate = function () {

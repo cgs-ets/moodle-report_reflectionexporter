@@ -29,10 +29,11 @@ define([
     "core/ajax",
     "core/log",
     "report_reflectionexporter/pdf-lib",
+    "report_reflectionexporter/fontkit.umd",
     "core/templates",
     "report_reflectionexporter/reflectionexporterHelper",
 
-], function ($, Ajax, Log, PDFLib, Templates, ReHelper) {
+], function ($, Ajax, Log, PDFLib, Fontkit, Templates, ReHelper) {
     "use strict";
 
     function init(data) {
@@ -125,8 +126,14 @@ define([
         const form = pdfDoc.getForm();
         const fields = form.getFields();
 
+        pdfDoc.registerFontkit(Fontkit);
+        const fontBytes = await fetch('./font/arial.ttf').then(res => res.arrayBuffer());
+
+        // Embed the font in the PDF document
+        const customFont = await pdfDoc.embedFont(fontBytes);
+
         fields.forEach((field) => {
-            this.setFormFields(user, form, field);
+            this.setFormFields(user, form, field, customFont);
         });
 
         // Return the base64 PDF
@@ -156,17 +163,22 @@ define([
      * @param {*} form
      * @param {*} field
      */
-    Controls.prototype.setFormFields = async function (user, form, field) {
+    Controls.prototype.setFormFields = async function (user, form, field, customFont) {
         var self = this;
         const fieldName = field.getName();
+        const fontSize = 9;
+
         switch (fieldName) {
             case self.CANDIDATE_PERSONAL_CODE: //Candaite personal code "Text1"
-                Y.log(user);
                 form.getTextField(fieldName).setText(String(user.id));
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.FIRST_REFLECTION_SESSION: // First reflection session (1st page) "Text3"
                 user.reflections[0].onlinetext = JSON.parse(user.reflections[0].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.reflections[0].onlinetext);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case "Dropdown1": // Month
                 form.getDropdown(fieldName).select(user.reflections[0].month);
@@ -176,10 +188,14 @@ define([
                 break;
             case self.FIRST_REFLECTION_SESSION_SUPERVISOR_INITIALS: // Supervisor initials "Text5"
                 form.getTextField(fieldName).setText(String(user.si));
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.INTERIM_REFLECTION: // Interim reflection (2nd page) "Text6"
                 user.reflections[1].onlinetext = JSON.parse(user.reflections[1].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.reflections[1].onlinetext);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case "Dropdown3": // Month
                 form.getDropdown(fieldName).select(user.reflections[1].month);
@@ -189,10 +205,14 @@ define([
                 break;
             case self.INTERIM_REFLECTION_SUPERVISOR_INITIALS: // Supervisor initials "Text8"
                 form.getTextField(fieldName).setText(String(user.si));
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.FINAL_REFLECTION: // Final reflection (3rd page) "Text9"
                 user.reflections[2].onlinetext = JSON.parse(user.reflections[2].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.reflections[2].onlinetext);
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case "Dropdown5": // Month
                 form.getDropdown(fieldName).select(user.reflections[2].month);
@@ -202,31 +222,37 @@ define([
                 break;
             case self.FINAL_REFLECTION_SUPERVISOR_INITIALS: // Supervisor initials "Text11"
                 form.getTextField(fieldName).setText(String(user.si));
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
                 break;
         }
     };
 
     // Call WS to save pdf data in DB.
+
     Controls.prototype.savePDFInDB = function (pdfs) {
         var self = this;
+        const batchSize = 10;
+        const batches = [];
+        let allResponses = [];
 
-        const pdfjson = JSON.stringify(pdfs);
-        Ajax.call([{
-            methodname: "report_reflectionexporter_save_pdfbase64",
-            args: {
-                pdfs: pdfjson,
-            },
-            done: function (response) {
+        for (let i = 0; i < pdfs.length; i += batchSize) {
+            batches.push(pdfs.slice(i, i + batchSize));
+        }
 
+        // Do this in batches because when the numbers gets too big it crashes.
+        function processBatch(batchIndex) {
+            if (batchIndex >= batches.length) {
+                // All batches processed, now render the template
                 const context = {
-                    pdfjson: response.savedrecords,
+                    pdfjson: JSON.stringify(allResponses),
                     courseid: self.data.cid,
                     coursename: self.data.coursename,
                     showuseridentity: true,
                     reflecid: self.data.rid,
                     formname: self.data.ibform,
                     firstuserid: 0,
-                }
+                };
 
                 Templates.render('report_reflectionexporter/viewer', context)
                     .done(function (html, js) {
@@ -238,13 +264,28 @@ define([
                         console.log(ex);
                     });
 
-            },
-            fail: function (reason) {
-                Log.error(reason);
-                ReHelper.get_error_template(self.data);
-            },
-        },]);
+                return;
+            }
 
+            const pdfjson = JSON.stringify(batches[batchIndex]);
+
+            Ajax.call([{
+                methodname: "report_reflectionexporter_save_pdfbase64",
+                args: {
+                    pdfs: pdfjson,
+                },
+                done: function (response) {
+                    allResponses = allResponses.concat(JSON.parse(response.savedrecords)) // Concatenate responses
+                    processBatch(batchIndex + 1); // Process next batch
+                },
+                fail: function (reason) {
+                    Log.error(reason);
+                    ReHelper.get_error_template(self.data);
+                },
+            }]);
+        }
+
+        processBatch(0); // Start processing batches
     }
 
     Controls.prototype.displayTemplate = function () {

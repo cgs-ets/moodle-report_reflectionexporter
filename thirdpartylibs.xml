@@ -21,4 +21,17 @@
         <license>Apache</license>
         <licenseversion>2.0</licenseversion>
     </library>
+    <library>
+        <location>amd/src/fontkit.es.js</location>
+        <name>fontkit.es.js</name>
+        <version></version>
+        <license>MIT</license>
+        <licenseversion>2.0</licenseversion>
+    </library>
+    <library>
+        <location>amd/src/fontkit.umd.js</location>
+        <name>fontkit.umd.js</name>
+        <version></version>
+        <license>MIT</license>
+    </library>
 </libraries>
