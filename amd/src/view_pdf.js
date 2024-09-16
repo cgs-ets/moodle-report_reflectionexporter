@@ -84,7 +84,8 @@ define([
                         exporticon: url.imageUrl('spreadsheet', 'report_reflectionexporter'),
                         rid: document.querySelector('[data-region="viewer-navigation-panel"]').getAttribute('data-rid'),
                         title: title,
-                        maxcommentlength: istkform ? 200 : 542
+                        maxcommentlength: istkform ? 200 : 542,
+                        comments: ReHelper.get_comments()
                     }
 
                     Templates.render('report_reflectionexporter/pdf_container', context).done(function (html, js) {

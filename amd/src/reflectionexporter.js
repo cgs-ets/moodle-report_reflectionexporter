@@ -43,14 +43,6 @@ define([
 
     function Controls(data) {
         this.data = data;
-        this.CANDIDATE_PERSONAL_CODE = 'Text1';
-        this.FIRST_REFLECTION_SESSION = 'Text3';
-        this.FIRST_REFLECTION_SESSION_SUPERVISOR_INITIALS = 'Text5';
-        this.INTERIM_REFLECTION = 'Text6';
-        this.INTERIM_REFLECTION_SUPERVISOR_INITIALS = 'Text8';
-        this.FINAL_REFLECTION = 'Text9';
-        this.FINAL_REFLECTION_SUPERVISOR_INITIALS = 'Text11';
-        this.SUPERVISOR_COMMENT = 'Text12';
     }
 
     /**
@@ -108,6 +100,7 @@ define([
                 courseid: this.data.cid,
                 rid: this.data.rid,
                 formname: this.data.ibform,
+                comment: users[i].teachercomments,
                 pdf: pdf
             };
 
@@ -169,59 +162,65 @@ define([
         const fontSize = 9;
 
         switch (fieldName) {
-            case self.CANDIDATE_PERSONAL_CODE: //Candaite personal code "Text1"
+
+            case ReHelper.get_ee_form_inputs().CANDIDATE_PERSONAL_CODE: //Candaite personal code "Text1"
                 form.getTextField(fieldName).setText(String(user.id));
                 form.getTextField(fieldName).setFontSize(fontSize);
                 form.getTextField(fieldName).updateAppearances(customFont);
                 break;
-            case self.FIRST_REFLECTION_SESSION: // First reflection session (1st page) "Text3"
+            case ReHelper.get_ee_form_inputs().FIRST_REFLECTION_SESSION: // First reflection session (1st page) "Text3"
                 user.reflections[0].onlinetext = JSON.parse(user.reflections[0].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.reflections[0].onlinetext);
                 form.getTextField(fieldName).setFontSize(fontSize);
                 form.getTextField(fieldName).updateAppearances(customFont);
                 break;
-            case "Dropdown1": // Month
+            case ReHelper.get_ee_form_inputs().MONTH1: // Month MONTH1
                 form.getDropdown(fieldName).select(user.reflections[0].month);
                 break;
-            case "Dropdown2": // DP
+            case ReHelper.get_ee_form_inputs().DP1: // DP DP1
                 form.getDropdown(fieldName).select(String(user.dp)); // just to make sure that we are sending a string
                 break;
-            case self.FIRST_REFLECTION_SESSION_SUPERVISOR_INITIALS: // Supervisor initials "Text5"
+            case ReHelper.get_ee_form_inputs().FIRST_REFLECTION_SESSION_SUPERVISOR_INITIALS: // Supervisor initials "Text5"
                 form.getTextField(fieldName).setText(String(user.si));
                 form.getTextField(fieldName).setFontSize(fontSize);
                 form.getTextField(fieldName).updateAppearances(customFont);
                 break;
-            case self.INTERIM_REFLECTION: // Interim reflection (2nd page) "Text6"
+            case ReHelper.get_ee_form_inputs().INTERIM_REFLECTION: // Interim reflection (2nd page) "Text6"
                 user.reflections[1].onlinetext = JSON.parse(user.reflections[1].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.reflections[1].onlinetext);
                 form.getTextField(fieldName).setFontSize(fontSize);
                 form.getTextField(fieldName).updateAppearances(customFont);
                 break;
-            case "Dropdown3": // Month
+            case ReHelper.get_ee_form_inputs().MONTH2: // Month MONTH2
                 form.getDropdown(fieldName).select(user.reflections[1].month);
                 break;
-            case "Dropdown4": // DP
+            case ReHelper.get_ee_form_inputs().DP2: // DP 2
                 form.getDropdown(fieldName).select(String(user.dp));
                 break;
-            case self.INTERIM_REFLECTION_SUPERVISOR_INITIALS: // Supervisor initials "Text8"
+            case ReHelper.get_ee_form_inputs().INTERIM_REFLECTION_SUPERVISOR_INITIALS: // Supervisor initials "Text8"
                 form.getTextField(fieldName).setText(String(user.si));
                 form.getTextField(fieldName).setFontSize(fontSize);
                 form.getTextField(fieldName).updateAppearances(customFont);
                 break;
-            case self.FINAL_REFLECTION: // Final reflection (3rd page) "Text9"
+            case ReHelper.get_ee_form_inputs().FINAL_REFLECTION: // Final reflection (3rd page) "Text9"
                 user.reflections[2].onlinetext = JSON.parse(user.reflections[2].onlinetext).replace(/(\r\n|\n|\r)/gm, "");
                 form.getTextField(fieldName).setText(user.reflections[2].onlinetext);
                 form.getTextField(fieldName).setFontSize(fontSize);
                 form.getTextField(fieldName).updateAppearances(customFont);
                 break;
-            case "Dropdown5": // Month
+            case ReHelper.get_ee_form_inputs().MONTH3: // Month
                 form.getDropdown(fieldName).select(user.reflections[2].month);
                 break;
-            case "Dropdown6": //DP //dp
+            case ReHelper.get_ee_form_inputs().DP3: //DP //dp
                 form.getDropdown(fieldName).select(String(user.dp));
                 break;
-            case self.FINAL_REFLECTION_SUPERVISOR_INITIALS: // Supervisor initials "Text11"
+            case ReHelper.get_ee_form_inputs().FINAL_REFLECTION_SUPERVISOR_INITIALS: // Supervisor initials "Text11"
                 form.getTextField(fieldName).setText(String(user.si));
+                form.getTextField(fieldName).setFontSize(fontSize);
+                form.getTextField(fieldName).updateAppearances(customFont);
+                break;
+            case ReHelper.get_ee_form_inputs().SUPERVISOR_COMMENT: // Supervisor COMMENT "Text12"
+                form.getTextField(fieldName).setText(String(user.teachercomments));
                 form.getTextField(fieldName).setFontSize(fontSize);
                 form.getTextField(fieldName).updateAppearances(customFont);
                 break;
@@ -252,8 +251,10 @@ define([
                     reflecid: self.data.rid,
                     formname: self.data.ibform,
                     firstuserid: 0,
+                    withcomment: self.data.withcomment
                 };
-
+                console.log("YA TERMNINO LOS BATCHES> AHORA A RENDERERAR")
+                console.log(context);
                 Templates.render('report_reflectionexporter/viewer', context)
                     .done(function (html, js) {
                         $(document.querySelector('.importing-animation')).fadeOut("fast", function () {
@@ -275,7 +276,13 @@ define([
                     pdfs: pdfjson,
                 },
                 done: function (response) {
-                    allResponses = allResponses.concat(JSON.parse(response.savedrecords)) // Concatenate responses
+                    console.log(response.savedrecords)
+                    var savedrecords = JSON.parse(response.savedrecords);
+                    if ((savedrecords[0]).teachercomments != null) {
+                        (savedrecords[0]).teachercomments = (savedrecords[0]).teachercomments.replace(/(\r\n|\n|\r)/gm, "")
+                        console.log(savedrecords)
+                    }
+                    allResponses = allResponses.concat(savedrecords) // Concatenate responses
                     processBatch(batchIndex + 1); // Process next batch
                 },
                 fail: function (reason) {

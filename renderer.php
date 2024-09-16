@@ -132,6 +132,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
 
         $info->notprocess = count(json_decode(reflectionexportermanager::get_no_reflections_json($data->rid)));
         $info->new = $data->new;
+        $info->withcomment = $data->withcomment;
 
         echo $this->output->render_from_template('report_reflectionexporter/generating_pdf', $info);
     }

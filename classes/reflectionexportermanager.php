@@ -131,6 +131,16 @@ class reflectionexportermanager {
         return $result->no_reflections_json;
     }
 
+    public static function get_no_comments_json($rid) {
+        global $DB;
+        $sql = "SELECT get_no_comments_json FROM {report_reflectionexporter} WHERE id = ?";
+        $params = ['id' => $rid];
+
+        $result = $DB->get_record_sql($sql, $params);
+      
+        return $result->get_no_comments_json;
+    }
+
     // Get the details of students selected in the form.
     public static function get_selected_students($studentids) {
         global $DB;
@@ -149,16 +159,22 @@ class reflectionexportermanager {
         global $DB;
         $pdfs = json_decode($pdfs);
         $dataobjects = [];
+        $comments = [];
 
         foreach ($pdfs as $pdf) {
+            $comments[$pdf->uid] =  strip_tags(format_text(trim($pdf->comment, chr(0xC2).chr(0xA0)), FORMAT_MOODLE));
+            error_log(print_r($pdf, true)); 
             $data = new stdClass();
             $data->userid = $pdf->uid;
             $data->courseid = $pdf->courseid;
             $data->refexid = $pdf->rid; // Id of mdl_report_reflectionexporter.
             $data->pdf = $pdf->pdf;
             $data->formname = $pdf->formname;
+
             $data->id = $DB->insert_record('report_reflec_exporter_pdf', $data, true);
             unset($data->pdf); // Dont send it back.
+            error_log(print_r($comments, true));
+            $data->teachercomments = $comments[$pdf->uid]; // send it back
             $dataobjects[] = $data;
         }
 
@@ -269,8 +285,6 @@ class reflectionexportermanager {
     public static function generate_summary_spreadsheet($data, $context, $course,  $filename) {
         // Increase the server timeout to handle the creation and sending of large zip files.
         \core_php_time_limit::raise();
-
-        error_log(print_r($data, true));
 
         $ref = self::get_no_reflections_json($data);
         $studentdata = json_decode($ref); // Get the no_reflections_json column.
@@ -424,7 +438,8 @@ class reflectionexportermanager {
         $reflections = [];
         $noreflections = [];
         $selectedorder = [$data->assessments1, $data->assessments2, $data->assessments3];
-      
+        $nocomments = [];
+
         foreach ($users as $user) {
             $assessids = implode(',', $selectedorder);
             profile_load_custom_fields($user);
@@ -436,8 +451,21 @@ class reflectionexportermanager {
             $us->lastname = $user->lastname;
             $us->uid = $user->id;
             $us->si = isset($data->onbehalf) ? $supervisorids[$user->id] : $data->supervisorinitials;
-            $ref = self::get_user_reflections($data->cid, $assessids, $user->id, $data->ibform);
 
+            if (isset($data->collectteachercomment)) {
+                $comments = self::get_feedback_comments($assessids, $user->id);
+
+                if ($comments == '') {
+                    $nc = new stdClass();
+                    $nc->student = $user->firstname . ' ' . $user->lastname;
+                    $nocomments[] = $nc;
+                } else {
+                    $us->teachercomments = $comments;
+                }
+                
+            } 
+
+            $ref = self::get_user_reflections($data->cid, $assessids, $user->id, $data->ibform);
             $us->reflections = self::map_assessment_order($ref, $selectedorder);
 
             if (count($us->reflections) < 3) {
@@ -447,6 +475,10 @@ class reflectionexportermanager {
             } else {
                 $reflections[] = $us;
             }
+
+            if (count($nocomments) > 0 && isset($data->collectteachercomment)) {
+                
+            }
         }
 
         // Check that $reflections has something to process. In case they all fail, let the user know.
@@ -454,13 +486,14 @@ class reflectionexportermanager {
             $rid = 0;
         } else {
             // Save the reflection data in the DB.
-            error_log(print_r(count($reflections), true));
             $dataobject = new stdClass();
             $dataobject->reflections_json = json_encode($reflections);
             $dataobject->no_reflections_json = json_encode($noreflections);
             $dataobject->courseid = $data->courseid;
             $dataobject->timecreated = time();
             $dataobject->formname = $data->ibform;
+            $dataobject->getcomment = $data->collectteachercomment;
+            $dataobject->no_comments_json = json_encode($nocomments);
 
             $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
         }
@@ -734,7 +767,7 @@ class reflectionexportermanager {
         } else {
             $fromform->rid = $rid;
             report_reflectionexporter_filemanager_postupdate($fromform);
-            $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1, 'ibform' => $fromform->ibform);
+            $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1, 'ibform' => $fromform->ibform, 'withcomment' => $fromform->collectteachercomment);
             redirect(new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params));
         }
     }
@@ -818,10 +851,11 @@ class reflectionexportermanager {
     }
 
     /**
-     * For TOK forms, the teacher can give feedback comments to the assessments
+     * The teacher can give feedback comments to the assessments
      * with the interactions.
      */
-    private static function get_feedback_comments($assesmentids, $student) {
+    private static function get_feedback_comments($assesmentids, $studentid) {
+        
         global $DB;
 
         $sql = "SELECT ac.assignment, ac.commenttext
@@ -831,18 +865,25 @@ class reflectionexportermanager {
                 WHERE  ag.userid = ?
                 AND ac.assignment IN ($assesmentids);";
 
-        $paramsarray = ['userid' => $student->uid];
+        $paramsarray = ['userid' => $studentid];
 
         $results = $DB->get_records_sql($sql, $paramsarray);
         $comments = '';
-
+        error_log(print_r($sql, true));
         foreach ($results as $comment) {
-
-            $comments .= strip_tags(format_text($comment->commenttext, FORMAT_MOODLE)) . PHP_EOL;
+            error_log(print_r($comment->commenttext, true));
+            $comments .= self::escape_for_json(strip_tags(format_text(trim($comment->commenttext, chr(0xC2).chr(0xA0)), FORMAT_MOODLE)));
         }
-
+      
         return $comments;
 
     }
+
+    private static function escape_for_json($value) {
+        $escapers = ["\\", "\"", "\n", "\r", "\t", "\x08", "\x0c", chr(0xC2).chr(0xA0)];
+        $replacements = ["\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f"];
+        return str_replace($escapers, $replacements, $value);
+    }
+    
 }
 

@@ -33,10 +33,10 @@ if ($ADMIN->fulltree) {
                     'EE/RPPF'));
     $settings->add(new admin_setting_configtext('report_reflectionexporter_school_name',
                     get_string('schoolname', 'report_reflectionexporter'),
-                    get_string('ibform_desc', 'report_reflectionexporter'),
+                    get_string('schoolname_desc', 'report_reflectionexporter'),
                     ''));
     $settings->add(new admin_setting_configtext('report_reflectionexporter_school_number',
                     get_string('schoolnumber', 'report_reflectionexporter'),
-                    get_string('ibform_desc', 'report_reflectionexporter'),
+                    get_string('schoolnumber_desc', 'report_reflectionexporter'),
                     ''));
 }

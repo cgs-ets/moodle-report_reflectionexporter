@@ -24,7 +24,8 @@
      data-first-userid="{{firstuserid}}"
      data-courseid="{{courseid}}"
      data-showuseridentity="{{showuseridentity}}"
-     data-rid="{{reflecid}}">
+     data-rid="{{reflecid}}"
+     data-withcomment="{{withcomment}}">
    {{> report_reflectionexporter/viewer_navigation }}
 </div>
 <div data-region="viewer-panel" class ='viewerPanel'>
@@ -38,4 +39,4 @@
 </div>
 
 {{! Keeps a reference to the PDFS generated }}
-<div class = 'data-pdfjson' hidden data-pdfs = {{pdfjson}}></div>
+<div class = 'data-pdfjson' hidden data-pdfs = "{{pdfjson}}"></div>

@@ -39,7 +39,12 @@ define(["core/templates"], function (Templates) {
                 FINAL_REFLECTION: 'Text9',
                 FINAL_REFLECTION_SUPERVISOR_INITIALS: 'Text11',
                 SUPERVISOR_COMMENT: 'Text12',
-
+                MONTH1: 'Dropdown1',
+                DP1: 'Dropdown2',
+                MONTH2: 'Dropdown3',
+                DP2: 'Dropdown4',
+                MONTH3: 'Dropdown5',
+                DP3: 'Dropdown6'
             };
 
         },
@@ -83,6 +88,17 @@ define(["core/templates"], function (Templates) {
                     Templates.replaceNodeContents($(document.querySelector('.importing-animation')), html, js);
                 })
                 .catch((error) => displayException(error));
+        },
+
+        get_comments: function () {
+            const hascomments = document.querySelector('[data-withcomment]').getAttribute('data-withcomment');
+
+            if (hascomments == 1) {
+                const data = JSON.parse(document.querySelector('.data-pdfjson').getAttribute('data-pdfs'));
+                return data[0].teachercomments
+            }
+
+            return '';
         }
 
 

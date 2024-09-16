@@ -39,6 +39,8 @@ $export                  = optional_param('export', 0, PARAM_INT); // Download a
 $datajson                = optional_param('datajson', 0, PARAM_RAW); // JSON with the information needed to display PDF.
 $finished                = optional_param('f', 0, PARAM_RAW); // Finished process.
 $ibform                  = required_param('ibform', PARAM_TEXT);
+$withcomment             = required_param('withcomment', PARAM_TEXT);
+
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     print_error('invalidcourse');
@@ -53,7 +55,7 @@ if ($download) {
 }
 
 if ($export) {
-    reflectionexportermanager::generate_spreadsheet($rid, $context, $course);
+    reflectionexportermanager::generate_spreadsheet($rid, $context, $course, get_string('wodcountzipname', 'report_reflectionexporter'));
 }
 
 $PAGE->set_context($context);
@@ -74,10 +76,13 @@ $data->new = $new;
 $data->cmid = $cmid;
 $data->ibform = $ibform;
 $data->finished = $finished == '1' ? true : false;
-
+$data->withcomment = $withcomment;
+error_log(print_r("LOS DATOS QUE PASO AL RENDERER", true));
+error_log(print_r($data, true));
 if ($new == 0) {
     $data->pdfjson = json_encode(reflectionexportermanager::get_existing_proc($rid));
     $data->notprocess = count(json_decode(reflectionexportermanager::get_no_reflections_json($rid)));
+    $data->nocomments = count(json_decode(reflectionexportermanager::get_no_comments_json($rid)));
 }
 
 $renderer = $PAGE->get_renderer('report_reflectionexporter');

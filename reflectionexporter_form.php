@@ -211,6 +211,11 @@ class reflectionexporter_form extends moodleform {
         $mform->addRule('assessments3', null, 'required');
         $mform->addHelpButton('assessments3', 'assessments3', 'report_reflectionexporter');
 
+         // Ask if they want the comments section to be picked up.
+        $mform->addElement('checkbox', 'collectteachercomment', get_string('collectteachercomment', 'report_reflectionexporter'));
+        $mform->addHelpButton('collectteachercomment', 'collectteachercomment', 'report_reflectionexporter');
+
+        // Save cancel buttons
         $buttonarray = array();
         $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('savechanges'));
         $buttonarray[] = $mform->createElement('cancel');
