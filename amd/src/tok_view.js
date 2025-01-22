@@ -37,9 +37,7 @@ define([
 
             }.bind(this));
 
-            // document.getElementById('download').addEventListener('click', self._zipdownload);
             self._enableDownloadAndSummary();
-
 
         });
 
@@ -96,7 +94,6 @@ define([
                         }
                     }
                 })
-
 
             },
             fail: function (reason) {

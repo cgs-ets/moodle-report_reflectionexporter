@@ -76,7 +76,7 @@ table.table.table-bordered.table-responsive.started-work {
 
 /* View page */
 
-.report_reflectionexporter [data-region="viewer-navigation-panel"] {
+.report_reflectionexporter [data-region='viewer-navigation-panel'] {
   position: absolute;
   top: 0;
   left: 0;
@@ -85,29 +85,29 @@ table.table.table-bordered.table-responsive.started-work {
   padding: 6px;
 }
 
-.path-report-reflectionexporter [data-region="viewer-navigation"] {
+.path-report-reflectionexporter [data-region='viewer-navigation'] {
   padding: 6px;
 }
 
-.path-report-reflectionexporter [data-region="reflectionexporter-info"] {
+.path-report-reflectionexporter [data-region='reflectionexporter-info'] {
   overflow-y: hidden;
 }
 
-.path-report-reflectionexporter [data-region="reflectionexporter-info"] {
+.path-report-reflectionexporter [data-region='reflectionexporter-info'] {
   white-space: nowrap;
   overflow-x: hidden;
   text-overflow: ellipsis;
 }
 
-.path-report-reflectionexporter [data-region="user-info"] {
+.path-report-reflectionexporter [data-region='user-info'] {
   height: 60px;
 }
 
-.path-report-reflectionexporter [data-region="user-info"] em.nowrap {
+.path-report-reflectionexporter [data-region='user-info'] em.nowrap {
   display: flow-root;
 }
 
-.path-report-reflectionexporter [data-region="user-selector"] .alignment {
+.path-report-reflectionexporter [data-region='user-selector'] .alignment {
   float: right;
   width: 320px;
   text-align: center;
@@ -115,7 +115,7 @@ table.table.table-bordered.table-responsive.started-work {
 }
 
 /* Actions buttons for tok exporter*/
-.path-report-reflectionexporter [data-region="tok-exporter-actions"] {
+.path-report-reflectionexporter [data-region='tok-exporter-actions'] {
   position: absolute;
   margin-top: 15%;
   margin-left: 40%;
@@ -153,7 +153,7 @@ table.table.table-bordered.table-responsive.started-work {
   height: 100%;
 }
 
-[data-region="pdf-comment-container"] {
+[data-region='pdf-comment-container'] {
   display: flex;
   flex-direction: row;
 }
@@ -172,7 +172,7 @@ table.table.table-bordered.table-responsive.started-work {
   width: fit-content;
   margin: auto;
   padding: 2rem;
-  /*display: flex;*/
+  display: flex;
 }
 
 .report_reflectionexporter .reflection-completed {
@@ -193,7 +193,7 @@ table.table.table-bordered.table-responsive.started-work {
 }
 
 .report_reflectionexporter .next-action a,
-.path-report-reflectionexporter [data-region="tok-exporter-actions"] a {
+.path-report-reflectionexporter [data-region='tok-exporter-actions'] a {
   margin: 2rem;
   padding: 2rem;
   box-shadow: 1px 2px 6px 5px slategrey;
@@ -209,7 +209,7 @@ a.btn-summary-hidden {
 
 /* Press effect */
 .report_reflectionexporter .next-action a:active,
-.path-report-reflectionexporter [data-region="tok-exporter-actions"] a:active {
+.path-report-reflectionexporter [data-region='tok-exporter-actions'] a:active {
   box-shadow: 1px 2px 6px 5px slategrey;
   transform: translateY(4px);
 }
@@ -276,9 +276,14 @@ a.btn-summary-hidden {
   margin-top: 0.3rem;
 }
 
-@media (max-width: 900px) {
-  [data-region="pdf-comment-container"] {
-    flex-direction: column;
+.form-ref-exporter-group-actions {
+  text-align: center;
+}
+
+/* Laptop */
+@media (max-width: 1366px) {
+  [data-region='pdf-comment-container'] {
+    flex-direction: row;
   }
 
   .report_reflectionexporter .next-action {
@@ -286,6 +291,43 @@ a.btn-summary-hidden {
     width: fit-content;
     margin: auto;
     padding: 2rem;
+  }
+
+  .report_reflectionexporter .supervisor-comment {
+    margin: 2rem;
+    width: 18rem;
+  }
+
+  .report_reflectionexporter .supervisor-comment {
+    margin: 2rem;
+    height: 173vh;
+  }
+
+  .report_reflectionexporter .next-action {
+    display: block;
+    width: min-content;
+  }
+
+  div#viewerContainer {
+    width: 80%;
+    flex: 2; /* 2:1 */
+  }
+
+  .report_reflectionexporter #viewer {
+    height: 140vh;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Styles for mobile devices */
+
+  [data-region='pdf-comment-container'] {
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  div#viewerContainer {
+    width: 100%;
   }
 }
 

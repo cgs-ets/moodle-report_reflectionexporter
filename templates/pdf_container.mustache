@@ -27,16 +27,22 @@
 {{! Comment section }}
 <div class = "supervisor-comment">
 
-    <h4 class ="reflection-completed">{{title}}</h4>
-
+    <div class="alert alert-primary completed-without-comments-alert" role="alert" hidden>
+         {{title}}
+    </div>
+    <div class="alert alert-primary completed-withcomments-alert" role="alert" hidden>
+     {{#str}} completed, report_reflectionexporter {{/str}}
+    </div>
     <form class = "reflection-comment-form" hidden>
         <div class="form-group" data-wordlenght={{}}>
             <label for="comment"><strong>Supervisor comments:</strong></label>
             <textarea class="form-control" id="comment" rows="10" >{{comments}}</textarea>
             <span class = 'reflectionexporter-comment-len-warning' hidden>{{#str}} commentwarning, report_reflectionexporter, {{maxcommentlength}} {{/str}}</span>
         </div>
-        <button type="submit" class="btn btn-primary save-show-next-btn">Save and show next</button>
-        <button type="submit" class="btn btn-primary save-exit-btn">Save and exit</button>
+        <div class="form-ref-exporter-group-actions">
+            <button type="submit" class="btn btn-primary save-show-next-btn">Save and show next</button>
+            <button type="submit" class="btn btn-primary save-exit-btn">Save and exit</button>
+        </div>
     </form>
 
    {{> report_reflectionexporter/summary_download_actions }}

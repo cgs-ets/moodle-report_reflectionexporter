@@ -34,6 +34,7 @@ define(['jquery'], function ($) {
     function init(data) {
 
         const control = new SupervisorInitialControl(data);
+        console.log(data);
         control.main();
 
     }
@@ -65,7 +66,7 @@ define(['jquery'], function ($) {
                     const teacher = document.querySelectorAll(`[id^= id_teacher_${groupid}]`)[0];
                     // Get the div that has the id fitem_id_teacher_groupid_techerid.
                     // For some reason the id in moodle uat is id_teacher_groupid_teacherid_label
-                    let teacherid = teacher.getAttribute('id').replace('_label','');
+                    let teacherid = teacher.getAttribute('id').replace('_label', '');
                     console.log(teacherid);
 
                     const dEl = document.getElementById(`fitem_${teacherid}`);
@@ -87,7 +88,7 @@ define(['jquery'], function ($) {
                     const teacher = document.querySelectorAll(`[id^= id_teacher_${groupid}]`)[0];
                     // Get the div that has the id fitem_id_teacher_groupid_techerid.
                     // For some reason the id in moodle uat is id_teacher_groupid_teacherid_label
-                    let teacherid = teacher.getAttribute('id').replace('_label','');
+                    let teacherid = teacher.getAttribute('id').replace('_label', '');
                     const dEl = document.getElementById(`fitem_${teacherid}`);
                     teacherid = teacherid.split('_').findLast(e => { if (!isNaN(parseInt(e))) return e });
                     dEl.classList.add('teacher-initial-field-hide');

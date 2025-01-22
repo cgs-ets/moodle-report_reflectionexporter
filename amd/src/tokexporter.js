@@ -67,7 +67,6 @@ define([
     };
 
     Controls.prototype.getInteractionspdf = function () {
-
         this.displayTemplate();
     }
 
@@ -107,8 +106,9 @@ define([
                 uid: users[i].interactions[0].userid,
                 courseid: this.data.cid,
                 rid: this.data.rid,
+                formname: this.data.ibform,
+                comment: users[i].teachercomments,
                 pdf: pdf,
-                formname: this.data.ibform
             };
 
             studentpdfs.push(student);
@@ -206,7 +206,7 @@ define([
                 form.getTextField(fieldName).updateAppearances(customFont);
                 break;
             case self.tokFormInputs.TEACHER_COMMENTS:
-                form.getTextField(fieldName).setText(user.comments);
+                form.getTextField(fieldName).setText(user.teachercomments);
                 form.getTextField(fieldName).setFontSize(fontSize);
                 form.getTextField(fieldName).updateAppearances(customFont);
                 break;
@@ -273,7 +273,9 @@ define([
                     showuseridentity: true,
                     reflecid: self.data.rid,
                     firstuserid: 0,
+                    withcomment: self.data.withcomment
                 }
+
 
                 Templates.render('report_reflectionexporter/viewer', context)
                     .done(function (html, js) {
@@ -296,7 +298,14 @@ define([
                     pdfs: pdfjson,
                 },
                 done: function (response) {
-                    allResponses = allResponses.concat(JSON.parse(response.savedrecords)) // Concatenate responses
+
+                    var savedrecords = JSON.parse(response.savedrecords);
+
+                    if ((savedrecords[0]).teachercomments != null) {
+                        (savedrecords[0]).teachercomments = (savedrecords[0]).teachercomments.replace(/(\r\n|\n|\r)/gm, "")
+                    }
+                    allResponses = allResponses.concat(savedrecords) // Concatenate responses
+
                     processBatch(batchIndex + 1); // Process next batch
                 },
                 fail: function (reason) {
@@ -318,7 +327,6 @@ define([
             showuseridentity: true,
             reflecid: self.data.rid,
             firstuserid: 0,
-            // tkform: self.data.ibform === 'TK_PPF',
         }
 
         Templates.render('report_reflectionexporter/viewer', context)

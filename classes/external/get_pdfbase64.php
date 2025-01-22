@@ -65,7 +65,7 @@ trait get_pdfbase64 {
 
         $result = reflectionexportermanager::get_pdfbase64($recorid);
         return array(
-            'pdfbase64' => $result,
+            'pdfbase64' => json_encode($result),
         );
     }
 

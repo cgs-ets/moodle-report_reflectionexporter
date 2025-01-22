@@ -174,6 +174,10 @@ class reflectionexporter_tok_form extends moodleform {
             $mform->addRule('interaction3', null, 'required');
             $mform->addHelpButton('interaction3', 'interaction3', 'report_reflectionexporter');
 
+              // Ask if they want the comments section to be picked up.
+            $mform->addElement('checkbox', 'collectteachercomment', get_string('collectteachercomment', 'report_reflectionexporter'));
+            $mform->addHelpButton('collectteachercomment', 'collectteachercomment', 'report_reflectionexporter');
+
             // Submit/cancel buttons.
             $buttonarray = array();
             $buttonarray[] = $mform->createElement('submit', 'submitbutton', get_string('savechanges'));

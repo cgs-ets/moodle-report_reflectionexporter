@@ -113,11 +113,12 @@ class reflectionexporter_form extends moodleform {
         // Keep them all hidden unless the teacher picks the group this teacher belongs to.
         foreach ($grouparrayaux as $aux) {
 
+            error_log(print_r($aux, true));
             $details = $aux->teachers;
             foreach ($details as $detail) {
                 $fieldname = "teacher_" . $aux->groupid . '_' . $detail->id;
                 $si = substr($detail->firstname, 0, 1) . '.' . substr($detail->lastname, 0, 1);
-                $label = get_string('teacheringroup', 'report_reflectionexporter', ['firstname' => $detail->firstname, 'lastname' => $detail->lastname, ]);
+                $label = get_string('teacheringroup', 'report_reflectionexporter', ['firstname' => $detail->firstname, 'lastname' => $detail->lastname, 'groupname' => $aux->groupname]);
 
                 $mform->addElement('text', $fieldname, $label, array('size' => '6', 'class' => 'teacher-initial-field-hide'));
                 $mform->settype($fieldname, PARAM_TEXT);

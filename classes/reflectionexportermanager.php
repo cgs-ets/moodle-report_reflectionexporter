@@ -44,6 +44,7 @@ class reflectionexportermanager {
     const STARTED = 'S';
     const FINISHED = 'F';
     const PDF_COMPLETED = 'C'; // Completed. Cant edit anymore.
+    const PDF_FLATTEN = 1; // Completed. Cant edit anymore.
 
     // Get the course's assessments that have submissions and the submission type is onlinetext.
     public static function get_submitted_assessments($courseid) {
@@ -127,18 +128,19 @@ class reflectionexportermanager {
         $params = ['id' => $rid];
 
         $result = $DB->get_record_sql($sql, $params);
-      
+
         return $result->no_reflections_json;
     }
 
     public static function get_no_comments_json($rid) {
         global $DB;
-        $sql = "SELECT get_no_comments_json FROM {report_reflectionexporter} WHERE id = ?";
+        $sql = "SELECT no_comments_json FROM {report_reflectionexporter} WHERE id = ?";
         $params = ['id' => $rid];
 
         $result = $DB->get_record_sql($sql, $params);
-      
-        return $result->get_no_comments_json;
+
+
+        return $result->no_comments_json;
     }
 
     // Get the details of students selected in the form.
@@ -163,17 +165,16 @@ class reflectionexportermanager {
 
         foreach ($pdfs as $pdf) {
             $comments[$pdf->uid] =  strip_tags(format_text(trim($pdf->comment, chr(0xC2).chr(0xA0)), FORMAT_MOODLE));
-            error_log(print_r($pdf, true)); 
             $data = new stdClass();
             $data->userid = $pdf->uid;
             $data->courseid = $pdf->courseid;
             $data->refexid = $pdf->rid; // Id of mdl_report_reflectionexporter.
             $data->pdf = $pdf->pdf;
             $data->formname = $pdf->formname;
-
+            $data->status = strlen($coments[$pdf->uid]) > 0 ? 'C' : 'NC';
             $data->id = $DB->insert_record('report_reflec_exporter_pdf', $data, true);
             unset($data->pdf); // Dont send it back.
-            error_log(print_r($comments, true));
+            error_log(print_r($pdf, true));
             $data->teachercomments = $comments[$pdf->uid]; // send it back
             $dataobjects[] = $data;
         }
@@ -189,6 +190,7 @@ class reflectionexportermanager {
         $dataobject->id = $pdfdata->id;
         $dataobject->pdf = $pdfdata->pdf;
         $dataobject->status = self::PDF_COMPLETED;
+        $dataobject->pdfflaten = self::PDF_FLATTEN;
 
         $DB->update_record('report_reflec_exporter_pdf', $dataobject);
 
@@ -211,12 +213,12 @@ class reflectionexportermanager {
     public static function get_pdfbase64($rid) {
         global $DB;
 
-        $sql  = "SELECT pdf FROM {report_reflec_exporter_pdf} WHERE id = ?";
+        $sql  = "SELECT pdf, pdfflaten FROM {report_reflec_exporter_pdf} WHERE id = ?";
         $params = ['id' => $rid];
 
         $r = $DB->get_record_sql($sql, $params);
-
-        return $r->pdf;
+        error_log(print_r($r, true));
+        return $r;
     }
 
     public static function generate_zip($data) {
@@ -288,7 +290,7 @@ class reflectionexportermanager {
 
         $ref = self::get_no_reflections_json($data);
         $studentdata = json_decode($ref); // Get the no_reflections_json column.
-      
+
         $tempdir = make_temp_directory('report_reflectionexporter/spreadsheet');
 
         report_reflectionexporter_summary_workbook($context, $studentdata, $tempdir, $course);
@@ -443,7 +445,7 @@ class reflectionexportermanager {
         foreach ($users as $user) {
             $assessids = implode(',', $selectedorder);
             profile_load_custom_fields($user);
-         
+
             $us = new stdClass();
             $us->id = $user->profile['IBCode']; // Personal code.
             $us->dp = $user->profile['Year'] == '11' ? 1 : '2';
@@ -451,7 +453,7 @@ class reflectionexportermanager {
             $us->lastname = $user->lastname;
             $us->uid = $user->id;
             $us->si = isset($data->onbehalf) ? $supervisorids[$user->id] : $data->supervisorinitials;
-
+            $us->teachercomments = '';
             if (isset($data->collectteachercomment)) {
                 $comments = self::get_feedback_comments($assessids, $user->id);
 
@@ -459,11 +461,11 @@ class reflectionexportermanager {
                     $nc = new stdClass();
                     $nc->student = $user->firstname . ' ' . $user->lastname;
                     $nocomments[] = $nc;
-                } else {
-                    $us->teachercomments = $comments;
                 }
-                
-            } 
+
+                $us->teachercomments = $comments;
+
+            }
 
             $ref = self::get_user_reflections($data->cid, $assessids, $user->id, $data->ibform);
             $us->reflections = self::map_assessment_order($ref, $selectedorder);
@@ -477,7 +479,7 @@ class reflectionexportermanager {
             }
 
             if (count($nocomments) > 0 && isset($data->collectteachercomment)) {
-                
+
             }
         }
 
@@ -777,7 +779,10 @@ class reflectionexportermanager {
      *  Get the title choice made by the students
      *  Get the 3 interactions from the assessment
      *  Get the feedback(s) comment given in the 3 assessments.
+     *
      */
+    // TODO: Add the date in the declaration area when collected comments
+    // TODO: When comments collected, set the option to download all at the begining.
     public static function process_tok_form($fromform, $id, $cmid) {
         $rid = self::collect_and_save_interactions($fromform, $id);
         if ($rid == 0) { // No students interactions found with the data provided.
@@ -785,7 +790,7 @@ class reflectionexportermanager {
         } else {
             $fromform->rid = $rid;
             report_reflectionexporter_tok_filemanager_postupdate($fromform);
-            $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1, 'ibform' => $fromform->ibform);
+            $params = array('cid' => $id, 'cmid' => $cmid, 'rid' => $rid, 'n' => 1, 'ibform' => $fromform->ibform, 'withcomment' => $fromform->collectteachercomment);
             redirect(new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params));
         }
     }
@@ -802,7 +807,7 @@ class reflectionexportermanager {
         foreach ($users as $user) {
             $assessids = implode(',', $selectedorder);
             profile_load_custom_fields($user);
-           
+
 
             $std                  = new stdClass();
             $std->id              = $user->profile['IBCode']; // Personal code.
@@ -814,7 +819,7 @@ class reflectionexportermanager {
             $std->prescribedtitle = isset($titles[$user->id]) ? strip_tags(format_text(($titles[$user->id])->prescribedtitle, FORMAT_MOODLE)) : '';
             $std->schoolname      = $CFG->report_reflectionexporter_school_name;
             $std->schoolnumber    = $CFG->report_reflectionexporter_school_number;
-            $std->studiescode     = $user->profile['IBStudiesCode']; // Studies code.
+            $std->studiescode     = $user->profile['StudiesCode']; // Studies code.
 
             $ref = self::get_user_reflections($data->cid, $assessids, $user->id, $data->ibform);
             $std->interactions = self::map_assessment_order($ref, $selectedorder);
@@ -823,6 +828,20 @@ class reflectionexportermanager {
             $essayref = self::get_user_reflections($data->cid, $data->tokessay, $user->id, $data->ibform, true);
             $std->wordcount = count($essayref) > 0 ? ($essayref[count($essayref) - 1])->wordcount : '';
 
+
+            if (isset($data->collectteachercomment)) {
+                $comments = self::get_feedback_comments($assessids, $user->id);
+
+                if ($comments == '') {
+                    $nc = new stdClass();
+                    $nc->student = $user->firstname . ' ' . $user->lastname;
+                    $nocomments[] = $nc;
+                }
+
+                $std->teachercomments = $comments;
+
+            }
+
             if (count($std->interactions) < 3) {
                 $std->missing = self::get_missing_assignments($std->interactions, $selectedorder);
                 unset($std->interactions); // We dont need the reflection.
@@ -830,6 +849,7 @@ class reflectionexportermanager {
             } else {
                 $interactions[] = $std;
             }
+
         }
 
         if (count($interactions) == 0) {
@@ -843,6 +863,8 @@ class reflectionexportermanager {
             $dataobject->formname = $data->ibform;
             $dataobject->userid = $data->userid;
             $dataobject->timecreated = time();
+            $dataobject->getcomment = $data->collectteachercomment;
+            $dataobject->no_comments_json = json_encode($nocomments);
 
             $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
         }
@@ -855,13 +877,12 @@ class reflectionexportermanager {
      * with the interactions.
      */
     private static function get_feedback_comments($assesmentids, $studentid) {
-        
         global $DB;
 
         $sql = "SELECT ac.assignment, ac.commenttext
                 FROM {assignfeedback_comments} ac
                 JOIN {assign_grades} ag
-                ON ac.assignment = ag.assignment
+                ON ac.grade = ag.id
                 WHERE  ag.userid = ?
                 AND ac.assignment IN ($assesmentids);";
 
@@ -869,12 +890,10 @@ class reflectionexportermanager {
 
         $results = $DB->get_records_sql($sql, $paramsarray);
         $comments = '';
-        error_log(print_r($sql, true));
         foreach ($results as $comment) {
-            error_log(print_r($comment->commenttext, true));
+
             $comments .= self::escape_for_json(strip_tags(format_text(trim($comment->commenttext, chr(0xC2).chr(0xA0)), FORMAT_MOODLE)));
         }
-      
         return $comments;
 
     }
@@ -884,6 +903,6 @@ class reflectionexportermanager {
         $replacements = ["\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f"];
         return str_replace($escapers, $replacements, $value);
     }
-    
+
 }
 

@@ -77,8 +77,7 @@ $data->cmid = $cmid;
 $data->ibform = $ibform;
 $data->finished = $finished == '1' ? true : false;
 $data->withcomment = $withcomment;
-error_log(print_r("LOS DATOS QUE PASO AL RENDERER", true));
-error_log(print_r($data, true));
+
 if ($new == 0) {
     $data->pdfjson = json_encode(reflectionexportermanager::get_existing_proc($rid));
     $data->notprocess = count(json_decode(reflectionexportermanager::get_no_reflections_json($rid)));

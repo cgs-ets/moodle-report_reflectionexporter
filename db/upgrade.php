@@ -96,5 +96,20 @@ function xmldb_report_reflectionexporter_upgrade($oldversion=0) {
         upgrade_plugin_savepoint(true, 2024091300, 'report', 'reflectionexporter');
     }
 
+    if ($oldversion < 2025012200) {
+
+        // Define field pdfflaten to be added to report_reflec_exporter_pdf.
+        $table = new xmldb_table('report_reflec_exporter_pdf');
+        $field = new xmldb_field('pdfflaten', XMLDB_TYPE_INTEGER, '1', null, null, null, '0', 'status');
+
+        // Conditionally launch add field pdfflaten.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Reflectionexporter savepoint reached.
+        upgrade_plugin_savepoint(true, 2025012200, 'report', 'reflectionexporter');
+    }
+
 
 }

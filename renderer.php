@@ -79,7 +79,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['ibform'] = str_replace('_', '/', $dataobject->ibform);
 
 
-        foreach ($procs as $proc) { 
+        foreach ($procs as $proc) {
             $pr = new stdClass();
             $pr->datecreated = userdate($proc->timecreated, get_string('strftimedatefullshort', 'core_langconfig'));
 
@@ -87,7 +87,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
                 $pr->finished = 1;
                 $f = 1;
                 $pr->status = 'Finished';
-                $pr->title = 'Show';
+                $pr->title = 'View';
                 $pr->datajson = json_encode(reflectionexportermanager::get_existing_proc($proc->id));
 
             } else {
@@ -105,7 +105,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
 
             $missing = count(json_decode($proc->no_reflections_json)) > 0 ;
 
-            $params = array('cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'rid' => $proc->id, 'n' => 0, 'f' => $f, 'ibform' => $dataobject->ibform);
+            $params = array('cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'rid' => $proc->id, 'n' => 0, 'f' => $f, 'ibform' => $dataobject->ibform,'withcomment' => $proc->getcomment);
             $pr->actionurl = new moodle_url('/report/reflectionexporter/reflectionexporter_process.php', $params);
             $pr->deleteurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid]);
             $pr->downloadurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'd' => 1]);
@@ -113,9 +113,8 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
             $pr->exportsummary = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'exportsummary' => 1]);
             $pr->todelete = $proc->id;
             $pr->missing = $missing;
-
-
             $pr->rid = $proc->id;
+
             $data['processes'] [] = $pr;
         }
 
