@@ -34,4 +34,10 @@
         <version></version>
         <license>MIT</license>
     </library>
+    <library>
+        <location>amd/src/base64js.min.js</location>
+        <name>base64js.min.js</name>
+        <version></version>
+        <license>MIT</license>
+    </library>
 </libraries>

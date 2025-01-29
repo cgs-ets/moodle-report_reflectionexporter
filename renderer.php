@@ -71,6 +71,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data['deleteicon'] = new moodle_url('/report/reflectionexporter/pix/delete.png');
         $data['zipicon'] = new moodle_url('/report/reflectionexporter/pix/zip_2.png');
         $data['clipboardicon'] = new moodle_url('/report/reflectionexporter/pix/clipboard_2.png');
+        $data['summaryicon'] = new moodle_url('/report/reflectionexporter/pix/summary.png');
         $data['spreadsheeticon'] = new moodle_url('/report/reflectionexporter/pix/spreadsheet_2.png');
         $data['newproc'] = $dataobject->newproc;
         $procs = reflectionexportermanager::get_process($dataobject->ibform);
@@ -111,6 +112,7 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
             $pr->downloadurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'd' => 1]);
             $pr->exporturl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'export' => 1]);
             $pr->exportsummary = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'exportsummary' => 1]);
+            $pr->summaryurl = new moodle_url('/report/reflectionexporter/reflectionexporter_summary.php', ['id' => $dataobject->cid, 'cmid' => $dataobject->cmid, 'rid' => $proc->id, 'ibform' => $dataobject->ibform]);
             $pr->todelete = $proc->id;
             $pr->missing = $missing;
             $pr->rid = $proc->id;
@@ -146,6 +148,43 @@ class report_reflectionexporter_renderer extends plugin_renderer_base {
         $data->firstuserid = 0;
 
         echo $this->output->render_from_template('report_reflectionexporter/viewer', $data);
+    }
+
+    public function render_single_download($context) {
+
+        return $this->output->render_from_template('report_reflectionexporter/download_single', $context);
+    }
+
+    public function user_picture($user) {
+
+        return $this->output->user_picture($user);
+    }
+
+    public function style_submission_for_table_summary($text) {
+        $text = preg_replace('/[^A-Za-z0-9 ]/', '', $text); // Remove special characters
+
+        $wordlimit = 10; // Set the word limit
+        $shortened_text = $this->truncate_text_by_words($text, $wordlimit);
+        $html = \html_writer::tag('div', \html_writer::tag('p', $shortened_text), array('class' => 'no-overflow'));
+
+        $tooltip_html = \html_writer::tag('span', $shortened_text, [
+            'data-toggle' => 'tooltip',
+            'title' => $text, // Full text as the tooltip content
+            'style' => 'cursor: pointer;' // Add pointer cursor to indicate interactivity
+        ]);
+
+        return $tooltip_html;
+    }
+
+
+    // Custom function to truncate text by word limit, the one that comes with moodle isnt working for this case
+    private function truncate_text_by_words($text, $wordlimit) {
+        $words = explode(' ', $text);
+        if (count($words) > $wordlimit) {
+            $words = array_slice($words, 0, $wordlimit);
+            $text = implode(' ', $words);
+        }
+        return $text . '...';
     }
 
 }

@@ -58,7 +58,7 @@ trait save_pdfbase64 {
         );
 
         $json = reflectionexportermanager::save_pdfbase64($pdfs);
-        
+
         return array('savedrecords' => json_encode($json));
     }
 

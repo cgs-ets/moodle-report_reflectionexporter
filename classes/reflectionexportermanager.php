@@ -44,6 +44,7 @@ class reflectionexportermanager {
     const STARTED = 'S';
     const FINISHED = 'F';
     const PDF_COMPLETED = 'C'; // Completed. Cant edit anymore.
+    const PDF_NOT_COMPLETED = 'NC'; // Not Completed.
     const PDF_FLATTEN = 1; // Completed. Cant edit anymore.
 
     // Get the course's assessments that have submissions and the submission type is onlinetext.
@@ -171,10 +172,10 @@ class reflectionexportermanager {
             $data->refexid = $pdf->rid; // Id of mdl_report_reflectionexporter.
             $data->pdf = $pdf->pdf;
             $data->formname = $pdf->formname;
-            $data->status = strlen($coments[$pdf->uid]) > 0 ? 'C' : 'NC';
+            $data->status = strlen($comments[$pdf->uid]) > 0 ? self::PDF_COMPLETED : self::PDF_NOT_COMPLETED;
             $data->id = $DB->insert_record('report_reflec_exporter_pdf', $data, true);
             unset($data->pdf); // Dont send it back.
-            error_log(print_r($pdf, true));
+
             $data->teachercomments = $comments[$pdf->uid]; // send it back
             $dataobjects[] = $data;
         }
@@ -217,7 +218,7 @@ class reflectionexportermanager {
         $params = ['id' => $rid];
 
         $r = $DB->get_record_sql($sql, $params);
-        error_log(print_r($r, true));
+
         return $r;
     }
 
@@ -840,6 +841,8 @@ class reflectionexportermanager {
 
                 $std->teachercomments = $comments;
 
+            } else{
+
             }
 
             if (count($std->interactions) < 3) {
@@ -863,7 +866,14 @@ class reflectionexportermanager {
             $dataobject->formname = $data->ibform;
             $dataobject->userid = $data->userid;
             $dataobject->timecreated = time();
-            $dataobject->getcomment = $data->collectteachercomment;
+
+            if(isset($data->collectteachercomment)) {
+                $dataobject->status = self::FINISHED;
+                $dataobject->getcomment = $data->collectteachercomment;
+            } else {
+                $dataobject->status = self::STARTED;
+                $dataobject->getcomment = 0;
+            }
             $dataobject->no_comments_json = json_encode($nocomments);
 
             $rid = $DB->insert_record('report_reflectionexporter', $dataobject);
@@ -903,6 +913,70 @@ class reflectionexportermanager {
         $replacements = ["\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f"];
         return str_replace($escapers, $replacements, $value);
     }
+
+    public static function get_student_completed_form($recordid) {
+        global $DB;
+
+        $sql = "SELECT pdf FROM {report_reflec_exporter_pdf} WHERE id = ? ";
+        $params = ['id' => $recordid];
+
+        $result = $DB->get_record_sql($sql, $params);
+
+        return $result->pdf;
+    }
+
+    public static function get_student_reflection_data($userid, $reflections) {
+
+
+       $r =  array_filter($reflections, function($reflection) use ($userid) {
+
+        return $reflection->uid == $userid;
+        });
+
+
+        $result = [$userid => array_values($r)[0]];
+
+        return $result;
+
+
+    }
+
+    // I have to download the pdfs in a zip file otherwise the pdf is not  created correctly.
+    public static function download_single_file($pdfid, $studentid, $ibform) {
+        global $DB, $CFG;
+
+        $pdf = (self::get_pdfbase64($pdfid)->pdf);
+
+        $student = $DB->get_record("user", ["id" => $studentid]);
+        error_log(print_r($ibform, true));
+        // / Prepare Tmp File for Zip archive.
+        $file = tempnam($CFG->tempdir, '/reflections');
+        $zip = new ZipArchive();
+        $zip->open($file, ZipArchive::OVERWRITE);
+        $pdfname = $student->firstname . '_' . $student->lastname . '.pdf';
+        $zip->addFromString($pdfname, base64_decode($pdf));
+
+        $zip->close();
+        $foldername = date('Y') . '_' . $ibform .'_'. $student->firstname . '_' . $student->lastname  . '.zip';
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/zip');
+        header('Content-Length: ' . filesize($file));
+        header('Content-Disposition: attachment; filename=" ' . $foldername . '"');
+        header('Pragma: public');
+        readfile($file);
+        unlink($file);
+
+        die();
+
+    }
+
+    public static  function cleanSpecialCharacters($text) {
+        // Replace non-printable or special characters like non-breaking spaces (\u00a0)
+        $cleanText = preg_replace('/[\x00-\x1F\x7F\xA0]/u', ' ', $text); // Replace with normal spaces
+        return $cleanText;
+    }
+
+
 
 }
 

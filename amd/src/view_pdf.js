@@ -326,9 +326,10 @@ define([
           commentsupervisor = form.getField(
             ReHelper.get_tok_form_inputs().TEACHER_COMMENTS,
           );
-          var today = new Date();
-          const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
-          today = today.toLocaleString('en-GB', options);
+          // var today = new Date();
+          // const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+          // today = today.toLocaleString('en-GB', options);
+          const today = ReHelper.get_today_formatted();
           const commentdate1 = form.getField(
             ReHelper.get_tok_form_inputs().COMPLETED_DECLARATION_DATE1,
           );

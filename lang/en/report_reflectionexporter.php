@@ -71,15 +71,13 @@ $string['delete']                           = 'Delete';
 $string['student']                          = 'Student';
 $string['ibcode']                           = 'IB Code';
 $string['missingactivities']                = 'Missing activitie(s)';
-$string['summary']                          = 'Summary';
 $string['ommitedstudents']                  = 'Omitted students';
 $string['downloadforms']                    = 'Downloads all the completed forms';
 $string['downloadspreadsheets']             = 'Downloads prescribed title and word count';
 $string['downloadsummary']                  = 'Download Missing Activities Summary';
 $string['extendedessayheader']              = 'Extended essay missing activities';
 $string['summaryzipname']                   = 'SummaryOfMissingActivities';
-
-// TOK Form
+$string['summary']                         = 'Summary';
 $string['tkattachment_filemanager']         = 'TK/PPF Form File';
 $string['tokattachment_filemanager_help']   = 'File where the interactions will be exported to.';
 $string['teachersname']                     = 'Teacher\'s name';
@@ -120,3 +118,4 @@ $string['commentwarning']                   = 'Your comment cannot be longer tha
 $string['collectteachercomment']            = 'Get teacher\'s comment from comment feedback';
 $string['collectteachercomment_help']       = 'If selected, the comment field in the IB forms will be populated with the comments from the teacher in the feedback comment section';
 $string['completed']                        = 'The form has been completed; however, you may edit the supervisor\'s comments if necessary.';
+$string['reflectionexporter_summary']       = '{$a} Summary';

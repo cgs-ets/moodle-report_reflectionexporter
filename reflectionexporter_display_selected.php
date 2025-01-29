@@ -33,6 +33,7 @@ require_once('reflectionexporter_form.php');
 $id                      = optional_param('id', 0, PARAM_INT); // Course ID.
 $cmid                    = optional_param('cmid', 0, PARAM_INT); // Course module ID.
 $form                    = required_param('ibform', PARAM_RAW); // IB form value from the selector.
+$fromsummary             = optional_param('fs', 0, PARAM_INT); // From summary.
 
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
@@ -52,10 +53,13 @@ $PAGE->add_body_classes(['report_reflectionexporter', 'limitedwidth']);
 $PAGE->set_title(get_string('heading', 'report_reflectionexporter'));
 $PAGE->set_heading(format_string($course->fullname, true, array('context' => $context)));
 
-$form = explode('_', $form);
-$form = $form[count($form) - 1];
+if($fromsummary  == 0)  {
+    $form = explode('_', $form);
+    $form = $form[count($form) - 1];
+    $form = IB_FORM_NAME[$form];
+}
 
-$heading = get_string('heading', 'report_reflectionexporter') . "- $form";
+$heading = get_string('heading', 'report_reflectionexporter') . " $form";
 
 $PAGE->set_heading($heading);
 
@@ -63,7 +67,7 @@ echo $OUTPUT->header();
 
 $viewmanager = new reflectionexporterviewmanager($id, $cmid);
 
-$form = IB_FORM_NAME[$form];
+
 switch ($form) {
     case 'EE_RPPF':
         $viewmanager->display_extended_essay_view($form);

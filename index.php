@@ -39,6 +39,10 @@ $download                = optional_param('d', 0, PARAM_INT); // Download the zi
 $datajson                = optional_param('datajson', 0, PARAM_RAW); // JSON with the information needed to display PDF.
 $export                  = optional_param('export', 0, PARAM_INT); // Download an excel file.
 $exportsummary           = optional_param('exportsummary', 0, PARAM_INT); // Download an excel file.
+$singledownload          = optional_param('sd', 0, PARAM_INT); // Download  one file.
+$pdfid                   = optional_param('pdfid', 0, PARAM_INT); // Download  one file.
+$studentid               = optional_param('stid', 0, PARAM_INT); // Download  one file.
+$ibform                  = optional_param('ibform', '_', PARAM_TEXT); // Download  one file.
 
 if (!$course = $DB->get_record('course', array('id' => $id))) {
     throw new moodle_exception('invalidcourse');
@@ -67,6 +71,10 @@ if ($export) {
 
 if ($exportsummary) {
     reflectionexportermanager::generate_summary_spreadsheet($rid, $context, $course,  get_string('summaryzipname', 'report_reflectionexporter'));
+}
+
+if ($singledownload) {
+    reflectionexportermanager::download_single_file($pdfid, $studentid, $ibform);
 }
 
 echo $OUTPUT->header();

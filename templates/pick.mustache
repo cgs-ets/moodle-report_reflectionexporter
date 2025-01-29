@@ -45,6 +45,7 @@
             {{#istok}}
                 <th>{{#str}}spswc, report_reflectionexporter{{/str}}</th>
             {{/istok}}
+            <th>{{#str}}summary, report_reflectionexporter{{/str}}</th>
             <th>{{#str}}delete, report_reflectionexporter{{/str}}</th>
         </tr>
     </thead>
@@ -76,7 +77,7 @@
                     </button>
                 </form>
             </td>
-          
+
             {{#istok}}
                 <td>
                     <form id ="exportform" method = "post" action = "{{{exporturl}}}"  class = 'reflection-exporter-forms-selected' >
@@ -87,6 +88,12 @@
                     </form>
                 </td>
             {{/istok}}
+
+            <td>
+                <a type="button" class="btn " href = "{{{summaryurl}}}" title = 'Summary' >
+                    <img class="icon reflection-exporter-action-btn" alt="" aria-hidden="true" src="{{{summaryicon}}}" />
+                </a>
+            </td>
 
             <td>
                 <a type="button" class="btn " title = 'Delete' >

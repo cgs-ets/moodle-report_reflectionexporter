@@ -128,5 +128,13 @@ define(['core/templates'], function (Templates) {
         .getAttribute('data-withcomment');
       return hascomments == 1;
     },
+
+    get_today_formatted: function () {
+      var today = new Date();
+      const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+      today = today.toLocaleString('en-GB', options);
+
+      return today;
+    },
   };
 });
