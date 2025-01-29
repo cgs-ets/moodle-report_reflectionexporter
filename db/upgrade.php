@@ -106,7 +106,6 @@ function xmldb_report_reflectionexporter_upgrade($oldversion=0) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-error_log(print_r("??????????????EY", true));
         // Reflectionexporter savepoint reached.
         upgrade_plugin_savepoint(true, 2025012200, 'report', 'reflectionexporter');
     }

@@ -301,9 +301,9 @@ class reflectionexporterviewmanager {
                 $link = $renderer->render_single_download($context);
 
 
-                $ref1 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($refdata->interactions[0])->onlinetext));
-                $ref2 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($refdata->interactions[1])->onlinetext));
-                $ref3 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($refdata->interactions[2])->onlinetext));
+                $ref1 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($refdata->reflections[0])->onlinetext));
+                $ref2 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($refdata->reflections[1])->onlinetext));
+                $ref3 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($refdata->reflections[2])->onlinetext));
                 $teachercomment = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters($refdata->teachercomments));
 
 
