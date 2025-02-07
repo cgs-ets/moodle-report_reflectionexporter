@@ -54,7 +54,7 @@ $context = context_course::instance($course->id);
 
 require_capability('report/reflectionexporter:grade', $context);
 
-$context = context_course::instance($course->id);
+
 $PAGE->set_context($context);
 $PAGE->set_url('/report/reflectionexporter/index.php', ['cid' => $id, 'cmid' => $cmid]);
 $PAGE->add_body_classes(['report_reflectionexporter', 'limitedwidth']);

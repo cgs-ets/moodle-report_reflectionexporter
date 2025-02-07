@@ -782,8 +782,7 @@ class reflectionexportermanager {
      *  Get the feedback(s) comment given in the 3 assessments.
      *
      */
-    // TODO: Add the date in the declaration area when collected comments
-    // TODO: When comments collected, set the option to download all at the begining.
+
     public static function process_tok_form($fromform, $id, $cmid) {
         $rid = self::collect_and_save_interactions($fromform, $id);
         if ($rid == 0) { // No students interactions found with the data provided.
@@ -797,11 +796,12 @@ class reflectionexportermanager {
     }
 
     private static function collect_and_save_interactions($data, $courseid) {
+        // var_dump($courseid); exit;
         global $DB, $CFG;
         $interactions   = [];
         $nointeractions = [];
         $selectedorder  = [$data->interaction1, $data->interaction2, $data->interaction3];
-        $users          =  groups_get_members($data->groupsallocated);//self::get_active_users($courseid);
+        $users          =  self::filter_teachers_in_group(groups_get_members($data->groupsallocated), $courseid);//self::get_active_users($courseid);
         $userids        = implode(',', array_keys($users));
         $titles         = self::get_tok_prescribed_title($courseid, $userids, $data->titlechoiceid);
 
@@ -880,6 +880,27 @@ class reflectionexportermanager {
         }
 
         return $rid;
+    }
+
+    private static function filter_teachers_in_group($users, $courseid){
+        $students = array_filter($users, function($user) use ($courseid) {
+            // Get the roles assigned to the user
+
+            $context = \context_course::instance($courseid);
+            $roles = get_user_roles($context, $user->id);
+
+            // Check if any role is a teacher
+            foreach ($roles as $role) {
+                if ($role->shortname === 'student') {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        return $students;
+
+
     }
 
     /**
