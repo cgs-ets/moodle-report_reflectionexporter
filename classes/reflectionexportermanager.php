@@ -47,16 +47,21 @@ class reflectionexportermanager {
     const PDF_NOT_COMPLETED = 'NC'; // Not Completed.
     const PDF_FLATTEN = 1; // Completed. Cant edit anymore.
 
-    // Get the course's assessments that have submissions and the submission type is onlinetext.
+    // Get the course's assessments that have submissions and the submission type is onlinetext or plaintext.
     public static function get_submitted_assessments($courseid) {
         global $DB;
 
-        $sql = "SELECT distinct assign.id, assign.name AS 'assignmentname'
-                FROM {assign} as assign
-                JOIN {assign_submission} as asub
-                ON assign.id = asub.assignment
-                JOIN {assignsubmission_onlinetext} as onlinetxt ON assign.id = onlinetxt.assignment
-                WHERE assign.course = ? AND asub.status = ?";
+        $sql = "SELECT DISTINCT assign.id, assign.name AS assignmentname
+                FROM {assign} AS assign
+                JOIN {assign_submission} AS asub
+                    ON assign.id = asub.assignment
+                LEFT JOIN {assignsubmission_onlinetext} AS onlinetxt
+                    ON assign.id = onlinetxt.assignment
+                LEFT JOIN {assignsubmission_plaintext} AS plaintext
+                    ON assign.id = plaintext.assignment
+                WHERE assign.course = ?
+                AND asub.status = ?
+                AND (onlinetxt.assignment IS NOT NULL OR plaintext.assignment IS NOT NULL)";
 
         $params = ['course' => $courseid, 'status' => 'submitted'];
 
@@ -69,27 +74,45 @@ class reflectionexportermanager {
     public static function get_user_reflections($courseid, $assessids, $userid, $ibform, $wc = false) {
         global $DB;
 
-        $sql = "SELECT onlinetxt.*, asub.timemodified AS 'month', asub.userid
-                FROM {assignsubmission_onlinetext} AS onlinetxt
-                JOIN {assign_submission} AS asub
-                ON onlinetxt.submission = asub.id
-                WHERE asub.status = ?
-                AND asub.assignment IN ($assessids)
-                AND asub.userid = ?;";
+        $sql = "SELECT CONCAT(submission_type, '_', id) as unique_id, id, assignment, submission, onlinetext, month, userid, submission_type
+                FROM (
+                    SELECT onlinetxt.id, onlinetxt.assignment, onlinetxt.submission, onlinetxt.onlinetext,
+                           asub.timemodified AS 'month', asub.userid, 'onlinetext' AS submission_type
+                    FROM {assignsubmission_onlinetext} AS onlinetxt
+                    JOIN {assign_submission} AS asub
+                    ON onlinetxt.submission = asub.id
+                    WHERE asub.status = ?
+                    AND asub.assignment IN ($assessids)
+                    AND asub.userid = ?
+                    UNION
+                    SELECT plaintxt.id, plaintxt.assignment, plaintxt.submission, plaintxt.plaintext AS onlinetext,
+                           asub.timemodified AS 'month', asub.userid, 'plaintext' AS submission_type
+                    FROM {assignsubmission_plaintext} AS plaintxt
+                    JOIN {assign_submission} AS asub
+                    ON plaintxt.submission = asub.id
+                    WHERE asub.status = ?
+                    AND asub.assignment IN ($assessids)
+                    AND asub.userid = ?
+                ) AS combined_results";
 
-        $params = ['status' => 'submitted', 'userid' => $userid];
+        $params = ['submitted', $userid, 'submitted', $userid];
         $results = $DB->get_records_sql($sql, $params);
         $context = $context = context_course::instance($courseid);
         // Format has to me FORMAT_MOODLE otherwise the text might be too long and wont be display propery.
         // If the student added images, process the URL to avoid warning.
         // The image wont be seen in the PDF.
         foreach ($results as $r) {
-            $onlinetext = file_rewrite_pluginfile_urls($r->onlinetext,
-                                    'pluginfile.php',
-                                    $context->id,
-                                    'assignsubmission_onlinetext',
-                                    'submissions_onlinetext',
-                                    $r->id);
+            if ($r->submission_type == 'onlinetext') {
+                $onlinetext = file_rewrite_pluginfile_urls($r->onlinetext,
+                                        'pluginfile.php',
+                                        $context->id,
+                                        'assignsubmission_onlinetext',
+                                        'submissions_onlinetext',
+                                        $r->id);
+            } else {
+                // For plaintext submissions, no file rewriting needed
+                $onlinetext = $r->onlinetext;
+            }
 
             $r->onlinetext = json_encode(strip_tags(format_text($onlinetext, FORMAT_MOODLE)), JSON_HEX_QUOT | JSON_HEX_TAG);
             // Depending on the form the date has different format.
@@ -118,6 +141,7 @@ class reflectionexportermanager {
         $params = ['id' => $rid];
 
         $result = $DB->get_record_sql($sql, $params);
+
 
         return $result;
     }
@@ -955,6 +979,9 @@ class reflectionexportermanager {
         });
 
 
+        // echo '<pre>';
+        // print_r($r);
+        // echo '</pre>'; exit;
         $result = [$userid => array_values($r)[0]];
 
         return $result;

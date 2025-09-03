@@ -40,5 +40,6 @@ class api extends external_api {
     use get_pdfbase64;
     use delete_process;
     use get_ommited;
+    use download_single;
 
 }

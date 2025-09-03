@@ -168,9 +168,10 @@ class reflectionexporterviewmanager {
         $ufields = \core_user\fields::for_name()->with_userpic()->get_required_fields();
         $ufields[0] = 'u.id';
         $ufields = implode(', ', $ufields);
-        reflectionexportermanager::get_reflections_json($recordid);
+        // reflectionexportermanager::get_reflections_json($recordid);
 
         $ref = (reflectionexportermanager::get_reflections_json($recordid))->reflections_json;
+
 
         $ref = json_decode( $ref);
 
@@ -198,6 +199,7 @@ class reflectionexporterviewmanager {
 
                 $studentreflections = reflectionexportermanager::get_student_reflection_data($process->id, $ref);
                 $refdata =  $studentreflections[$process->id];
+
                 $picture = $renderer->user_picture($process);
                 $fullname = $process->firstname . ' ' . $process->lastname;
                 $pdfname = $process->lastname .'_' . $process->firstname . '_reflection';
@@ -209,9 +211,11 @@ class reflectionexporterviewmanager {
                 $context->actionurl = new moodle_url('/report/reflectionexporter/index.php', ['cid' => $this->id, 'cmid' => $this->cmid, 'pdfid' => $process->pdfid, 'stid' => $process->id, 'sd' => 1, 'ibform' => $ibform]);
                 $link = $renderer->render_single_download($context);
 
-                $inter1 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($refdata->interactions[0])->onlinetext));
-                $inter2 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($refdata->interactions[1])->onlinetext));
-                $inter3 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($refdata->interactions[2])->onlinetext));
+                $interactions = (array) $refdata->interactions;
+
+                $inter1 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($interactions[0])->onlinetext));
+                $inter2 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($interactions[1])->onlinetext));
+                $inter3 = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters(($interactions[2])->onlinetext));
                 $teachercomment = $renderer->style_submission_for_table_summary (reflectionexportermanager::cleanSpecialCharacters($refdata->teachercomments));
 
                 $table->add_data([$picture,
