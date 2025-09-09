@@ -246,7 +246,7 @@ class reflectionexportermanager {
         return $r;
     }
 
-    public static function generate_zip($data) {
+   public static function generate_zip($data) {
         global $DB, $CFG;
         $data = json_decode($data);
 
@@ -260,28 +260,69 @@ class reflectionexportermanager {
         $courseid   = array_column($data, 'refexid');  // Id from mdl_report_reflectionexporter.
         $courseid   = $courseid[count($courseid) - 1];
 
-        $sql = "SELECT  exp.*, u.lastname, u.firstname
-                FROM mdl_user as u
-                INNER JOIN mdl_report_reflec_exporter_pdf exp
-                ON u.id = exp.userid
-                WHERE u.id in ($userids) AND exp.id in ($exportids ) AND exp.refexid = $refexpids";
-
-        $results = $DB->get_records_sql($sql);
-
+        // Get total count first
+        $countsql = "SELECT COUNT(*) as total
+                     FROM mdl_user as u
+                     INNER JOIN mdl_report_reflec_exporter_pdf exp
+                     ON u.id = exp.userid
+                     WHERE u.id in ($userids) AND exp.id in ($exportids ) AND exp.refexid = $refexpids";
+        
+        $totalcount = $DB->get_record_sql($countsql)->total;
+        
         // Prepare Tmp File for Zip archive.
         $file = tempnam($CFG->tempdir, '/reflections');
         $zip = new ZipArchive();
         $zip->open($file, ZipArchive::OVERWRITE);
 
-        foreach ($results as $result) {
-            // Collect the pdfs.
-            $filename = strtoupper($result->lastname) . '_' . $result->firstname . '_' .$result->formname .'.pdf';
-            $zip->addFromString($filename, base64_decode($result->pdf));
+        // Process in batches to avoid memory issues
+        $batchsize = 20; // Process 20 records at a time
+        $offset = 0;
+        $formname = '';
+
+        while ($offset < $totalcount) {
+            $sql = "SELECT  exp.*, u.lastname, u.firstname
+                    FROM mdl_user as u
+                    INNER JOIN mdl_report_reflec_exporter_pdf exp
+                    ON u.id = exp.userid
+                    WHERE u.id in ($userids) AND exp.id in ($exportids ) AND exp.refexid = $refexpids
+                    ORDER BY exp.id
+                    OFFSET $offset ROWS
+                    FETCH NEXT $batchsize ROWS ONLY";
+
+            $results = $DB->get_records_sql($sql);
+            
+            if (empty($results)) {
+                break;
+            }
+
+            foreach ($results as $result) {
+                // Collect the pdfs.
+                $filename = strtoupper($result->lastname) . '_' . $result->firstname . '_' .$result->formname .'.pdf';
+                $zip->addFromString($filename, base64_decode($result->pdf));
+                
+                // Store formname for zip filename
+                if (empty($formname)) {
+                    $formname = $result->formname;
+                }
+                
+                // Free memory after processing each PDF
+                unset($result->pdf);
+            }
+            
+            // Free batch memory
+            unset($results);
+            
+            // Force garbage collection to free memory
+            if (function_exists('gc_collect_cycles')) {
+                gc_collect_cycles();
+            }
+            
+            $offset += $batchsize;
         }
 
         // Close and send to users.
         $zip->close();
-        $foldername = date('Y') . '_' .$result->formname . '.zip';
+        $foldername = date('Y') . '_' . $formname . '.zip';
         header('Content-Description: File Transfer');
         header('Content-Type: application/zip');
         header('Content-Length: ' . filesize($file));
