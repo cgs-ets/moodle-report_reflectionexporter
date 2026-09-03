@@ -80,8 +80,10 @@ $data->withcomment = $withcomment;
 
 if ($new == 0) {
     $data->pdfjson = json_encode(reflectionexportermanager::get_existing_proc($rid));
-    $data->notprocess = count(json_decode(reflectionexportermanager::get_no_reflections_json($rid)));
-    $data->nocomments = count(json_decode(reflectionexportermanager::get_no_comments_json($rid)));
+    $norefjson = reflectionexportermanager::get_no_reflections_json($rid);
+    $data->notprocess = $norefjson ? count(json_decode($norefjson)) : 0;
+    $nocomjson = json_decode(reflectionexportermanager::get_no_comments_json($rid));
+    $data->nocomments = $nocomjson ? count($nocomjson) : 0;
 }
 
 $renderer = $PAGE->get_renderer('report_reflectionexporter');
