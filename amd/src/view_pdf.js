@@ -29,7 +29,8 @@ define([
   'core/templates',
   'core/ajax',
   'core/url',
-], function (PDFJSLIB, PDFLib, Fontkit, ReHelper, Templates, Ajax, url) {
+  'jquery'
+], function (PDFJSLIB, PDFLib, Fontkit, ReHelper, Templates, Ajax, url, $) {
   'use strict';
 
   var ViewPDF = function () {
