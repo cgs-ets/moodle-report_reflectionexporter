@@ -26,16 +26,15 @@ define([
     "report_reflectionexporter/pdf-lib",
     'core/templates',
     'core/ajax',
-    'core/url'
-], function (PDFJSLIB, PDFLib, Templates, Ajax, url) {
+    'core/url',
+    'jquery'
+], function(PDFJSLIB, PDFLib, Templates, Ajax, url, $) {
     "use strict";
 
     var ViewPDF = function () {
 
         $(document).on('user-changed', this._init.bind(this));
-
-
-    }
+    };
 
     ViewPDF.prototype._init = function () {
         var self = this;
